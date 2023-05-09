@@ -71,5 +71,34 @@ export default [
     status: 'completed',
     statusType: 'success',
     completion: 100
-  }
+  },
+  {
+    img: 'img/theme/vue.jpg',
+    title: 'Vue Paper UI Kit PRO',
+    budget: '$2200 USD',
+    status: 'completed',
+    statusType: 'success',
+    completion: 100
+  }, {
+    img: 'img/theme/vue.jpg',
+    title: 'Vue Paper UI Kit PRO',
+    budget: '$2200 USD',
+    status: 'completed',
+    statusType: 'success',
+    completion: 100
+  }, {
+    img: 'img/theme/vue.jpg',
+    title: 'Vue Paper UI Kit PRO',
+    budget: '$2200 USD',
+    status: 'completed',
+    statusType: 'success',
+    completion: 100
+  }, {
+    img: 'img/theme/vue.jpg',
+    title: 'Vue Paper UI Kit PRO',
+    budget: '$2200 USD',
+    status: 'completed',
+    statusType: 'success',
+    completion: 100
+  },
 ]

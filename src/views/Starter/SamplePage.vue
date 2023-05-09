@@ -1,6 +1,6 @@
 <template>
   <div>
-    <base-header class="pb-6">
+    <!-- <base-header class="pb-6">
       <b-row align-v="center" class="py-4">
         <b-col lg="6" cols="7">
           <h6 class="h2 text-white d-inline-block mb-0">Default</h6>
@@ -13,7 +13,6 @@
           <base-button size="sm" type="neutral">Filters</base-button>
         </b-col>
       </b-row>
-      <!-- Card stats -->
       <b-row >
         <b-col xl="3" md="6" >
           <stats-card title="Total traffic"
@@ -65,7 +64,7 @@
           </stats-card>
         </b-col>
       </b-row>
-    </base-header>
+    </base-header> -->
     <b-container fluid class="mt--6">
       <b-row class="starter-page">
         Sample page

@@ -1,9 +1,9 @@
 <template>
   <div>
        <!-- BootstrapVue Done -->
-    <base-header class="pb-6 pb-8 pt-5 pt-md-8 bg-gradient-success">
-      <!-- Card stats -->
-      <b-row>
+    <!-- <base-header class="pb-6 pb-8 pt-5 pt-md-8 bg-gradient-success">
+       Card stats -->
+      <!-- <b-row>
         <b-col xl="3" md="6">
           <stats-card title="Total traffic"
                       type="gradient-red"
@@ -58,9 +58,9 @@
           </stats-card>
         </b-col>
       </b-row>
-    </base-header>
+    </base-header> --> 
 
-    <b-container fluid class="mt--7">
+    <b-container fluid >
       <b-row class="justify-content-center">
         <b-col lg="12">
           <card header-classes="bg-transparent">

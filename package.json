@@ -7,6 +7,23 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "dev": "npm run serve",
+    "lint:scss": "stylelint 'src/**/*.scss' --syntax scss",
+    "lint:scss:fix": "stylelint 'src/**/*.scss' --syntax scss --fix",
+    "lint:js": "eslint . --ext .js,.jsx",
+    "lint:js:fix": "npm run lint:js -- --fix"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx}": [
+      "eslint . --fix", "git add"
+    ],
+    "src/**/*.scss": [
+      "stylelint --syntax scss --fix", "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "dependencies": {
     "axios": "^1.4.0",
@@ -41,9 +58,9 @@
     "@vue/cli-service": "^3.7.0",
     "@vue/eslint-config-prettier": "^4.0.1",
     "babel-plugin-component": "^1.1.0",
-    "husky": "^4.3.8",
+    "husky": "^8.0.3",
     "lint-staged": "^13.2.2",
-    "sass-loader": "^7.1.0",
+    "prettier": "^2.2.1",
     "vue-template-compiler": "^2.6.11"
   },
   "postcss": {

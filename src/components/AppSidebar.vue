@@ -11,8 +11,8 @@
         })
     "
   >
-    <CSidebarBrand>
-      <CIcon
+    <CSidebarBrand class="d-md-flex justify-content-start">
+      <!-- <CIcon
         custom-class-name="sidebar-brand-full"
         :icon="logoNegative"
         :height="35"
@@ -21,7 +21,9 @@
         custom-class-name="sidebar-brand-narrow"
         :icon="sygnet"
         :height="35"
-      />
+      /> -->
+      <CImage class="m-2" src="favicon.png" fluid width="40"></CImage>
+      <h5>Tickets</h5>
     </CSidebarBrand>
     <AppSidebarNav />
     <CSidebarToggler

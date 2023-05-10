@@ -2,11 +2,14 @@
 node_modules/
 dist/
 .cache/
+test/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 test/unit/coverage
 *.env
+**/*/test.js
+
 
 # Editor directories and files
 .idea

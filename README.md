@@ -1,0 +1,13 @@
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=bugs)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=huebnermarketing_Ticket-Management-Frontend&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=huebnermarketing_Ticket-Management-Frontend)

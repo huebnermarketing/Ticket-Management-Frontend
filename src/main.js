@@ -1,16 +1,19 @@
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+import store from './store'
 
-import Vue from 'vue';
-import DashboardPlugin from './plugins/dashboard-plugin';
-import App from './App.vue';
+import CoreuiVue from '@coreui/vue'
+import CIcon from '@coreui/icons-vue'
+import { iconsSet as icons } from '@/assets/icons'
+import DocsExample from '@/components/DocsExample'
 
-// router setup
-import router from './routes/router';
-// plugin setup
-Vue.use(DashboardPlugin);
+const app = createApp(App)
+app.use(store)
+app.use(router)
+app.use(CoreuiVue)
+app.provide('icons', icons)
+app.component('CIcon', CIcon)
+app.component('DocsExample', DocsExample)
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  render: h => h(App),
-  router
-});
+app.mount('#app')

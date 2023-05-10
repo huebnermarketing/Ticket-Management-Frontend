@@ -11,23 +11,26 @@
         })
     "
   >
-    <CSidebarBrand>
-      <CIcon
-        custom-class-name="sidebar-brand-full"
-        :icon="logoNegative"
-        :height="35"
+    <div class="d-flex bg-black">
+      <CSidebarBrand>
+        <CIcon
+          custom-class-name="sidebar-brand-full"
+          :icon="logoNegative"
+          :height="35"
+        />
+        <CIcon
+          custom-class-name="sidebar-brand-narrow"
+          :icon="sygnet"
+          :height="35"
+        />
+      </CSidebarBrand>
+      <CSidebarToggler
+        class="d-none d-lg-flex"
+        style="margin-left: auto"
+        @click="$store.commit('toggleUnfoldable')"
       />
-      <CIcon
-        custom-class-name="sidebar-brand-narrow"
-        :icon="sygnet"
-        :height="35"
-      />
-    </CSidebarBrand>
+    </div>
     <AppSidebarNav />
-    <CSidebarToggler
-      class="d-none d-lg-flex"
-      @click="$store.commit('toggleUnfoldable')"
-    />
   </CSidebar>
 </template>
 

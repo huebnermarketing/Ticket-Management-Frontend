@@ -1,7 +1,7 @@
 <template>
   <CFooter>
     <div>
-      <a href="https://coreui.io" target="_blank">CoreUI</a>
+      <a href="https://coreui.io" target="_blank" rel="noopener">CoreUI</a>
       <span class="ms-1"
         >&copy; {{ new Date().getFullYear() }} creativeLabs.</span
       >

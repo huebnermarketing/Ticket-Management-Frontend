@@ -1,16 +1,6 @@
 {
-  "name": "@coreui/coreui-free-vue-admin-template",
-  "version": "4.2.0",
-  "description": "CoreUI Free Vue Admin Template",
-  "bugs": {
-    "url": "https://github.com/coreui/coreui-free-vue-admin-template/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:coreui/coreui-free-vue-admin-template.git"
-  },
-  "license": "MIT",
-  "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
+  "name": "ticket-management-frontend",
+  "version": "0.0.1",
   "scripts": {
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",

@@ -10,8 +10,8 @@ import facebook from '@/assets/images/svgs/facebook-icon.svg';
 const checkbox = ref(false);
 const valid = ref(false);
 const show1 = ref(false);
-const password = ref('admin123');
-const username = ref('info@wrappixel.com');
+const password = ref('');
+const username = ref('');
 const passwordRules = ref([
     (v) => !!v || 'Password is required',
     (v) => (v && v.length <= 10) || 'Password must be less than 10 characters'
@@ -46,7 +46,7 @@ function validate(values, { setErrors }) {
     </div>
     <Form @submit="validate" v-slot="{ errors, isSubmitting }" class="mt-5">
         <v-label class="text-subtitle-1 font-weight-semibold pb-2 text-lightText">Username</v-label>
-        <VTextField v-model="username" :rules="emailRules" class="mb-8" required hide-details="auto"></VTextField>
+        <VTextField v-model="username" placeholder="email@domain.com" :rules="emailRules" class="mb-8" required hide-details="auto"></VTextField>
         <v-label class="text-subtitle-1 font-weight-semibold pb-2 text-lightText">Password</v-label>
         <VTextField v-model="password" :rules="passwordRules" required hide-details="auto" type="password" class="pwdInput"></VTextField>
         <div class="d-flex flex-wrap align-center my-3 ml-n2">

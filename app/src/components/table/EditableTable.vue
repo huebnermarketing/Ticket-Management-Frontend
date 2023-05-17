@@ -1,98 +1,19 @@
-<script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useContactStore } from '@/stores/apps/contact';
-
-import contact from '@/_mockApis/apps/contact';
-
-const store = useContactStore();
-
-onMounted(() => {
-    store.fetchContacts();
-});
-const getContacts = computed(() => {
-    return store.contacts;
-});
-
-const valid = ref(true);
-const dialog = ref(false);
-const search = ref('');
-const rolesbg = ref(['primary', 'secondary', 'error', 'success', 'warning']);
-const desserts = ref(contact);
-const editedIndex = ref(-1);
-const editedItem = ref({
-    id: '',
-    avatar: '1.jpg',
-    userinfo: '',
-    usermail: '',
-    phone: '',
-    jdate: '',
-    role: '',
-    rolestatus: ''
-});
-const defaultItem = ref({
-    id: '',
-    avatar: '1.jpg',
-    userinfo: '',
-    usermail: '',
-    phone: '',
-    jdate: '',
-    role: '',
-    rolestatus: ''
-});
-
-//Methods
-const filteredList = computed(() => {
-    return desserts.value.filter((user) => {
-        return user.userinfo.toLowerCase().includes(search.value.toLowerCase());
-    });
-});
-
-function editItem(item) {
-    editedIndex.value = desserts.value.indexOf(item);
-    editedItem.value = Object.assign({}, item);
-    dialog.value = true;
-}
-function deleteItem(item) {
-    const index = desserts.value.indexOf(item);
-    confirm('Are you sure you want to delete this item?') && desserts.value.splice(index, 1);
-}
-
-function close() {
-    dialog.value = false;
-    setTimeout(() => {
-        editedItem.value = Object.assign({}, defaultItem.value);
-        editedIndex.value = -1;
-    }, 300);
-}
-function save() {
-    if (editedIndex.value > -1) {
-        Object.assign(desserts.value[editedIndex.value], editedItem.value);
-    } else {
-        desserts.value.push(editedItem.value);
-    }
-    close();
-}
-
-//Computed Property
-const formTitle = computed(() => {
-    return editedIndex.value === -1 ? 'New Contact' : 'Edit Contact';
-});
-</script>
 <template>
     <v-row>
         <v-col cols="12" lg="4" md="6">
-            <v-text-field density="compact" v-model="search" label="Search Contacts" hide-details variant="outlined"></v-text-field>
+            <v-text-field density="compact" v-model="search" label="Search" hide-details variant="outlined"></v-text-field>
         </v-col>
         <v-col cols="12" lg="8" md="6" class="text-right">
             <v-dialog v-model="dialog" max-width="500">
                 <template v-slot:activator="{ props }">
                     <v-btn color="primary" v-bind="props" flat class="ml-auto">
-                        <v-icon class="mr-2">mdi-account-multiple-plus</v-icon>Add Contact
+                        <v-icon class="mr-2">{{ userDetails.addIcon }}</v-icon
+                        >{{ userDetails.addButton }}
                     </v-btn>
                 </template>
                 <v-card>
                     <v-card-title class="pa-4 bg-secondary">
-                        <span class="title text-white">{{ formTitle }}</span>
+                        <span class="title text-red">{{ formTitle }}</span>
                     </v-card-title>
 
                     <v-card-text>
@@ -219,3 +140,91 @@ const formTitle = computed(() => {
         </tbody>
     </v-table>
 </template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useContactStore } from '@/stores/apps/contact';
+
+import contact from '@/_mockApis/apps/contact';
+
+const store = useContactStore();
+
+const tableProps = defineProps({
+    userDetails: Object,
+    title: String,
+    breadcrumbs: Array,
+    icon: String
+});
+
+onMounted(() => {
+    store.fetchContacts();
+});
+const getContacts = computed(() => {
+    return store.contacts;
+});
+
+const valid = ref(true);
+const dialog = ref(false);
+const search = ref('');
+const rolesbg = ref(['primary', 'secondary', 'error', 'success', 'warning']);
+const desserts = ref(contact);
+const editedIndex = ref(-1);
+const editedItem = ref({
+    id: '',
+    avatar: '1.jpg',
+    userinfo: '',
+    usermail: '',
+    phone: '',
+    jdate: '',
+    role: '',
+    rolestatus: ''
+});
+const defaultItem = ref({
+    id: '',
+    avatar: '1.jpg',
+    userinfo: '',
+    usermail: '',
+    phone: '',
+    jdate: '',
+    role: '',
+    rolestatus: ''
+});
+
+//Methods
+const filteredList = computed(() => {
+    return desserts.value.filter((user) => {
+        return user.userinfo.toLowerCase().includes(search.value.toLowerCase());
+    });
+});
+
+function editItem(item) {
+    editedIndex.value = desserts.value.indexOf(item);
+    editedItem.value = Object.assign({}, item);
+    dialog.value = true;
+}
+function deleteItem(item) {
+    const index = desserts.value.indexOf(item);
+    confirm('Are you sure you want to delete this item?') && desserts.value.splice(index, 1);
+}
+
+function close() {
+    dialog.value = false;
+    setTimeout(() => {
+        editedItem.value = Object.assign({}, defaultItem.value);
+        editedIndex.value = -1;
+    }, 300);
+}
+function save() {
+    if (editedIndex.value > -1) {
+        Object.assign(desserts.value[editedIndex.value], editedItem.value);
+    } else {
+        desserts.value.push(editedItem.value);
+    }
+    close();
+}
+
+//Computed Property
+const formTitle = computed(() => {
+    return editedIndex.value === -1 ? 'New Contact' : 'Edit Contact';
+});
+</script>

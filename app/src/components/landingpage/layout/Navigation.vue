@@ -94,7 +94,7 @@ import { HelpIcon, ChevronDownIcon } from 'vue-tabler-icons';
     <v-btn variant="text" color="primary" class="custom-hover-primary nav-links" href="https://adminmart.com/support/" target="_blank"
         >Support</v-btn
     >
-    <v-btn class="custom-hover-primary bg-primary ml-2 text-white" flat href="/auth/login" target="_blank"
+    <v-btn class="custom-hover-primary bg-primary ml-2 text-white" flat href="/login" target="_blank"
         ><span class="text-white">Login</span></v-btn
     >
 </template>

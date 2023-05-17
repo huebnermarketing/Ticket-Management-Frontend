@@ -13,12 +13,12 @@ import LoginForm from '@/components/auth/LoginForm.vue';
                             <div class="d-flex justify-center py-4 mb-5"><Logo /></div>
                             <!-- <div class="text-h6 text-medium-emphasis text-center mb-6">Your Social Campaigns</div> -->
                             <LoginForm/>
-                            <h6 class="text-h6 text-medium-emphasis d-flex justify-center align-center mt-3">
+                            <!-- <h6 class="text-h6 text-medium-emphasis d-flex justify-center align-center mt-3">
                                 New to Modernize?
                                 <v-btn class="pl-0 text-primary text-body-1 opacity-1 pl-2" height="auto" to="/auth/register2" variant="plain"
-                                    >Create an account</v-btn
+                                    >Create an  account</v-btn
                                 >
-                            </h6>
+                            </h6> -->
                         </v-card-item>
                     </v-card>
                 </v-col>

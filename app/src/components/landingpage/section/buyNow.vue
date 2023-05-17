@@ -5,7 +5,7 @@
                 <v-col cols="12" md="5">
                     <h2 class="text-h2 font-weight-bold mt-10 mb-6">Build your app with our highly customizable Vue based Dashboard</h2>
                     <div class="d-sm-flex gap-3">
-                        <v-btn class="bg-surface text-primary btn-custom-md m-btn-full" size="large" target="_blank" href="/auth/login" flat
+                        <v-btn class="bg-surface text-primary btn-custom-md m-btn-full" size="large" target="_blank" href="/login" flat
                             >Login</v-btn
                         >
                         <v-btn

@@ -14,7 +14,7 @@
                             Modernize comes with light & dark color skins, well designed dashboards, applications and pages.
                         </p>
                         <div class="mt-6 d-sm-flex gap-3" data-aos="fade-up" data-aos-duration="1000">
-                            <v-btn target="_blank" href="/auth/login" color="primary" size="large" class="m-btn-full btn-custom-lg" flat
+                            <v-btn target="_blank" href="/login" color="primary" size="large" class="m-btn-full btn-custom-lg" flat
                                 >Login</v-btn
                             >
                             <v-btn

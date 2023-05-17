@@ -1,0 +1,3 @@
+<template>
+    contracts listing
+</template>

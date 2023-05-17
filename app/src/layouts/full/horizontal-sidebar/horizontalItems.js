@@ -296,7 +296,7 @@ import {
                 {
                   title: "Side Login",
                   icon: CircleIcon,
-                  to: "/auth/login"
+                  to: "/login"
                 },
                 {
                   title: "Boxed Login",

@@ -1,0 +1,3 @@
+<template>
+    Ticket listing
+</template>

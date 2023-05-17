@@ -8,12 +8,12 @@ const AuthRoutes = {
         {
             name: 'Landing Page',
             path: '/',
-            redirect: '/auth/login',
+            redirect: '/login',
             // component: () => import('@/views/pages/landingpage/index.vue')
         },
         {
             name: 'Side Login',
-            path: '/auth/login',
+            path: '/login',
             component: () => import('@/views/authentication/SideLogin.vue')
         },
         {

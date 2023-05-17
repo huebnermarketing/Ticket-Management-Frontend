@@ -153,7 +153,7 @@ const quickLink = [
   },
   {
     title: "Authentication Design",
-    href: "/auth/login"
+    href: "/login"
   },
   {
     title: "Register Now",
@@ -186,8 +186,8 @@ const quickLink = [
 //
 const searchSugg = [
   {
-    title: "Modern",
-    href: "/dashboards/modern"
+    title: "Dashboard",
+    href: "/dashboard"
   },
   {
     title: "eCommerce",

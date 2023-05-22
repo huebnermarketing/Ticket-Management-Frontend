@@ -12,11 +12,6 @@ import {
       to: "/dashboard"
     },
     {
-      title: "Users",
-      icon: UsersIcon,
-      to: "/users"
-    },
-    {
       title: "Tickets",
       icon: TicketIcon,
       to: "/tickets"
@@ -459,12 +454,12 @@ import {
   //       {
   //         title: "Side Forgot Password",
   //         icon: PointIcon,
-  //         to: "/auth/forgot-password"
+  //         to: "/forgot-password"
   //       },
   //       {
   //         title: "Boxed Forgot Password",
   //         icon: PointIcon,
-  //         to: "/auth/forgot-password2"
+  //         to: "/forgot-password2"
   //       }
   //     ]
   //   },

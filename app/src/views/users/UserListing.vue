@@ -1,7 +1,7 @@
 <template>
-    <UiParentCard :page="page" :breadcrumbs="breadcrumbs" title="Users Listing Table">
+    <!-- <UiParentCard :page="page" :breadcrumbs="breadcrumbs" title="Users Listing Table"> -->
         <EditableTable :userDetails="userDetails"/>
-    </UiParentCard>
+    <!-- </UiParentCard> -->
 </template>
 <script setup>
 import { ref } from 'vue';

@@ -25,7 +25,7 @@ function validate(values, { setErrors }) {
 </script>
 
 <template>
-    <!-- <v-row class="d-flex mb-3">
+    <v-row class="d-flex mb-3">
         <v-col cols="6" sm="6">
             <v-btn variant="outlined" size="large" class="border text-subtitle-1" block>
                 <img :src="google" height="16" class="mr-2" alt="google" />
@@ -39,12 +39,13 @@ function validate(values, { setErrors }) {
             </v-btn>
         </v-col>
     </v-row>
-    <div class="d-flex align-center text-center mb-6">
+    <!-- <div class="d-flex align-center text-center mb-6">
         <div class="text-h6 w-100 px-5 font-weight-regular auth-divider position-relative">
             <span class="bg-surface px-5 py-3 position-relative">or sign in with</span>
         </div>
     </div> -->
-    <Form @submit="validate" v-slot="{ errors, isSubmitting }" class="mt-5">
+    
+    <Form @submit="validate" v-slot="{ errors, isSubmitting }" class="mt-5 login-form-main">
         <v-label class="text-subtitle-1 font-weight-semibold pb-2 text-lightText">Username</v-label>
         <VTextField v-model="username" :rules="emailRules" class="mb-8" required hide-details="auto"></VTextField>
         <v-label class="text-subtitle-1 font-weight-semibold pb-2 text-lightText">Password</v-label>
@@ -53,13 +54,13 @@ function validate(values, { setErrors }) {
             <v-checkbox v-model="checkbox" :rules="[(v) => !!v || 'You must agree to continue!']" required hide-details color="primary">
                 <template v-slot:label>Remeber this Device</template>
             </v-checkbox>
-            <div class="ml-sm-auto">
-                <RouterLink to="" class="text-primary text-decoration-none text-body-1 opacity-1 font-weight-medium"
-                    >Forgot Password ?</RouterLink
-                >
-            </div>
         </div>
         <v-btn size="large" :loading="isSubmitting" color="primary" :disabled="valid" block type="submit" flat>Sign In</v-btn>
+        <div class="ml-sm-auto text-right mt-1">
+            <RouterLink to="/forgot-password" class="text-right text-primary text-decoration-none text-body-1 opacity-1 font-weight-medium"
+                >Forgot Password ?</RouterLink
+            >
+        </div>
         <div v-if="errors.apiError" class="mt-2">
             <v-alert color="error">{{ errors.apiError }}</v-alert>
         </div>

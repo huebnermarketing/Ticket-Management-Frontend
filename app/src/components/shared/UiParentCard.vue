@@ -10,7 +10,7 @@ const props = defineProps({
 
 // ===============================|| Ui Parent Card||=============================== //
 <template>
-    <v-card elevation="8" class="m-0">
+    <v-card elevation="8" class="m-0 c-parent-card">
         <v-card-item class="py-4 px-6">
             <div class="d-sm-flex align-center justify-space-between">
                 <v-card-title class="text-h5"

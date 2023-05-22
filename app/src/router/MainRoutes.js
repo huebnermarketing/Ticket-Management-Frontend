@@ -31,6 +31,21 @@ const MainRoutes = {
             path: '/reports',
             component: () => import('@/views/reports/ReportsListing.vue')
         },
+        {
+            name: 'UserProfile',
+            path: '/apps/user/profile',
+            component: () => import('@/views/apps/user-profile/Profile.vue')
+        },
+        {
+            name: 'Account Setting',
+            path: '/pages/account-settings',
+            component: () => import('@/views/pages/account-settings/AccountSettings.vue')
+        },
+        {
+            name: 'Account Setting',
+            path: '/pages/company-settings',
+            component: () => import('@/views/pages/company-settings/CompanySettings.vue')
+        },
         // {
         //     name: 'eCommerce',
         //     path: '/dashboards/ecommerce',
@@ -286,11 +301,6 @@ const MainRoutes = {
         //     name: 'Pricing',
         //     path: '/pages/pricing',
         //     component: () => import('@/views/pages/pricing/Pricing.vue')
-        // },
-        // {
-        //     name: 'Account Setting',
-        //     path: '/pages/account-settings',
-        //     component: () => import('@/views/pages/account-settings/AccountSettings.vue')
         // },
 
         // {

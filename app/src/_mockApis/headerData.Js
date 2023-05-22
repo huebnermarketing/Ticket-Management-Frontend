@@ -46,26 +46,19 @@ const notifications = [
 import proUser1 from "@/assets/images/svgs/icon-account.svg"
 import proUser2 from "@/assets/images/svgs/icon-inbox.svg"
 import proUser3 from "@/assets/images/svgs/icon-tasks.svg"
-const profileDD = [
-  {
-    avatar: proUser1,
-    title: "My Profile",
-    subtitle: "Account settings",
-    href: "/apps/user/profile"
-  },
-  {
-    avatar: proUser2,
-    title: "My Inbox",
-    subtitle: "Messages & Emails",
-    href: "/"
-  },
-  {
-    avatar: proUser3,
-    title: "My Tasks",
-    subtitle: "To-do and Daily tasks",
-    href: "/"
-  }
-]
+// const profileDD = [
+//   {
+//     avatar: proUser1,
+//     title: "My Profile",
+//     subtitle: "Account settings",
+//     href: "/apps/user/profile"
+//   },
+//   {
+//     avatar: proUser2,
+//     title: "Company Setting",
+//     href: "/pages/company-settings"
+//   },
+// ]
 
 //
 // Language
@@ -223,4 +216,4 @@ const searchSugg = [
   }
 ]
 
-export { notifications, profileDD, languageDD, appsLink, quickLink, searchSugg }
+export { notifications, languageDD, appsLink, quickLink, searchSugg }

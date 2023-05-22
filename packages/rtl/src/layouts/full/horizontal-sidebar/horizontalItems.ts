@@ -345,14 +345,14 @@ const horizontalItems: menu[] = [
                         to: '#',
                         children: [
                             {
-                                title: 'Side Forgot Password',
+                                title: Forgot Password,
                                 icon: CircleIcon,
-                                to: '/auth/forgot-password'
+                                to: '/forgot-password'
                             },
                             {
                                 title: 'Boxed Forgot Password',
                                 icon: CircleIcon,
-                                to: '/auth/forgot-password2'
+                                to: '/forgot-password2'
                             }
                         ]
                     },

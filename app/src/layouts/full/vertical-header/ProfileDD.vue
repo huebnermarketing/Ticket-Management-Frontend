@@ -1,17 +1,30 @@
 <script setup>
 import { MailIcon } from 'vue-tabler-icons';
-import { profileDD } from '@/_mockApis/headerData';
+import proUser1 from "@/assets/images/svgs/icon-account.svg"
+import proUser2 from "@/assets/images/svgs/icon-inbox.svg"
 
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
+const profileDD = [
+  {
+    avatar: proUser1,
+    title: "Account settings",
+    href: "/apps/user/profile"  
+  },
+  {
+    avatar: proUser2,
+    title: "Company Setting",
+    href: "/pages/company-settings"
+  },
+]
 </script>
 
 <template>
     <!-- ---------------------------------------------- -->
     <!-- notifications DD -->
     <!-- ---------------------------------------------- -->
-    <v-menu :close-on-content-click="false">
+    <v-menu :close-on-content-click="false" >
         <template v-slot:activator="{ props }">
             <v-btn class="custom-hover-primary" variant="text" v-bind="props" icon>
                 <v-avatar size="35">
@@ -37,7 +50,8 @@ const authStore = useAuthStore();
                 </div>
                 <v-divider></v-divider>
             </div>
-            <perfect-scrollbar style="height: calc(100vh - 240px); max-height: 240px">
+            <!-- <perfect-scrollbar style="height: calc(100vh - 240px); max-height: 240px"> -->
+            <perfect-scrollbar>
                 <v-list class="py-0 theme-list" lines="two">
                     <v-list-item v-for="item in profileDD" :key="item.title" class="py-4 px-8 custom-text-primary" :to="item.href">
                         <template v-slot:prepend>
@@ -52,7 +66,7 @@ const authStore = useAuthStore();
                     </v-list-item>
                 </v-list>
             </perfect-scrollbar>
-            <div class="px-8 py-3">
+            <!-- <div class="px-8 py-3">
                 <div class="bg-lightprimary rounded-md pa-5 overflow-hidden position-relative">
                     <h5 class="text-h6">
                         Unlimited<br />
@@ -61,10 +75,15 @@ const authStore = useAuthStore();
                     <v-btn variant="flat" color="primary" class="mt-3">Upgrade</v-btn>
                     <img src="@/assets/images/backgrounds/unlimited-bg.png" alt="bg-img" class="right-pos-img" />
                 </div>
-            </div>
+            </div> -->
             <div class="pt-4 pb-6 px-8 text-center">
                 <v-btn color="primary" variant="outlined" block @click="authStore.logout()">Logout</v-btn>
             </div>
         </v-sheet>
     </v-menu>
 </template>
+<style scoped>
+.maxWidth{
+    max-width: 100% !important;
+}
+</style>

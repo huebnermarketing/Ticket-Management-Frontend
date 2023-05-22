@@ -1,90 +1,17 @@
 <template>
-    <v-row>
+<div>
+        <v-row>
         <v-col cols="12" lg="4" md="6">
             <v-text-field density="compact" v-model="search" label="Search" hide-details variant="outlined"></v-text-field>
         </v-col>
         <v-col cols="12" lg="8" md="6" class="text-right">
-            <v-dialog v-model="dialog" max-width="500">
-                <template v-slot:activator="{ props }">
-                    <v-btn color="primary" v-bind="props" flat class="ml-auto">
-                        <v-icon class="mr-2">{{ userDetails.addIcon }}</v-icon
-                        >{{ userDetails.addButton }}
-                    </v-btn>
-                </template>
-                <v-card>
-                    <v-card-title class="pa-4 bg-secondary">
-                        <span class="title text-red">{{ formTitle }}</span>
-                    </v-card-title>
-
-                    <v-card-text>
-                        <v-form ref="form" v-model="valid" lazy-validation>
-                            <v-row>
-                                <v-col cols="12" sm="6">
-                                    <v-text-field variant="outlined" hide-details v-model="editedItem.id" label="Id"></v-text-field>
-                                </v-col>
-                                <v-col cols="12" sm="6">
-                                    <v-text-field
-                                        variant="outlined"
-                                        hide-details
-                                        v-model="editedItem.userinfo"
-                                        label="User info"
-                                    ></v-text-field>
-                                </v-col>
-                                <v-col cols="12" sm="6">
-                                    <v-text-field
-                                        variant="outlined"
-                                        hide-details
-                                        v-model="editedItem.usermail"
-                                        label="User email"
-                                        type="email"
-                                    ></v-text-field>
-                                </v-col>
-                                <v-col cols="12" sm="6">
-                                    <v-text-field
-                                        variant="outlined"
-                                        hide-details
-                                        v-model="editedItem.phone"
-                                        label="Phone"
-                                        type="phone"
-                                    ></v-text-field>
-                                </v-col>
-                                <v-col cols="12" sm="6">
-                                    <v-text-field
-                                        variant="outlined"
-                                        hide-details
-                                        v-model="editedItem.jdate"
-                                        label="Joining Date"
-                                    ></v-text-field>
-                                </v-col>
-                                <v-col cols="12" sm="6">
-                                    <v-text-field variant="outlined" hide-details v-model="editedItem.role" label="Role"></v-text-field>
-                                </v-col>
-                                <v-col cols="12" sm="12">
-                                    <v-select
-                                        variant="outlined"
-                                        hide-details
-                                        :items="rolesbg"
-                                        v-model="editedItem.rolestatus"
-                                        label="Role Background"
-                                    ></v-select>
-                                </v-col>
-                            </v-row>
-                        </v-form>
-                    </v-card-text>
-
-                    <v-card-actions class="pa-4">
-                        <v-spacer></v-spacer>
-                        <v-btn color="error" @click="close">Cancel</v-btn>
-                        <v-btn
-                            color="secondary"
-                            :disabled="editedItem.userinfo == '' || editedItem.usermail == ''"
-                            variant="flat"
-                            @click="save"
-                            >Save</v-btn
-                        >
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
+             <v-btn
+          color="primary"
+           @click="redirectAddTicket()"
+        >
+            <PlusIcon stroke-width="1.5" size="20" class="text-white"/>Add data
+        </v-btn>
+         <!-- <AddTicket :dialog.sync="dialog" @update = updateDialog() /> -->
         </v-col>
     </v-row>
     <v-table class="mt-5">
@@ -139,30 +66,36 @@
             </tr>
         </tbody>
     </v-table>
+    </div>
+
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useContactStore } from '@/stores/apps/contact';
+import AddTicket from '@/views/tickets/Addticket.vue'
+import { useRouter, useRoute } from 'vue-router'
 
 import contact from '@/_mockApis/apps/contact';
 
 const store = useContactStore();
-
+const router = useRouter()
+const route = useRoute()
 const tableProps = defineProps({
     userDetails: Object,
     title: String,
     breadcrumbs: Array,
     icon: String
 });
-
 onMounted(() => {
     store.fetchContacts();
 });
 const getContacts = computed(() => {
     return store.contacts;
 });
-
+function redirectAddTicket(){
+    router.push({ path: '/add-ticket'})
+}
 const valid = ref(true);
 const dialog = ref(false);
 const search = ref('');

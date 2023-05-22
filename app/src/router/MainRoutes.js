@@ -16,21 +16,33 @@ const MainRoutes = {
             path: '/users',
             component: () => import('@/views/users/UserListing.vue')
         },
+
+//---------------------------------- Tickets ---------------------------------------------//
         {
             name: 'Tickets',
             path: '/tickets',
             component: () => import('@/views/tickets/TicketListing.vue')
         },
         {
+            name: 'AddTickets',
+            path: '/add-ticket',
+            component: () => import('@/views/tickets/AddTicket.vue')
+        },
+//---------------------------------- Contracts ---------------------------------------------//
+
+        {
             name: 'Contracts',
             path: '/contracts',
             component: () => import('@/views/contracts/ContractListing.vue')
         },
+//---------------------------------- Reports ---------------------------------------------//
+
         {
             name: 'Reports',
             path: '/reports',
             component: () => import('@/views/reports/ReportsListing.vue')
         },
+
         {
             name: 'UserProfile',
             path: '/apps/user/profile',

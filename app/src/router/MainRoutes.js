@@ -22,6 +22,11 @@ const MainRoutes = {
             component: () => import('@/views/tickets/TicketListing.vue')
         },
         {
+            name: 'TableDemo',
+            path: '/table-demo',
+            component: () => import('@/views/TableDemo.vue')
+        },
+        {
             name: 'Contracts',
             path: '/contracts',
             component: () => import('@/views/contracts/ContractListing.vue')

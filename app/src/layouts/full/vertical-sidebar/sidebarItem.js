@@ -26,6 +26,11 @@ import {
       icon: FileReportIcon,
       to: "/reports"
     },
+    {
+      title: "Table Demo",
+      icon: FileReportIcon,
+      to: "/table-demo"
+    },
   ]
   export default sidebarItem
   

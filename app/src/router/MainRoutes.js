@@ -16,8 +16,15 @@ const MainRoutes = {
             path: '/users',
             component: () => import('@/views/users/UserListing.vue')
         },
+//---------------------------------- Table Demo ---------------------------------------------//
 
-//---------------------------------- Tickets ---------------------------------------------//
+        {
+            name: 'TableDemo',
+            path: '/table-demo',
+            component: () => import('@/views/TableDemo.vue')
+        },
+
+//---------------------------------- Tickets ------------------------------------------------//
         {
             name: 'Tickets',
             path: '/tickets',
@@ -29,7 +36,6 @@ const MainRoutes = {
             component: () => import('@/views/tickets/AddTicket.vue')
         },
 //---------------------------------- Contracts ---------------------------------------------//
-
         {
             name: 'Contracts',
             path: '/contracts',

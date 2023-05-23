@@ -1,30 +1,8 @@
-<script setup>
-import { MailIcon } from 'vue-tabler-icons';
-import proUser1 from "@/assets/images/svgs/icon-account.svg"
-import proUser2 from "@/assets/images/svgs/icon-inbox.svg"
-
-import { useAuthStore } from '@/stores/auth';
-
-const authStore = useAuthStore();
-const profileDD = [
-  {
-    avatar: proUser1,
-    title: "Account settings",
-    href: "/apps/user/profile"  
-  },
-  {
-    avatar: proUser2,
-    title: "Company Setting",
-    href: "/pages/company-settings"
-  },
-]
-</script>
-
 <template>
     <!-- ---------------------------------------------- -->
     <!-- notifications DD -->
     <!-- ---------------------------------------------- -->
-    <v-menu :close-on-content-click="false" >
+    <v-menu :close-on-content-click="false">
         <template v-slot:activator="{ props }">
             <v-btn class="custom-hover-primary" variant="text" v-bind="props" icon>
                 <v-avatar size="35">
@@ -77,13 +55,53 @@ const profileDD = [
                 </div>
             </div> -->
             <div class="pt-4 pb-6 px-8 text-center">
-                <v-btn color="primary" variant="outlined" block @click="authStore.logout()">Logout</v-btn>
+                <v-btn color="primary" variant="outlined" block @click="logout()">Logout</v-btn>
             </div>
         </v-sheet>
     </v-menu>
 </template>
+<script setup>
+import { MailIcon } from 'vue-tabler-icons';
+import proUser1 from '@/assets/images/svgs/icon-account.svg';
+import proUser2 from '@/assets/images/svgs/icon-inbox.svg';
+import { baseURlApi } from '@/api/axios';
+import { useAuthStore } from '@/stores/auth';
+import { useRoute, useRouter } from 'vue-router';
+const route = useRoute();
+const router = useRouter();
+
+const auth_token = localStorage.getItem('auth-token');
+const config = {
+     Authorization: `Bearer ${auth_token}` 
+};
+const profileDD = [
+    {
+        avatar: proUser1,
+        title: 'Account settings',
+        href: '/apps/user/profile'
+    },
+    {
+        avatar: proUser2,
+        title: 'Company Setting',
+        href: '/pages/company-settings'
+    }
+];
+function logout() {
+    console.log('11');
+    baseURlApi
+        .post('/logout',{  headers: {
+        'Authorization': `Bearer ${auth_token}` 
+        }
+  })
+        .then((res) => {
+            console.log('two');
+            router.push('/login');
+        })
+        .catch((err) => {});
+}
+</script>
 <style scoped>
-.maxWidth{
+.maxWidth {
     max-width: 100% !important;
 }
 </style>

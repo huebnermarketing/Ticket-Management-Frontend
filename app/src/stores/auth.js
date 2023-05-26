@@ -1,35 +1,37 @@
 import { defineStore } from 'pinia';
 import { router } from '@/router';
 import { fetchWrapper } from '@/utils/helpers/fetch-wrapper';
-
-const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
+import {baseURlApi} from '@/api/axios'
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export const useAuthStore = defineStore({
     id: 'auth',
     state: () => ({
         // initialize state from local storage to enable user to stay logged in
         // @ts-ignore
-        user: JSON.parse(localStorage.getItem('user')),
+        user: null,
         returnUrl: null
     }),
     actions: {
-        async login(username, password) {
-            const user = await fetchWrapper.post(`${baseUrl}/authenticate`, {
-                username,
-                password
-            });
+        async login(body) {
+            // const {data} = await baseURlApi.post(`${baseUrl}/login`, body);
+            const data = await baseURlApi.post(`${baseUrl}/login`, body);
 
             // update pinia state
-            this.user = user;
+            this.user = data.data;
             // store user details and jwt in local storage to keep user logged in between page refreshes
-            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('user', JSON.stringify(this.user));
+            localStorage.setItem('auth-token', data.data.access_token);    
+            return Promise.resolve(data)
             // redirect to previous url or default to home page
-            router.push(this.returnUrl || '/dashboard');
+            // router.push('/dashboard');
         },
-        logout() {
-            this.user = null;
-            localStorage.removeItem('user');
-            router.push('/');
+       async logout() {
+            const auth_token = localStorage.getItem('auth-token');
+            const headers = { 'Authorization': `Bearer ${auth_token}` };
+            const data = await baseURlApi.post(`${baseUrl}/logout`,{},{headers});
+            
+            return Promise.resolve(data)
         }
     }
 });

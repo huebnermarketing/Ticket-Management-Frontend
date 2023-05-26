@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
+</script>
+
 <template>
     <v-sheet rounded="md" color="lightsecondary" class="px-4 py-3 ExtraBox">
         <div class="d-flex align-center hide-menu">
@@ -9,37 +15,16 @@
                 <span class="text-subtitle-2 textSecondary">Designer</span>
             </div>
             <div class="ml-auto">
-                <v-btn variant="text" icon rounded="md" color="primary" @click="logout()">
+                <v-btn variant="text" icon rounded="md" color="primary" @click="authStore.logout()">
                     <PowerIcon />
+
                     <v-tooltip activator="parent" location="top">Logout</v-tooltip>
                 </v-btn>
             </div>
         </div>
     </v-sheet>
 </template>
-<script setup>
-// import { useAuthStore } from '@/stores/auth';
-import {baseURlApi} from '@/api/axios'
-import { useRoute, useRouter } from 'vue-router';
-const route = useRoute();
-const router = useRouter()
-const auth_token = localStorage.getItem('auth-token')
-// const authStore = useAuthStore();
-function logout() {
-    console.log('11');
-    baseURlApi
-        .post('/logout',{  headers: {
-        'Authorization': `Bearer ${auth_token}` 
-        }
-  })
-        .then((res) => {
-            console.log('two');
-            router.push('/login');
-        })
-        .catch((err) => {});
-}
-</script>
-<style>
+<style lang="scss">
 .ExtraBox {
     position: relative;
     overflow: hidden;

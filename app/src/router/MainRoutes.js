@@ -1,7 +1,7 @@
 const MainRoutes = {
     path: '/main',
     meta: {
-        requiresAuth: !true
+        requiresAuth: true
     },
     redirect: '/main',
     component: () => import('@/layouts/full/FullLayout.vue'),
@@ -32,7 +32,7 @@ const MainRoutes = {
         },
         {
             name: 'AddTickets',
-            path: '/add-ticket',
+            path: '/tickets/add-ticket',
             component: () => import('@/views/tickets/AddTicket.vue')
         },
 //---------------------------------- Contracts ---------------------------------------------//

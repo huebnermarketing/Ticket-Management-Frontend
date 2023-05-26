@@ -367,7 +367,7 @@
                                 </v-row>
 
                                 <v-btn color="error" class="mr-3">Cancel</v-btn>
-                                <v-btn color="primary">Submit</v-btn>
+                                <v-btn color="primary">Create Ticket</v-btn>
                             </v-col>
                         </v-row>
                     </v-col>

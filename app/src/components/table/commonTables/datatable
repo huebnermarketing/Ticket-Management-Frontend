@@ -17,28 +17,24 @@
     <v-table class="mt-5">
         <thead>
             <tr>
-                <th class="text-subtitle-1 font-weight-semibold">Id</th>
-                <th class="text-subtitle-1 font-weight-semibold">UserInfo</th>
-                <th class="text-subtitle-1 font-weight-semibold">Phone</th>
-                <th class="text-subtitle-1 font-weight-semibold">Joining Date</th>
-                <th class="text-subtitle-1 font-weight-semibold">Role</th>
-                <th class="text-subtitle-1 font-weight-semibold">Actions</th>
+                <th class="text-subtitle-1 font-weight-semibold" v-for="item in userDetails.headers" :key="item.title" :sortKey="item.sortable" defaultSort="desc">{{item.title}}</th>
             </tr>
         </thead>
         <tbody>
-            <tr v-for="item in filteredList" :key="item.id">
+            <tr v-for="item in userDetails.items" :key="item.id">
                 <td class="text-subtitle-1">{{ item.id }}</td>
                 <td>
-                    <div class="d-flex align-center py-4">
-                        <div>
+                    <!-- <div class="d-flex align-center py-4"> -->
+                        <!-------------------- Avatar ----------------------->
+                        <!-- <div>
                             <v-img :src="item.avatar" width="45px" class="rounded-circle img-fluid"></v-img>
-                        </div>
+                        </div> -->
 
-                        <div class="ml-5">
+                        <div>
                             <h4 class="text-h6 font-weight-semibold">{{ item.userinfo }}</h4>
                             <span class="text-subtitle-1 d-block mt-1 textSecondary">{{ item.usermail }}</span>
                         </div>
-                    </div>
+                    <!-- </div> -->
                 </td>
                 <td class="text-subtitle-1">{{ item.phone }}</td>
                 <td class="text-subtitle-1">{{ item.jdate }}</td>
@@ -124,11 +120,11 @@ const defaultItem = ref({
 });
 
 //Methods
-const filteredList = computed(() => {
-    return desserts.value.filter((user) => {
-        return user.userinfo.toLowerCase().includes(search.value.toLowerCase());
-    });
-});
+// const filteredList = computed(() => {
+//     return tableProps.userDetails.items.value.filter((user) => {
+//         return user.userinfo.toLowerCase().includes(search.value.toLowerCase());
+//     });
+// });
 
 function editItem(item) {
     editedIndex.value = desserts.value.indexOf(item);

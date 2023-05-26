@@ -2,7 +2,8 @@ const BLUE_THEME = {
     name: 'BLUE_THEME',
     dark: false,
     variables: {
-        'border-color': '#e5eaef'
+        'border-color': '#e5eaef',
+        // '--v-theme-success': '56, 57, 1'
     },
     colors: {
         primary: '#5D87FF',

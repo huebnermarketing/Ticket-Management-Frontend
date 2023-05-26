@@ -55,25 +55,34 @@
                 </div>
             </div> -->
             <div class="pt-4 pb-6 px-8 text-center">
-                <v-btn color="primary" variant="outlined" block @click="logout()">Logout</v-btn>
+                <v-btn color="primary" variant="outlined" block @click="loggedout()">Logout</v-btn>
             </div>
         </v-sheet>
     </v-menu>
+        <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" :top="'top'" v-if="isSnackbar">
+        <v-icon left>{{ icon }}</v-icon>
+        {{ message }}
+    </v-snackbar>
 </template>
 <script setup>
+import {ref} from 'vue';
 import { MailIcon } from 'vue-tabler-icons';
 import proUser1 from '@/assets/images/svgs/icon-account.svg';
 import proUser2 from '@/assets/images/svgs/icon-inbox.svg';
 import { baseURlApi } from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute, useRouter } from 'vue-router';
+const { logout } = useAuthStore();
+
 const route = useRoute();
 const router = useRouter();
 
-const auth_token = localStorage.getItem('auth-token');
-const config = {
-     Authorization: `Bearer ${auth_token}` 
-};
+const showSnackbar = ref(true);
+const message = ref('');
+const color = ref('');
+const icon = ref('');
+const timer = ref(5000);
+const isSnackbar = ref(false);
 const profileDD = [
     {
         avatar: proUser1,
@@ -86,22 +95,31 @@ const profileDD = [
         href: '/pages/company-settings'
     }
 ];
-function logout() {
-    console.log('11');
-    baseURlApi
-        .post('/logout',{  headers: {
-        'Authorization': `Bearer ${auth_token}` 
-        }
-  })
+function loggedout() {
+      logout()
         .then((res) => {
-            console.log('two');
-            router.push('/login');
+            message.value = res.data.message;
+            isSnackbar.value = true;
+            icon.value = 'mdi-check-circle';
+            color.value = 'success';
+            localStorage.clear()
+            location.href = '/login';
         })
-        .catch((err) => {});
-}
+        .catch((error) => {
+            isSnackbar.value = true;
+            message.value = error.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+};
 </script>
 <style scoped>
 .maxWidth {
     max-width: 100% !important;
+}
+.v-snackbar__content {
+    text-align: right !important;
+    font-size: 16px !important;
+    text-transform: capitalize !important;
 }
 </style>

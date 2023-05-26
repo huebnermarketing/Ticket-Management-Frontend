@@ -12,10 +12,14 @@ const props = defineProps({
 <template>
     <v-card elevation="8" class="m-0 c-parent-card">
         <v-card-item class="py-4 px-6">
-            <div class="d-sm-flex align-center justify-space-between">
-                <v-card-title class="text-h5"
-                    ><BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb
-                ></v-card-title>
+            <div class="align-center justify-space-between">
+                <div class="mb-4">
+                    <v-card-title class="text-h4">{{ title }}</v-card-title>
+                </div>
+                <div>
+                    <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
+                </div>
+
                 <!-- <template v-slot:append> -->
                 <slot name="action"></slot>
                 <!-- </template> -->

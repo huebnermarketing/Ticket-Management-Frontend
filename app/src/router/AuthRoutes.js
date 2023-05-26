@@ -12,9 +12,14 @@ const AuthRoutes = {
             component: () => import('@/components/auth/LoginForm.vue')
         },
         {
-            name: 'Side Login',
+            name: 'Login',
             path: '/login',
             component: () => import('@/views/authentication/SideLogin.vue')
+        },
+        {
+            name: 'Reset Password',
+            path: '/reset-password',
+            component: () => import('@/views/authentication/ResetPassword.vue')
         },
         {
             name: 'Boxed Login',
@@ -34,7 +39,7 @@ const AuthRoutes = {
         {
             name: 'Forgot Password',
             path: '/forgot-password',
-            component: () => import('@/views/authentication/SideForgotPassword.vue')
+            component: () => import('@/views/authentication/ForgotPassword.vue')
         },
         {
             name: 'Boxed Forgot Password',

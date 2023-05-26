@@ -38,7 +38,8 @@ const columns1 = [
     {
         text: 'Col 3',
         key: 'prop3'
-    }
+    },
+    { title: 'Actions', key: 'actions', sortable: false }
 ];
 const rows1 = [
     {
@@ -111,6 +112,10 @@ const rows2 = [
                 <template #[`row_rowId1_col_prop3`]="{ item, column, row }">
                     <v-chip closable rounded="md" class="font-weight-bold" :color="item.color" size="small" label> Custom </v-chip>
                 </template>
+                <!-- <template v-slot:columns1.actions="{ item }">
+                    <v-icon size="small" class="me-2" @click="editItem(item.raw)"> mdi-pencil </v-icon>
+                    <v-icon size="small" @click="deleteItem(item.raw)"> mdi-delete </v-icon>
+                </template> -->
             </DataTable>
             <h3>Checkbox</h3>
             <DataTable :columns="columns2" :rows="rows2" selection> </DataTable>

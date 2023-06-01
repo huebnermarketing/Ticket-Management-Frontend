@@ -15,11 +15,10 @@ baseURlApi.defaults.headers = {
 
 /* TODO : API Request with Token */
 baseURlApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem('budtoken')
+  const token = localStorage.getItem('auth-token')
   if (token) {
     config.headers['Authorization'] = 'Bearer ' + token
   }
-
   return config
 })
 

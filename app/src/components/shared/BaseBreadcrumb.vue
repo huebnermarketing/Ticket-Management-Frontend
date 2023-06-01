@@ -5,15 +5,19 @@ const props = defineProps({
     breadcrumbs: Array,
     icon: String
 });
-</script>
 
+const emit = defineEmits(['btnclicked'])
+function clicked() {
+  emit('btnclicked')
+}
+</script>
 <template>
     <v-card class="elevation-0 rounded-md">
         <div class="py-10 py-lg-0">
             <div class="d-flex justify-space-between">
                 <div class="d-flex py-0 align-center">
                     <div>
-                        <v-breadcrumbs :items="breadcrumbs" class="text-h6 font-weight-medium pa-0 ml-n1">
+                        <v-breadcrumbs :items="breadcrumbs" class="text-h6 font-weight-medium pa-0 ml-n1" @click="clicked">
                             <template v-slot:divider>
                                 <div class="d-flex align-center text-h3 text-primary"><chevron-right-icon /></div>
                             </template>

@@ -61,8 +61,8 @@ import facebook from '@/assets/images/svgs/facebook-icon.svg';
 const checkbox = ref(false);
 const valid = ref(false);
 const show1 = ref(false);
-const password = ref('123456');
-const email = ref('admin1@gmail.com');
+const password = ref('');
+const email = ref('');
 const passwordRules = ref(['Password is required', 'Password must be less than 10 characters']);
 const emailRules = ref(['E-mail is required', (v) => /.+@.+\..+/.test(v) || 'E-mail must be valid']);
 const showSnackbar = ref(true);
@@ -72,11 +72,12 @@ const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
 
-const requestBody = {
+
+function Login() {
+    const requestBody = {
     email: email.value,
     password: password.value
 };
-function Login() {
     // baseURlApi
     //     .post('/login', requestBody)
     login(requestBody)

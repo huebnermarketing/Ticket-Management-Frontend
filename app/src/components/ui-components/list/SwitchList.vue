@@ -9,7 +9,7 @@ const swt2 = ref(false);
 
     <v-list >
         <v-card variant="outlined" class="py-2">
-            <v-list-item  value="wifi" class="mb-2  "  active-color="primary">
+            <v-list-item  value="wifi" class="mb-2 "  active-color="primary">
                 <div class="d-flex align-center">
                     <WifiIcon size="22" stroke-width="1.5" class="mr-2" />
                     <div class="ml-3">Wi-Fi</div>
@@ -17,7 +17,7 @@ const swt2 = ref(false);
                 </div>
 
             </v-list-item>  
-            <v-list-item  value="bluetooth" class="mb-2  "  active-color="primary">
+            <v-list-item  value="bluetooth" class="mb-2 "  active-color="primary">
                 <div class="d-flex align-center">
                     <BluetoothIcon size="22" stroke-width="1.5" class="mr-2" />
                     <div class="ml-3">Bluetooth</div>

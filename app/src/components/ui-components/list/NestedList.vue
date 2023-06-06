@@ -41,6 +41,17 @@ const items = ref([
         text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
     }
 ]);
+function onScroll(e) { 
+     console.log("calledd 11")
+    // e is native scroll/mouse event
+      const el = e?.target
+      if (!el) return
+      const scrollPercent =
+        (100 * el.scrollTop) / (el.scrollHeight - el.clientHeight)
+      if (scrollPercent > 60) {
+        console.log("calledd")
+      }
+    }
 
 //sub tabs for contracts and tickets
 const contracts = ref([

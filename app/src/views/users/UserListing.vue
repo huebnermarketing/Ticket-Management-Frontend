@@ -1,13 +1,20 @@
 <template>
-    <v-row>
+    <v-row no-gutters>
         <v-col cols="12" md="12">
             <v-row justify="space-between" class="align-center mb-3">
                 <v-col cols="12" lg="4" md="6">
-                    <v-text-field density="compact" v-model="searchValue" label="Search" hide-details variant="outlined"></v-text-field>
+                    <v-text-field
+                        density="compact"
+                        @input="searchUser()"
+                        v-model="searchValue"
+                        label="Search"
+                        hide-details
+                        variant="outlined"
+                    ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="3">
                     <div class="d-flex gap-2 justify-end">
-                        <v-btn btn color="primary" @click="updateDialog()">
+                        <v-btn btn color="primary" @click="openAddUserDialog()">
                             <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add User
                         </v-btn>
                         <v-btn btn color="primary">
@@ -16,78 +23,111 @@
                     </div>
                 </v-col>
             </v-row>
-            <EasyDataTable
-                :server-items-length="serverItemsLength"
-                :headers="headers"
-                :items="items"
-                :theme-color="themeColor"
-                :search="searchField"
-                :search-value="searchValue"
-                :rows-per-page="10"
-                table-class-name="customize-table"            
-            >
-                <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
-                <template #item-name="{ first_name, last_name }">
-                    <div class="player-wrapper text-capitalize">
-                        {{ first_name + ' ' + last_name }}
+            <!-- style="height:300px !important; overflow-y: scroll !important" -->
+
+            <div v-if="current_page >= 1">
+                <transition name="fade">
+                    <div class="loading" v-if="isLoading">
+                        <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
                     </div>
-                </template>
-                <template #item-mobile="{ phone }">
-                    <div class="player-wrapper text-capitalize">
-                        {{ phone }}
-                    </div>
-                </template>
-                <template #item-email="{ email }">
-                    <div class="player-wrapper">
-                        {{ email }}
-                         {{id}}
-                    </div>
-                </template>
-                <template #item-user_type="{ role }">
-                    <div class="player-wrapper text-capitalize">
-                        {{ role.display_name }}
-                    </div>
-                </template>
-                <template #item-action ="{ id }">
-                    <div class="d-flex align-center">
-                        <v-tooltip text="Edit">
-                            <template v-slot:activator="{ props }">
-                                <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
-                                    ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
-                                /></v-btn>
-                            </template>
-                        </v-tooltip>
-                        <v-tooltip text="Delete">
-                            <template v-slot:activator="{ props }">
-                                <v-btn class="table-icons-common" icon flat @click="deleteItem(item)" v-bind="props"
-                                    ><TrashIcon stroke-width="1.5" size="20" class="text-error"
-                                /></v-btn>
-                            </template>
-                        </v-tooltip>
-                        <v-tooltip text="Reset password">
-                            <template v-slot:activator="{ props }">
-                                <v-btn class="table-icons-common" icon flat @click="openEditDialog()" v-bind="props"
-                                    ><StartIcon stroke-width="1.5" size="20" class="text-error"
-                                /></v-btn>
-                            </template>
-                        </v-tooltip>
-                    </div>
-                </template>
-            </EasyDataTable>
+                </transition>
+            </div>
+            <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto">
+                <!-- :search-value="searchValue" -->
+                <EasyDataTable
+                    sticky
+                     :must-sort="true"
+         
+                    :rows-per-page="300"
+                    :server-items-length="serverItemsLength"
+                    :headers="headers"
+                    :fixed-header="true"
+                    :hide-footer="true"
+                    :items="items"
+                    :search-value="searchValue"
+                    :theme-color="themeColor"
+                    :search="searchField"
+                    table-class-name="customize-table"
+                    ref="refUserListTable"
+                    :loading="isLoading"
+                >
+                    <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
+                    <template #item-name="{ first_name, last_name }">
+                        <div class="player-wrapper text-capitalize">
+                            {{ first_name + ' ' + last_name }}
+                        </div>
+                    </template>
+                    <template #item-mobile="{ phone }">
+                        <div class="player-wrapper text-capitalize">
+                            {{ phone }}
+                        </div>
+                    </template>
+                    <template #item-email="{ email }">
+                        <div class="player-wrapper">
+                            {{ email }}
+                        </div>
+                    </template>
+                    <template #item-user_type="{ role }">
+                        <div class="player-wrapper text-capitalize">
+                            {{ role.display_name }}
+                        </div>
+                    </template>
+                    <template #item-action="{ id }">
+                        <div class="d-flex align-center">
+                            <v-tooltip text="Edit">
+                                <template v-slot:activator="{ props }">
+                                    <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
+                                        ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
+                                    /></v-btn>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip text="Delete">
+                                <template v-slot:activator="{ props }">
+                                    <v-btn class="table-icons-common" icon flat @click="deleteUser(id)" v-bind="props"
+                                        ><TrashIcon stroke-width="1.5" size="20" class="text-error"
+                                    /></v-btn>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip text="Change password">
+                                <template v-slot:activator="{ props }">
+                                    <v-btn class="table-icons-common" icon flat @click="openChangePasswordDialog(id)" v-bind="props"
+                                        ><SendIcon stroke-width="1.5" size="20" class="text-primary"
+                                    /></v-btn>
+                                </template>
+                            </v-tooltip>
+                        </div>
+                    </template>
+                </EasyDataTable>
+            </div>
         </v-col>
+        <dialogBox
+            ref="deleteDialog"
+            @confirClk="confirmClick()"
+            @cancelClk="cancelClick()"
+            :dialogText="dialogText"
+            :confirmText="confirmText"
+            :dialogTitle="dialogTitle"
+            :cancelText="cancelText"
+            :title="title"
+        />
+
         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
         </v-snackbar>
-        <addUser ref="adduser" />
-        <editUser ref="edituser" />
+        <addUser ref="adduser" :getUsers="getUsers" />
+        <editUser ref="edituser" :getUsers="getUsers" />
+        <changePassword ref="changePasswordFromUser" />
+        <!-- v-if="isDelete" -->
     </v-row>
 </template>
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch, defineExpose } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import addUser from '@/views/users/addUser.vue';
-import editUser from '@/views/users/editUser.vue'
+import editUser from '@/views/users/editUser.vue';
+import changePassword from '@/views/users/changePassword.vue';
+import dialogBox from '@/components/TicketComponents/dialog.vue';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import 'vue3-easy-data-table/dist/style.css';
@@ -95,8 +135,21 @@ const themeColor = ref('rgb(var(--v-theme-secondary))');
 
 const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
+
+//dialog props
+const dialogTitle = ref('Are you sure you want to delete this user ?');
+const dialogText = ref('This will delete this user permanently, you can not undo this action.');
+const cancelText = ref('Cancel');
+const confirmText = ref('Delete');
+const title = ref('Delete User');
+
+//refs
 const adduser = ref();
 const edituser = ref();
+const changePasswordFromUser = ref();
+const deleteDialog = ref();
+const refUserListTable = ref();
+
 const breadcrumbs = ref([
     {
         text: 'tickets',
@@ -117,15 +170,17 @@ const headers = ref([
     { text: 'User type', value: 'user_type', sortable: true },
     { text: 'Action', value: 'action' }
 ]);
-const serverItemsLength = ref(0);
-
+const serverItemsLength = ref(50);
+const current_page = ref(0);
 const sortBy = ref('first_name', 'user_type');
-const sortType = ref('desc');
+const sortType = ref('desc','asc');
 const items = ref([]);
-const params = {sort_value: sortBy.value, order_by: sortType.value, page: 1 }
-const searchField = ref('name','mobile','email')
+const searchField = ref('name', 'mobile', 'email');
 const searchValue = ref('');
-const total_record = ref()
+const total_record = ref();
+const deleteId = ref(0);
+const isLoading = ref(false);
+const resizableDiv = ref();
 //props for toastification
 const showSnackbar = ref(true);
 const message = ref('');
@@ -134,40 +189,108 @@ const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
 const serverOptions = {
-  page: 1,
-  sort_value: sortBy.value,
-  order_by: sortType.value
+    page: 1,
+    sort_value: sortBy.value,
+    order_by: sortType.value
 };
+const tableHeight = ref(0);
 //get users
+// function searchUser(){
+//      baseURlApi
+//         .get('/ search-user', searchValue.value)
+//         .then((res) => {
+//            console.log("res",resizeBy)
+//         })
+//         .catch((error) => {
+
+//         });
+// }
 function getUsers() {
+    isLoading.value = true;
+    const params = { total_record: 50, sort_value: sortBy.value, order_by: sortType.value, page: parseInt(current_page.value) + 1 };
     baseURlApi
-        .get('/get-users',  {params})
+        .get('/user/get-users', { params })
         .then((res) => {
-            console.log('msg', res.data.data);
-            items.value = res.data.data.data;
-            serverItemsLength.value = res.data.data.total
+            isLoading.value = false;
+            serverItemsLength.value = res.data.data.total;
+            let countries = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
+
+            items.value = countries.slice();
+            items.value = JSON.parse(JSON.stringify(items.value));
+            const proxy = new Proxy(items.value, {
+                get(target, prop, receiver) {
+                    return target[prop];
+                }
+            });
+            items.value = [...proxy];
+            items.value = [...JSON.parse(JSON.stringify(items.value))];
+            current_page.value = res.data.data.current_page;
+
             message.value = res.data.message;
             isSnackbar.value = true;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
         })
         .catch((error) => {
+            isLoading.value = false;
             isSnackbar.value = true;
             message.value = error.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
 }
+//set table height
+
 //open modal
-function updateDialog() {
+function openAddUserDialog() {
     adduser.value?.open();
+    adduser.value?.getRoles();
 }
-function openEditDialog(id){
-    console.log("idd", id)
+function openEditDialog(id) {
+    edituser.value?.getRoles();
     edituser.value?.open();
     edituser.value?.getUsersData(id);
 }
+function openChangePasswordDialog(id) {
+    changePasswordFromUser.value?.open(id);
+}
+function cancelClick() {
+    deleteDialog.value?.close();
+}
+function confirmClick() {
+    baseURlApi
+        .delete(`user/delete-user/${deleteId.value}`)
+        .then((res) => {
+            deleteDialog.value?.close();
+            getUsers();
+            message.value = res.data.message;
+            isSnackbar.value = true;
+            icon.value = 'mdi-check-circle';
+            color.value = 'success';
+        })
+        .catch((error) => {
+            deleteDialog.value?.close();
+            isSnackbar.value = true;
+            message.value = error.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
+//delete user
+function deleteUser(id) {
+    deleteId.value = id;
+    deleteDialog.value?.open();
+}
 onMounted(() => {
+    const listElm = document.querySelector('#infinite-list');
+
+    listElm.addEventListener('scroll', (e) => {
+        if (items.value.length < serverItemsLength.value) {
+            if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
+                getUsers();
+            }
+        }
+    });
     getUsers();
 });
 </script>
@@ -176,7 +299,27 @@ onMounted(() => {
 .vue3-easy-data-table__footer {
     display: none !important;
 }
-.vue3-easy-data-table__message{
+.vue3-easy-data-table__message {
     min-height: calc(100vh - 100px) !important;
+}
+.loading {
+    text-align: center;
+    position: absolute;
+    color: #fff;
+    z-index: 100 !important;
+    background: rgb(93, 135, 255);
+    padding: 8px 18px;
+    border-radius: 5px;
+    left: calc(50% - 45px);
+    top: calc(50% - 18px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

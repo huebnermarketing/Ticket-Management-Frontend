@@ -10,19 +10,24 @@
                 </div>
             </v-col>
             <v-col cols="12" lg="4" xl="4" xxl="3" class="d-flex align-center justify-center">
+                <v-form ref="resetpwd"  @submit.prevent="resetPassword">
                 <div class="pa-sm-7 pa-4">
                     <h2 class="text--darken-2 text-h4 font-weight-bold">Change Password</h2>
                     <p class="text-subtitle-1 py-4 text-10">To change your password please confirm here</p>
                     <div class="mt-5">
                         <v-label class="mb-2 font-weight-medium">New Password</v-label>
-                        <v-text-field color="primary" variant="outlined" type="password" v-model="newpwd" />
+                        <v-text-field color="primary" variant="outlined" type="password" v-model="newpwd" :rules="passwordrule"/>
                         <v-label class="mb-2 font-weight-medium">Confirm Password</v-label>
-                        <v-text-field color="primary" variant="outlined" type="password" v-model="confirmpwd" />
+                        <v-text-field color="primary" variant="outlined" type="password" v-model="confirmpwd" :rules="confirmpasswordrule"/>
                     </div>
-                    <v-btn size="large" color="lightprimary" @click="resetPassword()" block class="mt-5 text-primary" flat
+                     <v-btn size="large" color="lightprimary" disabled block class="mt-5 text-primary" flat v-if="isClicked"
+                        >Reset Password</v-btn
+                    >
+                    <v-btn size="large" type="submit" color="lightprimary" block class="mt-5 text-primary" flat v-if="!isClicked"
                         >Reset Password</v-btn
                     >
                 </div>
+                </v-form>
             </v-col>
         </v-row>
         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" :top="'top'" v-if="isSnackbar">
@@ -37,11 +42,13 @@ import Logo from '@/layouts/full/logo/Logo.vue';
 import { baseURlApi } from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute, useRouter } from 'vue-router';
+import {formValidationsRules} from '@/mixins/formValidationRules.js'
 const route = useRoute();
 const router = useRouter();
-
-const newpwd = ref('');
-const confirmpwd = ref('');
+const isClicked = ref(false)
+const {confirmpwd, newpwd, confirmpasswordrule,passwordrule} = formValidationsRules();
+// const newpwd = ref('');
+// const confirmpwd = ref('');
 
 const auth_token = localStorage.getItem('auth-token');
 const token = route.query.token;
@@ -51,10 +58,13 @@ const color = ref('');
 const icon = ref('mdi-check-circle');
 const timer = ref(5000);
 const isSnackbar = ref(false);
+const resetpwd = ref()
 
-const resetDetails = JSON.parse(localStorage.getItem('reset-object'));
 
-function resetPassword() {
+async function resetPassword() {
+    const resetDetails = JSON.parse(localStorage.getItem('reset-object'));
+
+    const { valid } = await resetpwd.value?.validate(); 
     const requestBody = {
         email: resetDetails.email,
         password: newpwd.value,
@@ -62,9 +72,14 @@ function resetPassword() {
         reset_token: resetDetails.reset_token,
         token: resetDetails.token
     };
-    baseURlApi
-        .post('/reset-password', requestBody)
+    if(valid){
+        isClicked.value = true
+     baseURlApi
+        .post('auth/reset-password?permission=user-auth', requestBody)
         .then((res) => {
+            resetpwd.value?.reset()
+            resetpwd.value?.resetValidation();
+             isClicked.value = false
             message.value = res.data.message;
             isSnackbar.value = true;
             icon.value = 'mdi-check-circle';
@@ -72,16 +87,18 @@ function resetPassword() {
             router.push('/login');
         })
         .catch((error) => {
+            isClicked.value = false
             isSnackbar.value = true;
             message.value = error.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
+    }
 }
 
 onMounted(() => {
     baseURlApi
-        .post('/reset-password-details', { token: token })
+        .post('/auth/reset-password-details?permission=user-auth', { token: token })
         .then((res) => {
             localStorage.setItem('reset-object', JSON.stringify(res.data.data));
             message.value = res.data.message;

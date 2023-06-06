@@ -1,3 +1,43 @@
+
+<template>
+    <v-card>
+        <v-tabs v-model="tab" bg-color="transparent" color="primary" stacked centered class="c-main-tabs">
+            <v-tab v-for="(item, i) in items" :key="i" :value="item.value">
+                <div class="d-flex">
+                    <component v-bind:is="item.icon" size="20" stroke-width="1.5" class="mr-2"></component>
+                    <span>{{ item.name }}</span>
+                </div>
+            </v-tab>
+        </v-tabs>
+         <v-tabs v-model="subtab" bg-color="transparent" color="primary" v-if="tab == 'contract and ticket'"  align-tabs="start">
+            <v-tab v-for="(data, i) in contracts" :key="i" :value="data.value">
+                {{ data.name }}
+            </v-tab>
+        </v-tabs>
+          <v-card elevation="0" class="mb-6 m-5 overflow-hidden c-inner-card" v-if="tab == 'contract and ticket'">
+            <UiChildCard :title="'contracts'">
+                <v-window v-model="subtab">
+                    <v-window-item v-for="(item, i) in contracts" :key="i" :value="item.value">
+                        <v-card color="text-primary" flat>
+                            <v-card-text>{{ item.text }}</v-card-text>
+                        </v-card>
+                    </v-window-item>
+                </v-window>
+            </UiChildCard>
+        </v-card>
+        <v-card elevation="0" class="mb-6 m-5 overflow-hidden c-inner-card" v-if="tab !== 'contract and ticket'">
+            <UiChildCard :title="'Users'">
+                <v-window v-model="tab">
+                    <v-window-item v-for="(item, i) in items" :key="i" :value="item.value">
+                        <v-card >
+                           <component v-bind:is="item.component"></component>
+                        </v-card>
+                    </v-window-item>
+                </v-window>
+            </UiChildCard>
+        </v-card>
+    </v-card>
+</template>
 <script setup>
 import { ref } from 'vue';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
@@ -67,46 +107,9 @@ const contracts = ref([
 ]);
 const tab = ref(null);
 const subtab = ref(null);
+
 </script>
-<template>
-    <v-card>
-        <v-tabs v-model="tab" bg-color="transparent" color="primary" stacked centered class="c-main-tabs">
-            <v-tab v-for="(item, i) in items" :key="i" :value="item.value">
-                <div class="d-flex">
-                    <component v-bind:is="item.icon" size="20" stroke-width="1.5" class="mr-2"></component>
-                    <span>{{ item.name }}</span>
-                </div>
-            </v-tab>
-        </v-tabs>
-         <v-tabs v-model="subtab" bg-color="transparent" color="primary" v-if="tab == 'contract and ticket'"  align-tabs="start">
-            <v-tab v-for="(data, i) in contracts" :key="i" :value="data.value">
-                {{ data.name }}
-            </v-tab>
-        </v-tabs>
-          <v-card elevation="0" class="mb-6 m-5 overflow-hidden c-inner-card" v-if="tab == 'contract and ticket'">
-            <UiChildCard :title="'contracts'">
-                <v-window v-model="subtab">
-                    <v-window-item v-for="(item, i) in contracts" :key="i" :value="item.value">
-                        <v-card color="text-primary" flat>
-                            <v-card-text>{{ item.text }}</v-card-text>
-                        </v-card>
-                    </v-window-item>
-                </v-window>
-            </UiChildCard>
-        </v-card>
-        <v-card elevation="0" class="mb-6 m-5 overflow-hidden c-inner-card" v-if="tab !== 'contract and ticket'">
-            <UiChildCard :title="'Users'">
-                <v-window v-model="tab">
-                    <v-window-item v-for="(item, i) in items" :key="i" :value="item.value">
-                        <v-card >
-                           <component v-bind:is="item.component"></component>
-                        </v-card>
-                    </v-window-item>
-                </v-window>
-            </UiChildCard>
-        </v-card>
-    </v-card>
-</template>
+
 <style scoped>
 .c-inner-card {
     margin: 20px 20px 10px 20px !important;

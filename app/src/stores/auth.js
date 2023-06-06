@@ -13,12 +13,13 @@ export const useAuthStore = defineStore({
         returnUrl: null
     }),
     actions: {
-        async login(body) {
+         async login(body) {
             // const {data} = await baseURlApi.post(`${baseUrl}/login`, body);
-            const data = await baseURlApi.post(`${baseUrl}/login`, body);
-
+            const data =  await baseURlApi.post(`${baseUrl}/auth/login?permission=user-auth`, body);
+            console.log("dttdd",data)
             // update pinia state
             this.user = data.data;
+            
             // store user details and jwt in local storage to keep user logged in between page refreshes
             localStorage.setItem('user', JSON.stringify(this.user));
             localStorage.setItem('auth-token', data.data.access_token);    
@@ -29,7 +30,7 @@ export const useAuthStore = defineStore({
        async logout() {
             const auth_token = localStorage.getItem('auth-token');
             const headers = { 'Authorization': `Bearer ${auth_token}` };
-            const data = await baseURlApi.post(`${baseUrl}/logout`,{},{headers});
+            const data = await baseURlApi.post(`${baseUrl}/auth/logout`,{},{headers});
             
             return Promise.resolve(data)
         }

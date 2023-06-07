@@ -2,7 +2,7 @@
     <!-- ---------------------------------------------- -->
     <!-- notifications DD -->
     <!-- ---------------------------------------------- -->
-    <v-menu :close-on-content-click="false">
+    <v-menu :close-on-content-click="true">
         <template v-slot:activator="{ props }">
             <v-btn class="custom-hover-primary" variant="text" v-bind="props" icon>
                 <v-avatar size="35">

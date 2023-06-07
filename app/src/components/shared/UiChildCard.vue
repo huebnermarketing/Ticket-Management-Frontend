@@ -7,7 +7,7 @@ const props = defineProps({
 <template>
     <v-card variant="outlined c-child-card">
         <v-card-item class="py-4 px-6">
-            <v-card-title class="text-h5">{{ title }}</v-card-title>
+            <v-card-title class="text-h5 text-capitalize">{{ title }}</v-card-title>
         </v-card-item>
         <v-divider />
         <v-card-text>

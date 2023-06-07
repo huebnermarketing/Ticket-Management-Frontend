@@ -15,11 +15,11 @@
                 <v-col cols="12" md="3">
                     <div class="d-flex gap-2 justify-end">
                         <v-btn btn color="primary" @click="openAddUserDialog()">
-                            <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add User
+                            <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add Customer
                         </v-btn>
-                        <!-- <v-btn btn color="primary">
+                        <v-btn btn color="primary">
                             <FilterIcon stroke-width="1.5" size="20" class="text-white" />
-                        </v-btn> -->
+                        </v-btn>
                     </div>
                 </v-col>
             </v-row>
@@ -32,17 +32,16 @@
                     </div>
                 </transition>
             </div>
-            {{ typeof serverItemsLength }}{{serverItemsLength}}
             <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto">
                 <!-- :search-value="searchValue" -->
                 <EasyDataTable
-                    :rows-per-page="500"
                     sticky
-                    
-                    fixed
+                     :must-sort="true"
+         
+                    :rows-per-page="300"
                     :server-items-length="serverItemsLength"
                     :headers="headers"
-                    :fixed-headers="true"
+                    :fixed-header="true"
                     :hide-footer="true"
                     :items="items"
                     :search-value="searchValue"
@@ -51,8 +50,6 @@
                     table-class-name="customize-table"
                     ref="refUserListTable"
                     :loading="isLoading"
-                    :sort-by="sortBy"
-                    :sort-type="sortType"
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                     <template #item-name="{ first_name, last_name }">
@@ -72,9 +69,7 @@
                     </template>
                     <template #item-user_type="{ role }">
                         <div class="player-wrapper text-capitalize">
-                            <v-chip :color="role.id == 1 ? 'primary' : role.id == 2 ? 'secondary' : role.id == 3 ? 'green' : ''">{{
-                                role.display_name
-                            }}</v-chip>
+                            <v-chip :color="role.id == 1 ? 'primary' : role.id == 2 ? 'secondary':role.id == 3 ? 'green': ''">{{ role.display_name }}</v-chip>
                         </div>
                     </template>
                     <template #item-action="{ id }">
@@ -90,13 +85,6 @@
                                 <template v-slot:activator="{ props }">
                                     <v-btn class="table-icons-common" icon flat @click="deleteUser(id)" v-bind="props"
                                         ><TrashIcon stroke-width="1.5" size="20" class="text-error"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Change password">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="openChangePasswordDialog(id)" v-bind="props"
-                                        ><SendIcon stroke-width="1.5" size="20" class="text-primary"
                                     /></v-btn>
                                 </template>
                             </v-tooltip>
@@ -177,8 +165,8 @@ const headers = ref([
 ]);
 const serverItemsLength = ref(50);
 const current_page = ref(0);
-const sortBy = ref('first_name' || 'email');
-const sortType = ref('desc' || 'asc');
+const sortBy = ref('first_name', 'user_type');
+const sortType = ref('desc','asc');
 const items = ref([]);
 const searchField = ref('name', 'mobile', 'email');
 const searchValue = ref('');

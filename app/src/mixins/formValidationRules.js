@@ -2,18 +2,6 @@ import { ref } from 'vue';
 export const formValidationsRules = () => {
     const newpwd = ref('');
     const confirmpwd = ref('')
-    const filesizelimitrule = [
-        // function limitFileSize(e) {
-        //     const file1 = e.target.files[0]
-        //     let size = parseFloat(file1 ? file1.size : '') / (1024 * 1024).toFixed(2);
-        //     size > 10 ? fileSize.value = true : fileSize.value = false;
-        // }
-        // ($event) => {
-        //     console.log("valll",value)
-        //     if($event.target.value[0] < 1000000) return true;
-        //     return 'Avatar size should be less than 2 MB!'
-        //   },
-    ]
     const firstnamerule = [
         (value) => {
             if (value) return true;
@@ -23,6 +11,12 @@ export const formValidationsRules = () => {
             if (value?.length >= 2) return true;
 
             return 'First Name must be greater than 2 characters.';
+        }
+    ];
+    const requiredrule = [
+        (value) => {
+            if (value) return true;
+            return 'This field is requred.';
         }
     ];
     const lastnamerule = [
@@ -98,9 +92,88 @@ export const formValidationsRules = () => {
     const dropdownrule = [
         (value) => {
             if (value.length !== 0) return true;
-
             return 'Please select an item.';
         }
     ];
-    return {confirmpwd,filesizelimitrule, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule,  };
+    const companynamerule = [
+        (value) => {
+            if (value) return true;
+            return 'Company Name is requred.';
+        },
+        (value) => {
+            if (value?.length >= 2) return true;
+
+            return 'Company Name must be greater than 2 characters.';
+        }
+    ];
+    const addresslinerule = [
+        (value) => {
+            if (value) return true;
+            return 'Address Line Name is requred.';
+        },
+        (value) => {
+            if (value?.length >= 2) return true;
+
+            return 'Address Line must be greater than 2 characters.';
+        }
+    ];
+    const arearule = [
+        (value) => {
+            if (value) return true;
+            return 'Area Line Name is requred.';
+        },
+        (value) => {
+            if (value?.length >= 2) return true;
+
+            return 'Area must be greater than 2 characters.';
+        }
+    ];
+    const countyrule = [
+        (value) => {
+            if (value) return true;
+            return 'County Name is requred.';
+        },
+        (value) => {
+            if (value?.length >= 2) return true;
+
+            return 'County Name must be greater than 2 characters.';
+        }
+    ];
+    const cityrule = [
+        (value) => {
+            if (value) return true;
+            return 'City is requred.';
+        },
+        (value) => {
+            if (value?.length >= 2) return true;
+
+            return 'City must be greater than 2 characters.';
+        }
+    ];
+    const staterule = [
+        (value) => {
+            if (value) return true;
+            return 'State is requred.';
+        },
+        (value) => {
+            if (value?.length >= 2) return true;
+
+            return 'State must be greater than 2 characters.';
+        }
+    ];
+    const zipcoderule = [
+        (value) => {
+            if (value) return true;
+            return 'Zip Code is requred.';
+        },
+        (value) => {
+            if (value?.length == 6) return true;
+            return 'Zip Code must have 6 digits.';
+        },
+        (value) => {
+            if(isNaN(value) == false) return true;
+            return 'Zip Code must be a numeric value.';
+        }
+    ];
+    return {requiredrule,cityrule,staterule,zipcoderule,countyrule,arearule,addresslinerule,companynamerule,confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule,  };
 };

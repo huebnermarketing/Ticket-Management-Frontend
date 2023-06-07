@@ -203,7 +203,6 @@ const props = defineProps({
     getUsers: Function
 });
 function uploadImage(e) {
-    console.log('uploadedd', e.target.files[0]);
     isProfileImg.value = true;
     const fd = new FormData();
     const file = e.target.files[0];
@@ -261,7 +260,7 @@ function getUsersData(id) {
 async function updateUser() {
     const { valid } = await edituserform.value?.validate();
   
-    if (valid) {
+    if (valid) {    
           issubmit.value = true;
         const fd = new FormData();
         fd.append('first_name', firstName.value);

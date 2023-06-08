@@ -5,7 +5,7 @@ export const formValidationsRules = () => {
     const firstnamerule = [
         (value) => {
             if (value) return true;
-            return 'First Name is requred.';
+            return 'First Name is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
@@ -16,7 +16,7 @@ export const formValidationsRules = () => {
     const requiredrule = [
         (value) => {
             if (value) return true;
-            return 'This field is requred.';
+            return 'This field is required.';
         }
     ];
     const lastnamerule = [
@@ -98,7 +98,7 @@ export const formValidationsRules = () => {
     const companynamerule = [
         (value) => {
             if (value) return true;
-            return 'Company Name is requred.';
+            return 'Company Name is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
@@ -109,7 +109,7 @@ export const formValidationsRules = () => {
     const addresslinerule = [
         (value) => {
             if (value) return true;
-            return 'Address Line Name is requred.';
+            return 'Address Line is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
@@ -120,7 +120,7 @@ export const formValidationsRules = () => {
     const arearule = [
         (value) => {
             if (value) return true;
-            return 'Area Line Name is requred.';
+            return 'Area is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
@@ -131,7 +131,7 @@ export const formValidationsRules = () => {
     const countyrule = [
         (value) => {
             if (value) return true;
-            return 'County Name is requred.';
+            return 'County Name is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
@@ -142,7 +142,7 @@ export const formValidationsRules = () => {
     const cityrule = [
         (value) => {
             if (value) return true;
-            return 'City is requred.';
+            return 'City is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
@@ -153,7 +153,7 @@ export const formValidationsRules = () => {
     const staterule = [
         (value) => {
             if (value) return true;
-            return 'State is requred.';
+            return 'State is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
@@ -164,16 +164,16 @@ export const formValidationsRules = () => {
     const zipcoderule = [
         (value) => {
             if (value) return true;
-            return 'Zip Code is requred.';
+            return 'Zip Code is required.';
         },
         (value) => {
-            if (value?.length == 6) return true;
-            return 'Zip Code must have 6 digits.';
+            if (value?.length <=8 && value?.length >=4) return true;
+            return 'Zip Code must have a length between 4 and 8.';
         },
         (value) => {
             if(isNaN(value) == false) return true;
             return 'Zip Code must be a numeric value.';
         }
     ];
-    return {requiredrule,cityrule,staterule,zipcoderule,countyrule,arearule,addresslinerule,companynamerule,confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule,  };
+    return {requiredrule,cityrule,staterule,zipcoderule,countyrule,arearule,addresslinerule,companynamerule,confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule};
 };

@@ -4,11 +4,12 @@
         <VTextField v-model="email" :rules="emailrule" required></VTextField>
         <v-btn size="large" color="primary" disabled block flat v-if="isClicked">Forgot Password</v-btn>
         <v-btn size="large" color="primary" @click="forgotPassword()" block flat v-if="!isClicked">Forgot Password</v-btn>
-    </v-form>
-    <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" :top="'top'" v-if="isSnackbar">
+         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" :top="'top'" v-if="isSnackbar">
         <v-icon left>{{ icon }}</v-icon>
         {{ message }}
     </v-snackbar>
+    </v-form>
+   
 </template>
 <script setup>
 import { ref } from 'vue';
@@ -20,7 +21,7 @@ const { emailrule } = formValidationsRules();
 
 const show1 = ref(false);
 const email = ref('');
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const isClicked = ref(false);
 const color = ref('');
@@ -48,7 +49,7 @@ async function forgotPassword() {
             .catch((error) => {
                 isClicked.value = false;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });

@@ -1,9 +1,9 @@
 <template>
     <div>
         <v-row>
-         <v-col>   
+         <v-col cols="12">   
         <v-form @submit.prevent="Login" ref="loginForm" class="mt-5">
-            <v-label class="text-subtitle-1 font-weight-semibold pb-2 text-lightText">Username</v-label>
+            <v-label class="text-subtitle-1 font-weight-semibold pb-2 text-lightText">Email</v-label>
             <VTextField v-model="email" :rules="emailrule" class="mb-8" required hide-details="auto"></VTextField>
             <v-label class="text-subtitle-1 font-weight-semibold pb-2 text-lightText">Password</v-label>
             <VTextField v-model="password" :rules="passwordrule" required hide-details="auto" type="password" class="pwdInput"></VTextField>
@@ -55,7 +55,7 @@ const showSnackbar = ref(true);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
-const timer = ref(5000);
+const timer = ref(200005);
 const isSnackbar = ref(false);
 
 async function Login() {
@@ -70,7 +70,6 @@ async function Login() {
         isLogin.value = true;
         login(requestBody)
             .then((res) => {
-                console.log('res', res);
                 message.value = res.data.message;
                 loginForm.value?.reset();
                 loginForm.value?.resetValidation();
@@ -94,10 +93,3 @@ async function Login() {
     }
 }
 </script>
-<style>
-.v-snackbar__content {
-    text-align: right !important;
-    font-size: 16px !important;
-    text-transform: capitalize !important;
-}
-</style>

@@ -202,6 +202,9 @@ const edituserform = ref();
 const props = defineProps({
     getUsers: Function
 });
+
+//emits
+
 function uploadImage(e) {
     isProfileImg.value = true;
     const fd = new FormData();

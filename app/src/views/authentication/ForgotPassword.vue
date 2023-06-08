@@ -9,14 +9,14 @@ import ResetPassword from '@/components/auth/ResetForm.vue';
         <v-row class="h-100vh mh-100 auth">
             <v-col cols="12" lg="8" xl="8" xxl="9" class="d-lg-flex align-center justify-center authentication position-relative">
                 <div class="auth-header pt-sm-6 pt-2 px-sm-6 px-3 pb-sm-6 pb-0">
-                    <div class="position-relative"><Logo /></div>
+                    <div class="position-relative"><h4 class="text-h3 font-weight-bold text-capitalize">Systune Systems Services</h4></div>
                 </div>
                 <div class="">
                     <img src="/assets/images/landinglogo.svg" class="position-relative d-none d-lg-flex" alt="login-background" />
                 </div>
             </v-col>
             <v-col cols="12" lg="4" xl="4" xxl="3" class="d-flex align-center justify-center">
-                <div class="pa-sm-7 pa-4">
+                <div class="pa-sm-7 pa-4 w-75">
                     <h2 class="text--darken-2 text-h4 font-weight-bold">Forgot your password?</h2>
                     <p class="text-subtitle-1 py-4 text-10">
                         Please enter the email address associated with your account and We will email you a link to reset your password.
@@ -28,4 +28,3 @@ import ResetPassword from '@/components/auth/ResetForm.vue';
         </v-row>
     </div>
 </template>
-

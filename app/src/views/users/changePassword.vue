@@ -2,7 +2,7 @@
     <div class="text-center">
         <v-dialog v-model="dialog" persistent class="dialog-mw">
             <v-card class="overflow-auto">
-                <v-form @submit.prevent="createUser" ref="changepasswordform">
+                <v-form @submit.prevent="changePassword" ref="changepasswordform">
                     <v-container>
                         <v-card-title class="pa-5">
                             <span class="text-h5">Change password</span>
@@ -81,7 +81,7 @@ function closeDialog() {
     dialog.value = false;
 }
 
-async function createUser() {
+async function changePassword() {
     const { valid } = await changepasswordform.value?.validate();
     if (valid) {
         issubmit.value = true;

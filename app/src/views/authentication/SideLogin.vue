@@ -9,8 +9,9 @@ import LoginForm from '@/components/auth/LoginForm.vue';
         <v-row class="h-100vh mh-100 auth">
             <v-col cols="12" lg="7" xl="8" class="d-lg-flex align-center justify-center authentication position-relative">
                 <div class="auth-header pt-lg-6 pt-2 px-sm-6 px-3 pb-lg-6 pb-0">
-                    <div class="position-relative">
-                        <Logo />
+                    <div class="position-relative text-capitalize">
+                        <h4 class="text-h3 font-weight-bold font-serif">Systune Systems Services</h4>
+                        <!-- <Logo /> -->
                     </div>
                 </div>
                 <div class="">
@@ -18,9 +19,9 @@ import LoginForm from '@/components/auth/LoginForm.vue';
                 </div>
             </v-col>
             <v-col cols="12" lg="5" xl="4" class="d-flex align-center justify-center">
-                <div class="mt-xl-0 mt-5 mw-100">
-                    <h2 class="text-h3 font-weight-bold mb-2">Welcome to Modernize</h2>
-                    <div class="text-subtitle-1 mb-6">Your Admin Dashboard</div>
+                <div class="mt-xl-0 mt-5 w-75">
+                    <h2 class="text-h3 font-weight-bold mb-2 text-capitalize">Welcome to Systune Systems Services</h2>
+                    <!-- <div class="text-subtitle-1 mb-6">Your Admin Dashboard</div> -->
                     <LoginForm />
                     <!-- <h6 class="text-h6 d-flex align-center mt-6 font-weight-medium">
                         New to Modernize?

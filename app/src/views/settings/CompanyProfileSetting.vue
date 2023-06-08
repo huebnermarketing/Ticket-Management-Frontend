@@ -1,10 +1,10 @@
 <template>
     <div class="text-center">
-        <v-form @submit.prevent="updateProfile" ref="companyProfileForm" style="width: 70%">
+        <v-form @submit.prevent="updateProfile" ref="companyProfileForm">
             <div class="loading" v-if="isLoading">
                 <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
             </div>
-            <v-row align="start" align-content-md="start" justify="start">
+            <v-row align="start" align-content-md="start" justify="start" style="max-width: 1000px">
                 <!-- accept="image/png, image/jpeg,i image/jpg" -->
                 <!---------------------------------- profil photo --------------------------------->
                 <v-col cols="12" md="6">
@@ -54,10 +54,10 @@
                         >
                     </div>
                 </v-col>
-                <!---------------------------------- fevicon --------------------------------->
+                <!---------------------------------- favicon --------------------------------->
                 <v-col cols="12" md="6">
                     <div class="text-start">
-                        <v-label class="mb-2 font-weight-medium text-capitalize mr-4">Fevicon</v-label>
+                        <v-label class="mb-2 font-weight-medium text-capitalize mr-4">favicon</v-label>
                         <v-avatar size="50" class="border">
                             <img v-if="!userFevicon" src="@/assets/images/profile/uploadLogo.png" height="20" alt="image" />
                             <img
@@ -69,26 +69,26 @@
                             />
                         </v-avatar>
                         <label
-                            for="fevicon"
+                            for="favicon"
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="!isFevicon"
-                            @click="refs['fevicon-input'].click()"
+                            @click="refs['favicon-input'].click()"
                             >Choose file</label
                         >
                         <!-- file input for upload and edit profile -->
                         <input
                             type="file"
-                            ref="fevicon-input"
+                            ref="favicon-input"
                             class="d-none"
-                            id="fevicon"
+                            id="favicon"
                             accept="image/jpeg,image/jpg,image/png"
                             @change="uploadFevicon($event)"
                         />
                         <label
-                            for="fevicon"
+                            for="favicon"
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="isFevicon"
-                            @click="refs['fevicon-input'].click()"
+                            @click="refs['favicon-input'].click()"
                         >
                             Edit</label
                         >
@@ -177,7 +177,7 @@
                 </v-col>
                 <!---------------------------------- currency --------------------------------->
                 <v-col cols="12" md="6" class="text-start">
-                    <v-label class="mb-2 font-weight-medium text-capitalize required">Currency</v-label>
+                    <v-label class="mb-2 font-weight-medium text-capitalize required">Currency{{currency}}</v-label>
                     <v-select
                         v-model="currency"
                         :items="currencyOptions"
@@ -194,6 +194,12 @@
                         </template>
                         <template v-slot:append-item> </template>
                     </v-select>
+                    <v-spacer></v-spacer>
+                    <!-- Action buttons -->
+                    <v-col cols="12" class="text-right mt-5" style="padding:0">
+                        <v-btn color="primary" type="submit" v-if="!issubmit" class="p-0">Update Profile</v-btn>
+                        <v-btn color="primary" v-if="issubmit" disabled>Update Profile</v-btn>
+                    </v-col>
                 </v-col>
                 <!---------------------------------- Action ------------------------------------>
             </v-row>
@@ -207,13 +213,6 @@
                 :cancelText="cancelText"
                 :title="title"
             />
-            <v-spacer></v-spacer>
-            <v-col cols="12" class="text-right">
-                <!-- <v-btn color="error" class="mr-3" @click="closeDialog()" v-if="!issubmit">Cancel</v-btn> -->
-                <v-btn color="primary" type="submit" v-if="!issubmit">Update Profile</v-btn>
-                <!-- <v-btn color="error" class="mr-3" v-if="issubmit" disabled>Cancel</v-btn> -->
-                <v-btn color="primary" v-if="issubmit" disabled>Update Profile</v-btn>
-            </v-col>
         </v-form>
 
         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">

@@ -90,8 +90,8 @@ const title = ref([]);
 //sub tabs for contracts and tickets
 const contracts = ref([
     {
-        name: 'Contact Type',
-        value: 'contact type',
+        name: 'Contract Type',
+        value: 'contract type',
         component: ContractType
     },
     {

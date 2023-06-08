@@ -32,13 +32,12 @@
                     </div>
                 </transition>
             </div>
-            {{ typeof serverItemsLength }}{{serverItemsLength}}
+            <!-- {{ typeof serverItemsLength }}{{ serverItemsLength }} -->
             <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto">
                 <!-- :search-value="searchValue" -->
                 <EasyDataTable
-                    :rows-per-page="500"
+                    :rows-per-page="-1"
                     sticky
-                    
                     fixed
                     :server-items-length="serverItemsLength"
                     :headers="headers"
@@ -53,14 +52,15 @@
                     :loading="isLoading"
                     :sort-by="sortBy"
                     :sort-type="sortType"
+                    show-index
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
-                    <template #item-name="{ first_name, last_name }">
+                    <template #item-first_name="{ first_name, last_name }">
                         <div class="player-wrapper text-capitalize">
                             {{ first_name + ' ' + last_name }}
                         </div>
                     </template>
-                    <template #item-mobile="{ phone }">
+                    <template #item-phone="{ phone }">
                         <div class="player-wrapper text-capitalize">
                             {{ phone }}
                         </div>
@@ -121,7 +121,7 @@
             {{ message }}
         </v-snackbar>
         <addUser ref="adduser" :getUsers="getUsers" />
-        <editUser ref="edituser" :getUsers="getUsers" />
+        <editUser ref="edituser" :getUsers="filterData" />
         <changePassword ref="changePasswordFromUser" />
         <!-- v-if="isDelete" -->
     </v-row>
@@ -147,6 +147,7 @@ const dialogText = ref('This will delete this user permanently, you can not undo
 const cancelText = ref('Cancel');
 const confirmText = ref('Delete');
 const title = ref('Delete User');
+const editId = ref(0)
 
 //refs
 const adduser = ref();
@@ -169,16 +170,16 @@ const breadcrumbs = ref([
 ]);
 
 const headers = ref([
-    { text: 'Name', value: 'name', sortable: true },
-    { text: 'Mobile', value: 'mobile' },
-    { text: 'Email', value: 'email' },
-    { text: 'User type', value: 'user_type', sortable: true },
+    { text: 'Name', value: 'first_name', sortable: true },
+    { text: 'Mobile', value: 'phone', sortable: true },
+    { text: 'Email', value: 'email', sortable: true },
+    { text: 'User type', value: 'user_type' },
     { text: 'Action', value: 'action' }
 ]);
 const serverItemsLength = ref(50);
-const current_page = ref(0);
-const sortBy = ref('first_name' || 'email');
-const sortType = ref('desc' || 'asc');
+const current_page = ref(1);
+const sortBy = 'first_name';
+const sortType = 'desc';
 const items = ref([]);
 const searchField = ref('name', 'mobile', 'email');
 const searchValue = ref('');
@@ -193,6 +194,7 @@ const color = ref('');
 const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
+
 const serverOptions = {
     page: 1,
     sort_value: sortBy.value,
@@ -200,41 +202,38 @@ const serverOptions = {
 };
 const tableHeight = ref(0);
 //get users
-// function searchUser(){
-//      baseURlApi
-//         .get('/ search-user', searchValue.value)
-//         .then((res) => {
-//            console.log("res",resizeBy)
-//         })
-//         .catch((error) => {
-
-//         });
-// }
+function searchUser() {
+    const fd = new FormData();
+    fd.append('search_key', searchValue.value);
+    baseURlApi
+        .post(`user/search-user?total_record=${current_page.value}`, fd)
+        .then((res) => {
+            console.log('res', res);
+        })
+        .catch((error) => {});
+}
 function getUsers() {
     isLoading.value = true;
-    const params = { total_record: 50, sort_value: sortBy.value, order_by: sortType.value, page: parseInt(current_page.value) + 1 };
+    const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
         .get('/user/get-users', { params })
         .then((res) => {
             isLoading.value = false;
             serverItemsLength.value = res.data.data.total;
-            let countries = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
+            items.value = res.data.data.data
 
-            items.value = countries.slice();
-            items.value = JSON.parse(JSON.stringify(items.value));
-            const proxy = new Proxy(items.value, {
-                get(target, prop, receiver) {
-                    return target[prop];
-                }
-            });
-            items.value = [...proxy];
-            items.value = [...JSON.parse(JSON.stringify(items.value))];
-            current_page.value = res.data.data.current_page;
 
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
+            // let countries = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
+
+            // items.value = countries.slice();
+            // items.value = JSON.parse(JSON.stringify(items.value));
+            // const proxy = new Proxy(items.value, {
+            //     get(target, prop, receiver) {
+            //         return target[prop];
+            //     }
+            // });
+            // items.value = [...proxy];
+            // items.value = [...JSON.parse(JSON.stringify(items.value))];
         })
         .catch((error) => {
             isLoading.value = false;
@@ -244,40 +243,50 @@ function getUsers() {
             icon.value = 'mdi-close-circle';
         });
 }
-function getUsersData() {
-    isLoading.value = true;
-    const params = { total_record: 50, sort_value: sortBy.value, order_by: sortType.value, page: 1 };
-    baseURlApi
-        .get('/user/get-users', { params })
-        .then((res) => {
-            isLoading.value = false;
-            serverItemsLength.value = res.data.data.total;
-            let countries = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
 
-            items.value = countries.slice();
-            items.value = JSON.parse(JSON.stringify(items.value));
-            const proxy = new Proxy(items.value, {
-                get(target, prop, receiver) {
-                    return target[prop];
-                }
-            });
-            items.value = [...proxy];
-            items.value = [...JSON.parse(JSON.stringify(items.value))];
-            current_page.value = res.data.data.current_page;
+// function filterData(){
+//     handlerFromEditComponent(updatedUser){
+//   // Object.assign({}, users.find(e=>e.id===updatedUser.id),updatedUser)
+//   const existing=users.find(e=>e.id===updatedUser.id)
+//   if(existing) {
+    
+//   }
+// }
+// }
+// function getUsersData() {
+//     isLoading.value = true;
+//     const params = { total_record: 50, sort_value: sortBy.value, order_by: sortType.value, page: 1 };
+//     baseURlApi
+//         .get('/user/get-users', { params })
+//         .then((res) => {
+//             isLoading.value = false;
+//             serverItemsLength.value = res.data.data.total;
+//             let countries = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
 
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
-        })
-        .catch((error) => {
-            isLoading.value = false;
-            isSnackbar.value = true;
-            message.value = error.message;
-            color.value = 'error';
-            icon.value = 'mdi-close-circle';
-        });
-}
+//             items.value = countries.slice();
+//             items.value = JSON.parse(JSON.stringify(items.value));
+//             const proxy = new Proxy(items.value, {
+//                 get(target, prop, receiver) {
+//                     return target[prop];
+//                 }
+//             });
+//             items.value = [...proxy];
+//             items.value = [...JSON.parse(JSON.stringify(items.value))];
+//             current_page.value = res.data.data.current_page;
+
+//             message.value = res.data.message;
+//             isSnackbar.value = true;
+//             icon.value = 'mdi-check-circle';
+//             color.value = 'success';
+//         })
+//         .catch((error) => {
+//             isLoading.value = false;
+//             isSnackbar.value = true;
+//             message.value = error.message;
+//             color.value = 'error';
+//             icon.value = 'mdi-close-circle';
+//         });
+// }
 //set table height
 
 //open modal
@@ -286,6 +295,7 @@ function openAddUserDialog() {
     adduser.value?.getRoles();
 }
 function openEditDialog(id) {
+    editId.value = id
     edituser.value?.getRoles();
     edituser.value?.open();
     edituser.value?.getUsersData(id);
@@ -324,8 +334,10 @@ onMounted(() => {
     const listElm = document.querySelector('#infinite-list');
 
     listElm.addEventListener('scroll', (e) => {
+        console.log('srolll');
         if (items.value.length < serverItemsLength.value) {
             if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
+                current_page.value = current_page.value + 1;
                 getUsers();
             }
         }

@@ -71,6 +71,7 @@ async function Login() {
         login(requestBody)
             .then((res) => {
                 message.value = res.data.message;
+                console.log("res",res)
                 loginForm.value?.reset();
                 loginForm.value?.resetValidation();
                 isSnackbar.value = true;

@@ -45,15 +45,14 @@
                                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                                             v-if="isProfileImg"
                                             @click="refs['file-input'].click()"
-                                        >
-                                            Edit</label
+                                        >Edit</label
                                         >
                                         <label
                                             color="error"
                                             class="mb-0 ml-3 text-error font-weight-bold cursor-pointer text-decoration-underline"
                                             v-if="isProfileImg"
                                             @click="resetProfilepic()"
-                                            >Reset</label
+                                            >Remove</label
                                         >
                                     </div>
                                     <!-- <div class="text-subtitle-1 text-medium-emphasis text-center my-sm-8 my-6">
@@ -116,7 +115,7 @@
                                     <v-select
                                         v-model="userRole"
                                         :items="userRoleOptions"
-                                        item-title="name"
+                                        item-title="display_name"
                                         item-value="id"
                                         return-object
                                         single-line
@@ -203,11 +202,11 @@ const createuserform = ref();
 
 // validations rules
 
+/*emits*/
+const emit = defineEmits(['addUserClicked'])
 
-//props
-const props = defineProps({
-    getUsers:Function
-})
+
+//methods
 function uploadImage(e) {
     console.log('uploadedd');
     isProfileImg.value = true;
@@ -260,15 +259,16 @@ async function createUser() {
         baseURlApi
             .post('user/create-user', fd)
             .then((res) => {
+                const addedData = res.data.data
+                emit('addUserClicked',addedData)
                 issubmit.value = false;
                 createuserform.value?.reset();
                 createuserform.value?.resetValidation();
-                props.getUsers()
                 dialog.value = false;
-                message.value = res.data.message;
-                isSnackbar.value = true;
-                icon.value = 'mdi-check-circle';
-                color.value = 'success';
+                // message.value = res.data.message;
+                // isSnackbar.value = true;
+                // icon.value = 'mdi-check-circle';
+                // color.value = 'success';
             })
             .catch((error) => {
                 issubmit.value = false;

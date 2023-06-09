@@ -24,21 +24,23 @@ const sidebarMenu = shallowRef(sidebarItems);
         app
         class="leftSidebar"
         :rail="customizer.mini_sidebar"
-        expand-on-hover width="270"
+        expand-on-hover
+        width="270"
     >
         <!---Logo part -->
-        <v-locale-provider  v-if="customizer.setRTLLayout"  rtl >
-        <div class="pa-5">
-            <RtlLogo />
-        </div>
+        <v-locale-provider v-if="customizer.setRTLLayout" rtl>
+            <div class="pa-5">
+                <RtlLogo />
+            </div>
         </v-locale-provider>
-        <v-locale-provider  v-else>
-        <div class="pa-5">
-            <Logo />
-        </div>
+        <v-locale-provider v-else>
+            <div class="pa-5">
+                <h6 class="text-h6 font-weight-bold font-serif">Systune Systems Services</h6>
+
+                <!-- <Logo /> -->
+            </div>
         </v-locale-provider>
 
-        
         <!-- ---------------------------------------------- -->
         <!---Navigation -->
         <!-- ---------------------------------------------- -->

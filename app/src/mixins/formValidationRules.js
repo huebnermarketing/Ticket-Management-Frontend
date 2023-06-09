@@ -91,7 +91,7 @@ export const formValidationsRules = () => {
 
     const dropdownrule = [
         (value) => {
-            if (value.length !== 0) return true;
+            if (value) return true;
             return 'Please select an item.';
         }
     ];
@@ -169,11 +169,11 @@ export const formValidationsRules = () => {
         (value) => {
             if (value?.length <=8 && value?.length >=4) return true;
             return 'Zip Code must have a length between 4 and 8.';
-        },
-        (value) => {
-            if(isNaN(value) == false) return true;
-            return 'Zip Code must be a numeric value.';
         }
+        // (value) => {
+        //     if(isNaN(value) == false) return true;
+        //     return 'Zip Code must be a numeric value.';
+        // }
     ];
     return {requiredrule,cityrule,staterule,zipcoderule,countyrule,arearule,addresslinerule,companynamerule,confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule};
 };

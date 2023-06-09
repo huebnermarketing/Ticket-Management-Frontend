@@ -1,6 +1,6 @@
 <template>
     <v-card elevation="2">
-        <v-tabs v-model="tab" bg-color="transparent" color="primary" stacked centered class="c-main-tabs">
+        <v-tabs v-model="tab"  color="primary"  bg-color="teal-darken-3" stacked centered class="c-main-tabs">
             <v-tab v-for="(item, i) in items" :key="i" :value="item.value">
                 <div class="d-flex">
                     <component v-bind:is="item.icon" size="20" stroke-width="1.5" class="mr-2"></component>
@@ -127,5 +127,8 @@ const subtab = ref(null);
 }
 .c-main-tabs {
     border-bottom: 1px solid rgb(var(--v-theme-borderColor)) !important;
+}
+.c-main-tabs:focus{
+    background: calc(0.04 * var(--v-theme-overlay-multiplier)) !important;
 }
 </style>

@@ -40,14 +40,13 @@
 @import './pages/apps';
 
 @import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css';
-
 .v-input__details {
     padding: 0 0 0 2px !important;
 }
 .v-snackbar__content {
     text-align: right !important;
     font-size: 16px !important;
-    text-transform: capitalize !important;
+    // text-transform: capitalize !important;
 }
 .v-snackbar__wrapper{
     min-width: unset !important;

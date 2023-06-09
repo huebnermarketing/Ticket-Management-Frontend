@@ -31,98 +31,107 @@
                 </transition>
             </div>
             <div id="infinite-list">
-                <EasyDataTable
-                    sticky
-                    :must-sort="true"
-                    :rows-per-page="300"
-                    :server-items-length="serverItemsLength"
-                    :headers="headers"
-                    :fixed-header="true"
-                    :hide-footer="true"
-                    :items="items"
-                    :search-value="searchValue"
-                    :theme-color="themeColor"
-                    :search="searchField"
-                    table-class-name="customize-table"
-                    :loading="isLoading"
-                >
-                    <template #item-ticket_status="{ status_name, id }">
-                        <div class="player-wrapper text-capitalize" v-if="id !== editID">
-                            {{ status_name }}                 
-                        </div>
-                        <v-text-field
-                            v-if="isEditable && id == editID"
-                            name="problemType1"
-                            v-model="editTicketStatus"
-                            variant="outlined"
-                            color="primary"
-                            class="mt-2"
-                        >
-                        </v-text-field>
-                    </template>
-                    <template #item-action="{ id, is_lock }">
-                        <div class="d-flex align-center" v-if="is_lock == 0">
-                            <v-tooltip text="Edit">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn v-if="id !== editID" class="table-icons-common" icon flat @click="editProblem(id)" v-bind="props"
-                                        ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Update">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        v-if="isEditable && id == editID && !isEdit"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        @click="updateProblem(id)"
-                                        v-bind="props"
-                                        ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                    <v-btn
-                                        v-if="isEditable && id == editID && isEdit"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        disabled
-                                        v-bind="props"
-                                        ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Cancel">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        v-if="isEditable && id == editID && !isEdit"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        @click="cancelUpdate(id)"
-                                        v-bind="props"
-                                        ><MinusIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Delete">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="deleteContract(id)" v-bind="props"
-                                        ><TrashIcon stroke-width="1.5" size="20" class="text-error"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                        </div>
-                        <div class="d-flex align-center" v-if="is_lock == 1">
-                            <v-tooltip text="Locked">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat v-bind="props" style="cursor:default !important"
-                                        ><LockIcon stroke-width="1.5" size="20" class="text-error"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                        </div>
-                    </template>
-                </EasyDataTable>
+                <v-form @submit.prevent="updateContract()" ref="contractEditForm">
+                    <EasyDataTable
+                        sticky
+                        :must-sort="true"
+                        :rows-per-page="300"
+                        :server-items-length="serverItemsLength"
+                        :headers="headers"
+                        :fixed-header="true"
+                        :hide-footer="true"
+                        :items="items"
+                        :search-value="searchValue"
+                        :theme-color="themeColor"
+                        :search="searchField"
+                        table-class-name="customize-table"
+                        :loading="isLoading"
+                    >
+                        <template #item-ticket_status="{ status_name, id }">
+                            <div class="player-wrapper text-capitalize" v-if="id !== editID">
+                                {{ status_name }}
+                            </div>
+                            <v-text-field
+                                v-if="isEditable && id == editID"
+                                name="problemType1"
+                                v-model="editTicketStatus"
+                                variant="outlined"
+                                color="primary"
+                                class="mt-2"
+                                :rules="requiredrule"
+                            >
+                            </v-text-field>
+                        </template>
+                        <template #item-action="{ id, is_lock }">
+                            <div class="d-flex align-center" v-if="is_lock == 0">
+                                <v-tooltip text="Edit">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="id !== editID"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="editProblem(id)"
+                                            v-bind="props"
+                                            ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Update">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="isEditable && id == editID && !isEdit"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="updateTicketStatus(id)"
+                                            v-bind="props"
+                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                        <v-btn
+                                            v-if="isEditable && id == editID && isEdit"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            disabled
+                                            v-bind="props"
+                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Cancel">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="isEditable && id == editID && !isEdit"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="cancelUpdate(id)"
+                                            v-bind="props"
+                                            ><XIcon stroke-width="1.5" size="20" class="text-error"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Delete">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn  v-if="id !== editID" class="table-icons-common" icon flat @click="deleteContract(id)" v-bind="props"
+                                            ><TrashIcon stroke-width="1.5" size="20" class="text-error"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                            </div>
+                            <div class="d-flex align-center" v-if="is_lock == 1">
+                                <v-tooltip text="Locked">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn class="table-icons-common" icon flat v-bind="props" style="cursor: default !important"
+                                            ><LockIcon stroke-width="1.5" size="20" class="text-error"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                            </div>
+                        </template>
+                    </EasyDataTable>
+                </v-form>
             </div>
             <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
                 <v-icon left>{{ icon }}</v-icon>
@@ -166,6 +175,7 @@ const title = ref('Delete Problem Type');
 
 //refs
 const deleteDialog = ref();
+const contractEditForm = ref();
 
 const headers = ref([
     { text: 'Ticket Status', value: 'ticket_status' },
@@ -193,33 +203,36 @@ const ticketStatus = ref('');
 const editTicketStatus = ref('');
 
 //update
-function updateProblem(id) {
-    isEdit.value = true;
-    const requestBody = {
-        status_name: editTicketStatus.value
-    };
-    baseURlApi
-        .post(`settings/ticket-status/update/${id}`, requestBody)
-        .then((res) => {
-            isEdit.value = false;
-            isEditable.value = false;
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
-            getTicketStatus();
-            editID.value = 0;
-            dialog.value = false;
-        })
-        .catch((error) => {
-            editID.value = 0;
-            isEdit.value = false;
-            isEditable.value = false;
-            isSnackbar.value = true;
-            message.value = error.message;
-            color.value = 'error';
-            icon.value = 'mdi-close-circle';
-        });
+async function updateTicketStatus(id) {
+    const { valid } = await contractEditForm.value?.validate();
+    if (valid) {
+        isEdit.value = true;
+        const requestBody = {
+            status_name: editTicketStatus.value
+        };
+        baseURlApi
+            .post(`settings/ticket-status/update/${id}`, requestBody)
+            .then((res) => {
+                isEdit.value = false;
+                isEditable.value = false;
+                // message.value = res.data.message;
+                // isSnackbar.value = true;
+                // icon.value = 'mdi-check-circle';
+                // color.value = 'success';
+                getTicketStatus();
+                editID.value = 0;
+                dialog.value = false;
+            })
+            .catch((error) => {
+                editID.value = 0;
+                isEdit.value = false;
+                isEditable.value = false;
+                isSnackbar.value = true;
+                message.value = error.message;
+                color.value = 'error';
+                icon.value = 'mdi-close-circle';
+            });
+    }
 }
 
 //get data for prefilled input
@@ -248,10 +261,10 @@ function getTicketStatus() {
         .then((res) => {
             isLoading.value = false;
             items.value = res.data.data;
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
+            // message.value = res.data.message;
+            // isSnackbar.value = true;
+            // icon.value = 'mdi-check-circle';
+            // color.value = 'success';
         })
         .catch((error) => {
             isLoading.value = false;

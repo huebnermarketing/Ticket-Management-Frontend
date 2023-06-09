@@ -225,15 +225,14 @@ onMounted(() => {
                                         class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                                         v-if="isProfileImg"
                                         @click="refs['file-input'].click()"
-                                    >
-                                        Edit</label
+                                        >Edit</label
                                     >
                                     <label
                                         color="error"
                                         class="mb-0 ml-3 text-error font-weight-bold cursor-pointer text-decoration-underline"
                                         v-if="isProfileImg"
                                         @click="resetProfilepic()"
-                                        >Reset</label
+                                        >Remove</label
                                     >
                                 </div>
                             </v-col>

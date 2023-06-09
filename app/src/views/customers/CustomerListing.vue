@@ -219,10 +219,10 @@ function getUsers() {
             items.value = [...JSON.parse(JSON.stringify(items.value))];
             current_page.value = res.data.data.current_page;
 
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
+            // message.value = res.data.message;
+            // isSnackbar.value = true;
+            // icon.value = 'mdi-check-circle';
+            // color.value = 'success';
         })
         .catch((error) => {
             isLoading.value = false;

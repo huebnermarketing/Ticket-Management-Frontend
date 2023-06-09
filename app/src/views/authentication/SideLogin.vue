@@ -19,7 +19,7 @@ import LoginForm from '@/components/auth/LoginForm.vue';
                 </div>
             </v-col>
             <v-col cols="12" lg="5" xl="4" class="d-flex align-center justify-center">
-                <div class="mt-xl-0 mt-5 w-75">
+                <div class="mt-xl-0 mt-5 w-lg-75">
                     <h2 class="text-h3 font-weight-bold mb-2 text-capitalize">Welcome to Systune Systems Services</h2>
                     <!-- <div class="text-subtitle-1 mb-6">Your Admin Dashboard</div> -->
                     <LoginForm />

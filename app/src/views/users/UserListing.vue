@@ -25,14 +25,13 @@
             </v-row>
             <!-- style="height:300px !important; overflow-y: scroll !important" -->
 
-            <div v-if="current_page >= 1">
+            <div v-if="current_page > 1">
                 <transition name="fade">
                     <div class="loading" v-if="isLoading">
                         <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
                     </div>
                 </transition>
             </div>
-            <!-- {{ typeof serverItemsLength }}{{ serverItemsLength }} -->
             <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto">
                 <!-- :search-value="searchValue" -->
                 <EasyDataTable
@@ -52,7 +51,6 @@
                     :loading="isLoading"
                     :sort-by="sortBy"
                     :sort-type="sortType"
-                    show-index
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                     <template #item-first_name="{ first_name, last_name }">
@@ -120,10 +118,9 @@
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
         </v-snackbar>
-        <addUser ref="adduser" :getUsers="getUsers" />
-        <editUser ref="edituser" :getUsers="filterData" />
+        <addUser ref="adduser" @addUserClicked="addUsersData" />
+        <editUser ref="edituser" @updateClicked="filterData" />
         <changePassword ref="changePasswordFromUser" />
-        <!-- v-if="isDelete" -->
     </v-row>
 </template>
 <script setup>
@@ -147,7 +144,7 @@ const dialogText = ref('This will delete this user permanently, you can not undo
 const cancelText = ref('Cancel');
 const confirmText = ref('Delete');
 const title = ref('Delete User');
-const editId = ref(0)
+const editId = ref(0);
 
 //refs
 const adduser = ref();
@@ -187,6 +184,7 @@ const total_record = ref();
 const deleteId = ref(0);
 const isLoading = ref(false);
 const resizableDiv = ref();
+const isFromAdd = ref(false);
 //props for toastification
 const showSnackbar = ref(true);
 const message = ref('');
@@ -204,6 +202,7 @@ const tableHeight = ref(0);
 //get users
 function searchUser() {
     const fd = new FormData();
+    if(searchValue.value.length > 0){
     fd.append('search_key', searchValue.value);
     baseURlApi
         .post(`user/search-user?total_record=${current_page.value}`, fd)
@@ -211,6 +210,7 @@ function searchUser() {
             console.log('res', res);
         })
         .catch((error) => {});
+    }
 }
 function getUsers() {
     isLoading.value = true;
@@ -220,20 +220,39 @@ function getUsers() {
         .then((res) => {
             isLoading.value = false;
             serverItemsLength.value = res.data.data.total;
-            items.value = res.data.data.data
+            let itemsData = [];
+            if (isFromAdd.value) {
+                let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
 
+                // Declare an empty object
+                let uniqueObject = {};
 
-            // let countries = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
+                // Loop for the array elements
+                for (let i in newArray) {
+                    // Extract the title
+                    let objid = newArray[i]['id'];
 
-            // items.value = countries.slice();
-            // items.value = JSON.parse(JSON.stringify(items.value));
-            // const proxy = new Proxy(items.value, {
-            //     get(target, prop, receiver) {
-            //         return target[prop];
-            //     }
-            // });
-            // items.value = [...proxy];
-            // items.value = [...JSON.parse(JSON.stringify(items.value))];
+                    // Use the title as the index
+                    uniqueObject[objid] = newArray[i];
+                }
+
+                // Loop to push unique object into array
+                for (let i in uniqueObject) {
+                    itemsData.push(uniqueObject[i]);
+                }
+            } else {
+                itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data));
+            }
+
+            items.value = itemsData.slice();
+            items.value = JSON.parse(JSON.stringify(items.value));
+            const proxy = new Proxy(items.value, {
+                get(target, prop, receiver) {
+                    return target[prop];
+                }
+            });
+            items.value = [...proxy];
+            items.value = [...JSON.parse(JSON.stringify(items.value))];
         })
         .catch((error) => {
             isLoading.value = false;
@@ -244,49 +263,15 @@ function getUsers() {
         });
 }
 
-// function filterData(){
-//     handlerFromEditComponent(updatedUser){
-//   // Object.assign({}, users.find(e=>e.id===updatedUser.id),updatedUser)
-//   const existing=users.find(e=>e.id===updatedUser.id)
-//   if(existing) {
-    
-//   }
-// }
-// }
-// function getUsersData() {
-//     isLoading.value = true;
-//     const params = { total_record: 50, sort_value: sortBy.value, order_by: sortType.value, page: 1 };
-//     baseURlApi
-//         .get('/user/get-users', { params })
-//         .then((res) => {
-//             isLoading.value = false;
-//             serverItemsLength.value = res.data.data.total;
-//             let countries = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
+function filterData(editedData) {
+    const existing = items.value.find((e) => e.id === editedData.id);
+    if (existing) Object.assign(existing, editedData);
+}
+function addUsersData(addedData) {
+    isFromAdd.value = true;
+    getUsers();
+}
 
-//             items.value = countries.slice();
-//             items.value = JSON.parse(JSON.stringify(items.value));
-//             const proxy = new Proxy(items.value, {
-//                 get(target, prop, receiver) {
-//                     return target[prop];
-//                 }
-//             });
-//             items.value = [...proxy];
-//             items.value = [...JSON.parse(JSON.stringify(items.value))];
-//             current_page.value = res.data.data.current_page;
-
-//             message.value = res.data.message;
-//             isSnackbar.value = true;
-//             icon.value = 'mdi-check-circle';
-//             color.value = 'success';
-//         })
-//         .catch((error) => {
-//             isLoading.value = false;
-//             isSnackbar.value = true;
-//             message.value = error.message;
-//             color.value = 'error';
-//             icon.value = 'mdi-close-circle';
-//         });
-// }
 //set table height
 
 //open modal
@@ -295,7 +280,7 @@ function openAddUserDialog() {
     adduser.value?.getRoles();
 }
 function openEditDialog(id) {
-    editId.value = id
+    editId.value = id;
     edituser.value?.getRoles();
     edituser.value?.open();
     edituser.value?.getUsersData(id);
@@ -332,12 +317,12 @@ function deleteUser(id) {
 }
 onMounted(() => {
     const listElm = document.querySelector('#infinite-list');
-
     listElm.addEventListener('scroll', (e) => {
-        console.log('srolll');
         if (items.value.length < serverItemsLength.value) {
             if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
+                console.log("scrolled")
                 current_page.value = current_page.value + 1;
+                isFromAdd.value = false;
                 getUsers();
             }
         }

@@ -13,7 +13,6 @@
                                 v-model="problemType"
                                 variant="outlined"
                                 color="primary"
-                                placeholder="CPU"
                                 :rules="requiredrule"
                             >
                             </v-text-field>
@@ -32,90 +31,104 @@
                 </transition>
             </div>
             <div id="infinite-list">
-                <EasyDataTable
-                    sticky
-                    :must-sort="true"
-                    :rows-per-page="300"
-                    :server-items-length="serverItemsLength"
-                    :headers="headers"
-                    :fixed-header="true"
-                    :hide-footer="true"
-                    :items="items"
-                    :search-value="searchValue"
-                    :theme-color="themeColor"
-                    :search="searchField"
-                    table-class-name="customize-table"
-                    :loading="isLoading"
-                >
-                    <template #item-problem_type="{ problem_name, id }">
-                        <div class="player-wrapper text-capitalize" v-if="id !== editID">
-                            {{ problem_name }}
-                        </div>
-                        <v-text-field
-                            v-if="isEditable && id == editID"
-                            name="problemType1"
-                            v-model="editproblemType"
-                            variant="outlined"
-                            color="primary"
-                            placeholder="AMC"
-                            class="mt-2"
-                        >
-                        </v-text-field>
-                    </template>
-                    <template #item-action="{ id }">
-                        <div class="d-flex align-center">
-                            <v-tooltip text="Edit">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn v-if="id !== editID" class="table-icons-common" icon flat @click="editProblem(id)" v-bind="props"
-                                        ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Update">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        v-if="isEditable && id == editID && !isEdit"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        @click="updateProblem(id)"
-                                        v-bind="props"
-                                        ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                    <v-btn
-                                        v-if="isEditable && id == editID && isEdit"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        disabled
-                                        v-bind="props"
-                                        ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Cancel">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        v-if="isEditable && id == editID && !isEdit"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        @click="cancelUpdate(id)"
-                                        v-bind="props"
-                                        ><MinusIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Delete">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="deleteContract(id)" v-bind="props"
-                                        ><TrashIcon stroke-width="1.5" size="20" class="text-error"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                        </div>
-                    </template>
-                </EasyDataTable>
+                <v-form @submit.prevent="updateContract()" ref="problemEditForm">
+                    <EasyDataTable
+                        sticky
+                        :must-sort="true"
+                        :rows-per-page="300"
+                        :server-items-length="serverItemsLength"
+                        :headers="headers"
+                        :fixed-header="true"
+                        :hide-footer="true"
+                        :items="items"
+                        :search-value="searchValue"
+                        :theme-color="themeColor"
+                        :search="searchField"
+                        table-class-name="customize-table"
+                        :loading="isLoading"
+                    >
+                        <template #item-problem_type="{ problem_name, id }">
+                            <div class="player-wrapper text-capitalize" v-if="id !== editID">
+                                {{ problem_name }}
+                            </div>
+                            <v-text-field
+                                v-if="isEditable && id == editID"
+                                name="problemType1"
+                                v-model="editproblemType"
+                                variant="outlined"
+                                color="primary"
+                                class="mt-2"
+                                :rules="requiredrule"
+                            >
+                            </v-text-field>
+                        </template>
+                        <template #item-action="{ id }">
+                            <div class="d-flex align-center">
+                                <v-tooltip text="Edit">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="id !== editID"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="editProblem(id)"
+                                            v-bind="props"
+                                            ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Update">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="isEditable && id == editID && !isEdit"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="updateProblem(id)"
+                                            v-bind="props"
+                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                        <v-btn
+                                            v-if="isEditable && id == editID && isEdit"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            disabled
+                                            v-bind="props"
+                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Cancel">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="isEditable && id == editID && !isEdit"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="cancelUpdate(id)"
+                                            v-bind="props"
+                                            ><XIcon stroke-width="1.5" size="20" class="text-error"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Delete">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="id !== editID"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="deleteContract(id)"
+                                            v-bind="props"
+                                            ><TrashIcon stroke-width="1.5" size="20" class="text-error"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                            </div>
+                        </template>
+                    </EasyDataTable>
+                </v-form>
             </div>
             <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
                 <v-icon left>{{ icon }}</v-icon>
@@ -151,6 +164,7 @@ const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
 //dialog props
+const dialog = ref(false);
 const dialogTitle = ref('Are you sure you want to delete this Problem Type ?');
 const dialogText = ref('This will delete this Problem Type permanently, you can not undo this action.');
 const cancelText = ref('Cancel');
@@ -159,6 +173,7 @@ const title = ref('Delete Problem Type');
 
 //refs
 const deleteDialog = ref();
+const problemEditForm = ref();
 
 const headers = ref([
     { text: 'Problem Type', value: 'problem_type' },
@@ -186,33 +201,36 @@ const problemType = ref('');
 const editproblemType = ref('');
 
 //update
-function updateProblem(id) {
-    isEdit.value = true;
-    const requestBody = {
-        problem_name: editproblemType.value
-    };
-    baseURlApi
-        .post(`settings/problem-type/update/${id}`, requestBody)
-        .then((res) => {
-            isEdit.value = false;
-            isEditable.value = false;
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
-            getProblems();
-            editID.value = 0;
-            dialog.value = false;
-        })
-        .catch((error) => {
-            editID.value = 0;
-            isEdit.value = false;
-            isEditable.value = false;
-            isSnackbar.value = true;
-            message.value = error.message;
-            color.value = 'error';
-            icon.value = 'mdi-close-circle';
-        });
+async function updateProblem(id) {
+    const { valid } = await problemEditForm.value?.validate();
+    if (valid) {
+        isEdit.value = true;
+        const requestBody = {
+            problem_name: editproblemType.value
+        };
+        baseURlApi
+            .post(`settings/problem-type/update/${id}`, requestBody)
+            .then((res) => {
+                isEdit.value = false;
+                isEditable.value = false;
+                message.value = res.data.message;
+                isSnackbar.value = true;
+                icon.value = 'mdi-check-circle';
+                color.value = 'success';
+                getProblems();
+                editID.value = 0;
+                dialog.value = false;
+            })
+            .catch((error) => {
+                editID.value = 0;
+                isEdit.value = false;
+                isEditable.value = false;
+                isSnackbar.value = true;
+                message.value = error.message;
+                color.value = 'error';
+                icon.value = 'mdi-close-circle';
+            });
+    }
 }
 
 //get data for prefilled input
@@ -242,10 +260,10 @@ function getProblems() {
         .then((res) => {
             isLoading.value = false;
             items.value = res.data.data;
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
+            // message.value = res.data.message;
+            // isSnackbar.value = true;
+            // icon.value = 'mdi-check-circle';
+            // color.value = 'success';
         })
         .catch((error) => {
             isLoading.value = false;

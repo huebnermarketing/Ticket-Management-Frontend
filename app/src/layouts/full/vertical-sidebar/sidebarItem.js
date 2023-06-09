@@ -1,8 +1,8 @@
 import {
     TicketIcon,
-    UsersIcon,
     HeartHandshakeIcon,
     HomeIcon,
+    WritingIcon,
     FileReportIcon,
   } from "vue-tabler-icons"
   const sidebarItem = [
@@ -18,7 +18,7 @@ import {
     },
     {
       title: "Contracts",
-      icon: HeartHandshakeIcon,
+      icon: WritingIcon,
       to: "/contracts"
     },
     {

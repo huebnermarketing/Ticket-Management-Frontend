@@ -50,15 +50,14 @@
                                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                                             v-if="isProfileImg"
                                             @click="refs['file-input'].click()"
-                                        >
-                                            Edit</label
+                                        >Edit</label
                                         >
                                         <label
                                             color="error"
                                             class="mb-0 ml-3 text-error font-weight-bold cursor-pointer text-decoration-underline"
                                             v-if="isProfileImg"
                                             @click="resetProfilepic()"
-                                            >Reset</label
+                                            >Remove</label
                                         >
                                     </div>
                                     <!-- <div class="text-subtitle-1 text-medium-emphasis text-center my-sm-8 my-6">
@@ -122,7 +121,7 @@
                                     <v-select
                                         v-model="userRole"
                                         :items="userRoleOptions"
-                                        item-title="name"
+                                        item-title="display_name"
                                         item-value="id"
                                         return-object
                                         single-line
@@ -198,12 +197,8 @@ const timer = ref(5000);
 const isSnackbar = ref(false);
 const edituserform = ref();
 
-//props
-const props = defineProps({
-    getUsers: Function
-});
-
 //emits
+const emit = defineEmits(['updateClicked'])
 
 function uploadImage(e) {
     isProfileImg.value = true;
@@ -264,7 +259,7 @@ async function updateUser() {
     const { valid } = await edituserform.value?.validate();
   
     if (valid) {    
-          issubmit.value = true;
+        issubmit.value = true;
         const fd = new FormData();
         fd.append('first_name', firstName.value);
         fd.append('last_name', lastName.value);
@@ -277,15 +272,17 @@ async function updateUser() {
         baseURlApi
             .post(`user/update-user/${userId.value}`, fd)
             .then((res) => {
+                const editedData = res.data.data
+                emit('updateClicked',editedData)
                 issubmit.value = false;
-                props.getUsers();
+                // props.getUsers();
                 edituserform.value?.reset();
                 edituserform.value?.resetValidation();
                 dialog.value = false;
-                message.value = res.data.message;
-                isSnackbar.value = true;
-                icon.value = 'mdi-check-circle';
-                color.value = 'success';
+                // message.value = res.data.message;
+                // isSnackbar.value = true;
+                // icon.value = 'mdi-check-circle';
+                // color.value = 'success';
             })
             .catch((error) => {
                 issubmit.value = false;

@@ -13,7 +13,6 @@
                                 v-model="contractType"
                                 variant="outlined"
                                 color="primary"
-                                placeholder="AMC"
                                 :rules="requiredrule"
                             >
                             </v-text-field>
@@ -34,6 +33,7 @@
                 </transition>
             </div>
             <div id="infinite-list">
+                 <v-form @submit.prevent="updateContract()" ref="contractEditForm">
                 <EasyDataTable
                     sticky
                     :must-sort="true"
@@ -49,6 +49,7 @@
                     table-class-name="customize-table"
                     :loading="isLoading"
                 >
+                
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                     <template #item-contract_service_type="{ contract_name, id }">
                         <div class="player-wrapper text-capitalize" v-if="id !== editID">
@@ -60,8 +61,8 @@
                             v-model="editContractType"
                             variant="outlined"
                             color="primary"
-                            placeholder="AMC"
                             class="mt-2"
+                            :rules="requiredrule"
                         >
                         </v-text-field>
                     </template>
@@ -83,6 +84,7 @@
                             <v-tooltip text="Update">
                                 <template v-slot:activator="{ props }">
                                     <v-btn
+                                        type="submit"
                                         v-if="isEditable && id == editID && !isEdit"
                                         class="table-icons-common"
                                         icon
@@ -111,20 +113,22 @@
                                         flat
                                         @click="cancelUpdate(id)"
                                         v-bind="props"
-                                        ><MinusIcon stroke-width="1.5" size="20" class="text-primary"
+                                        ><XIcon stroke-width="1.5" size="20" class="text-error"
                                     /></v-btn>
                                 </template>
                             </v-tooltip>
                             <v-tooltip text="Delete">
                                 <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="deleteContract(id)" v-bind="props"
+                                    <v-btn v-if="id !== editID" class="table-icons-common" icon flat @click="deleteContract(id)" v-bind="props"
                                         ><TrashIcon stroke-width="1.5" size="20" class="text-error"
                                     /></v-btn>
                                 </template>
                             </v-tooltip>
                         </div>
                     </template>
+                    
                 </EasyDataTable>
+                 </v-form>
             </div>
             <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
                 <v-icon left>{{ icon }}</v-icon>
@@ -147,7 +151,6 @@
 import { onMounted, ref, watch, defineExpose } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
-
 const { requiredrule } = formValidationsRules();
 
 import dialogBox from '@/components/TicketComponents/dialog.vue';
@@ -160,6 +163,7 @@ const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
 //dialog props
+const dialog = ref(false);
 const dialogTitle = ref('Are you sure you want to delete this Contract Service Type ?');
 const dialogText = ref('This will delete this Contract Service Type permanently, you can not undo this action.');
 const cancelText = ref('Cancel');
@@ -168,6 +172,7 @@ const title = ref('Delete Contract Service Type');
 
 //refs
 const deleteDialog = ref();
+const contractEditForm = ref()
 
 const headers = ref([
     { text: 'Contract Service Type', value: 'contract_service_type' },
@@ -195,8 +200,10 @@ const contractType = ref('');
 const editContractType = ref('');
 
 //update
-function updateContract(id) {
-    isEdit.value = true;
+async function updateContract(id) {
+     const { valid } = await contractEditForm.value?.validate();
+    if (valid) {
+        isEdit.value = true;
     const requestBody = {
         contract_name: editContractType.value
     };
@@ -222,6 +229,7 @@ function updateContract(id) {
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
+    }
 }
 
 //get data for prefilled input
@@ -251,10 +259,10 @@ function getContracts() {
         .then((res) => {
             isLoading.value = false;
             items.value = res.data.data;
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
+            // message.value = res.data.message;
+            // isSnackbar.value = true;
+            // icon.value = 'mdi-check-circle';
+            // color.value = 'success';
         })
         .catch((error) => {
             isLoading.value = false;

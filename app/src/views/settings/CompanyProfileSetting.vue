@@ -16,7 +16,7 @@
                             <img
                                 v-if="userProfilePic"
                                 :src="userProfilePic"
-                                height="90"
+                                height="50"
                                 alt="image"
                                 class="users-profile-image object-fit-cover w-inherit"
                             />
@@ -42,15 +42,14 @@
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="isProfileImg"
                             @click="refs['file-input'].click()"
-                        >
-                            Edit</label
+                        >Edit</label
                         >
                         <label
                             color="error"
                             class="mb-0 ml-3 text-error font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="isProfileImg"
                             @click="resetProfilepic()"
-                            >Reset</label
+                            >Remove</label
                         >
                     </div>
                 </v-col>
@@ -63,7 +62,7 @@
                             <img
                                 v-if="userFevicon"
                                 :src="userFevicon"
-                                height="90"
+                                height="50"
                                 alt="image"
                                 class="users-profile-image object-fit-cover w-inherit"
                             />
@@ -89,15 +88,14 @@
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="isFevicon"
                             @click="refs['favicon-input'].click()"
-                        >
-                            Edit</label
+                        >Edit</label
                         >
                         <label
                             color="error"
                             class="mb-0 ml-3 text-error font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="isFevicon"
                             @click="resetFevicon()"
-                            >Reset</label
+                            >Remove</label
                         >
                     </div>
                     <!-- <div class="text-subtitle-1 text-medium-emphasis text-center my-sm-8 my-6">
@@ -177,7 +175,7 @@
                 </v-col>
                 <!---------------------------------- currency --------------------------------->
                 <v-col cols="12" md="6" class="text-start">
-                    <v-label class="mb-2 font-weight-medium text-capitalize required">Currency{{currency}}</v-label>
+                    <v-label class="mb-2 font-weight-medium text-capitalize required">Currency</v-label>
                     <v-select
                         v-model="currency"
                         :items="currencyOptions"
@@ -187,7 +185,7 @@
                         single-line
                         variant="outlined"
                         label="Please select currency "
-                        :rules="dropdownrule"
+                        :rules="selectRule"
                     >
                         <template v-slot:selection="{ item }">
                             <span>{{ currency.name }} ({{ currency.symbol }} )</span>
@@ -273,7 +271,14 @@ const filesizelimitrule = [
         if ($event.target.value[0] < 200000) return true;
         return 'Avatar size should be less than 2 MB!';
     }
-];
+]
+
+ const selectRule = [
+        () => {
+            if (currency.value ? Object.keys(currency.value).length > 0 : '') return true;
+            return 'Please select an item.';
+        }
+    ]
 
 //currency dropdown customize items options
 function getFieldText(item) {
@@ -328,10 +333,10 @@ function getCompanyprofileData() {
             userFevicon.value = res.data.data.company_setting.company_favicon;
             zipcode.value = res.data.data.company_setting.zipcode;
             companyId.value = res.data.data.company_setting.id;
-            isSnackbar.value = true;
-            message.value = res.data.message;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
+            // isSnackbar.value = true;
+            // message.value = res.data.message;
+            // icon.value = 'mdi-check-circle';
+            // color.value = 'success';
         })
         .catch((error) => {
             isLoading.value = false;

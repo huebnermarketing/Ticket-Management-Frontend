@@ -2,11 +2,15 @@
     <div class="text-center">
         <v-dialog v-model="dialog" persistent class="dialog-mw">
             <v-card class="overflow-auto">
+                 <v-toolbar dark color="primary">
+                    <v-toolbar-title>Edit User</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                </v-toolbar>
                 <v-form @submit.prevent="updateUser" ref="edituserform">
                     <v-container>
-                        <v-card-title class="pa-5">
+                        <!-- <v-card-title class="pa-5">
                             <span class="text-h5">Edit User</span>
-                        </v-card-title>
+                        </v-card-title> -->
                         <v-card-text>
                             <div class="loading" v-if="isLoading">
                                 <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
@@ -14,10 +18,9 @@
                             <v-row>
                                 <!-- accept="image/png, image/jpeg,i image/jpg" -->
                                 <!---------------------------------- profil photo --------------------------------->
-                                <v-col cols="12" md="12">
-                                    <v-label class="mb-2 font-weight-medium text-capitalize mr-4"
-                                        >Profile photo</v-label
-                                    >
+                                <v-col cols="12" md="12" class="d-flex">
+                                    <v-label class="mb-2 font-weight-medium text-capitalize mr-4">Profile photo</v-label>
+
                                     <div>
                                         <v-avatar size="90" class="border">
                                             <img v-if="!userProfilePic" src="@/assets/images/profile/user.png" height="90" alt="image" />
@@ -43,14 +46,14 @@
                                             class="d-none"
                                             id="profileImage"
                                             accept="image/jpeg,image/jpg,image/png"
-                                            @change="uploadImage($event)"                                                    
+                                            @change="uploadImage($event)"
                                         />
                                         <label
                                             for="profileImage"
                                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                                             v-if="isProfileImg"
                                             @click="refs['file-input'].click()"
-                                        >Edit</label
+                                            >Edit</label
                                         >
                                         <label
                                             color="error"
@@ -169,7 +172,7 @@ import { ref, defineExpose, defineComponent, onMounted } from 'vue';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
-const { firstnamerule,filesizelimitrule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule } =
+const { firstnamerule, filesizelimitrule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule } =
     formValidationsRules();
 
 const dialog = ref(false);
@@ -185,8 +188,8 @@ const isProfileImg = ref(false);
 const issubmit = ref(false);
 const userId = ref(0);
 const isActiveUser = ref(true);
-const isLoading = ref(false)
-const fileSize = ref(false)
+const isLoading = ref(false);
+const fileSize = ref(false);
 
 //props for toastification
 const showSnackbar = ref(true);
@@ -198,7 +201,7 @@ const isSnackbar = ref(false);
 const edituserform = ref();
 
 //emits
-const emit = defineEmits(['updateClicked'])
+const emit = defineEmits(['updateClicked']);
 
 function uploadImage(e) {
     isProfileImg.value = true;
@@ -230,35 +233,38 @@ function closeDialog() {
     dialog.value = false;
 }
 function limitFileSize(e) {
-    const file1 = e.target.files[0]
+    const file1 = e.target.files[0];
     let size = parseFloat(file1 ? file1.size : '') / (1024 * 1024).toFixed(2);
-    size > 10 ? fileSize.value = true : fileSize.value = false;
-    console.log("lmm")
+    size > 10 ? (fileSize.value = true) : (fileSize.value = false);
+    console.log('lmm');
 }
 
 function getUsersData(id) {
-    userProfilePic.value = ''
-    isLoading.value = true
+    userProfilePic.value = '';
+    isLoading.value = true;
     userId.value = id;
-    baseURlApi.get(`user/edit-user/${id}`).then((res) => {
-        isLoading.value = false
-        const data = res.data.data;
-        firstName.value = data.first_name;
-        lastName.value = data.last_name;
-        mobile.value = data.phone.trim();
-        userRole.value = data.role;
-        userEmail.value = data.email.trim();
-        data.profile_photo ? isProfileImg.value = true : isProfileImg.value = false
-        userProfilePic.value = data.profile_photo;
-        isActiveUser.value = data.is_active == 1 ? true : false;
-    }).catch((error)=>{
-        isLoading.value = false
-    });
+    baseURlApi
+        .get(`user/edit-user/${id}`)
+        .then((res) => {
+            isLoading.value = false;
+            const data = res.data.data;
+            firstName.value = data.first_name;
+            lastName.value = data.last_name;
+            mobile.value = data.phone.trim();
+            userRole.value = data.role;
+            userEmail.value = data.email.trim();
+            data.profile_photo ? (isProfileImg.value = true) : (isProfileImg.value = false);
+            userProfilePic.value = data.profile_photo;
+            isActiveUser.value = data.is_active == 1 ? true : false;
+        })
+        .catch((error) => {
+            isLoading.value = false;
+        });
 }
 async function updateUser() {
     const { valid } = await edituserform.value?.validate();
-  
-    if (valid) {    
+
+    if (valid) {
         issubmit.value = true;
         const fd = new FormData();
         fd.append('first_name', firstName.value);
@@ -272,8 +278,8 @@ async function updateUser() {
         baseURlApi
             .post(`user/update-user/${userId.value}`, fd)
             .then((res) => {
-                const editedData = res.data.data
-                emit('updateClicked',editedData)
+                const editedData = res.data.data;
+                emit('updateClicked', editedData);
                 issubmit.value = false;
                 // props.getUsers();
                 edituserform.value?.reset();

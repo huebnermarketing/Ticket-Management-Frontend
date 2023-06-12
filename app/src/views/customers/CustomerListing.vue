@@ -17,15 +17,15 @@
                         <v-btn btn color="primary" @click="openAddUserDialog()">
                             <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add Customer
                         </v-btn>
-                        <v-btn btn color="primary">
+                        <!-- <v-btn btn color="primary">
                             <FilterIcon stroke-width="1.5" size="20" class="text-white" />
-                        </v-btn>
+                        </v-btn> -->
                     </div>
                 </v-col>
             </v-row>
             <!-- style="height:300px !important; overflow-y: scroll !important" -->
 
-            <div v-if="current_page >= 1">
+            <div v-if="current_page > 1">
                 <transition name="fade">
                     <div class="loading" v-if="isLoading">
                         <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
@@ -35,13 +35,12 @@
             <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto">
                 <!-- :search-value="searchValue" -->
                 <EasyDataTable
+                    :rows-per-page="-1"
                     sticky
-                     :must-sort="true"
-         
-                    :rows-per-page="300"
+                    fixed
                     :server-items-length="serverItemsLength"
                     :headers="headers"
-                    :fixed-header="true"
+                    :fixed-headers="true"
                     :hide-footer="true"
                     :items="items"
                     :search-value="searchValue"
@@ -50,14 +49,16 @@
                     table-class-name="customize-table"
                     ref="refUserListTable"
                     :loading="isLoading"
+                    :sort-by="sortBy"
+                    :sort-type="sortType"
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
-                    <template #item-name="{ first_name, last_name }">
+                    <template #item-first_name="{ first_name, last_name }">
                         <div class="player-wrapper text-capitalize">
                             {{ first_name + ' ' + last_name }}
                         </div>
                     </template>
-                    <template #item-mobile="{ phone }">
+                    <template #item-phone="{ phone }">
                         <div class="player-wrapper text-capitalize">
                             {{ phone }}
                         </div>
@@ -69,7 +70,9 @@
                     </template>
                     <template #item-user_type="{ role }">
                         <div class="player-wrapper text-capitalize">
-                            <v-chip :color="role.id == 1 ? 'primary' : role.id == 2 ? 'secondary':role.id == 3 ? 'green': ''">{{ role.display_name }}</v-chip>
+                            <v-chip :color="role.id == 1 ? 'primary' : role.id == 2 ? 'secondary' : role.id == 3 ? 'green' : ''">{{
+                                role.display_name
+                            }}</v-chip>
                         </div>
                     </template>
                     <template #item-action="{ id }">
@@ -85,6 +88,13 @@
                                 <template v-slot:activator="{ props }">
                                     <v-btn class="table-icons-common" icon flat @click="deleteUser(id)" v-bind="props"
                                         ><TrashIcon stroke-width="1.5" size="20" class="text-error"
+                                    /></v-btn>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip text="Change password">
+                                <template v-slot:activator="{ props }">
+                                    <v-btn class="table-icons-common" icon flat @click="openChangePasswordDialog(id)" v-bind="props"
+                                        ><SendIcon stroke-width="1.5" size="20" class="text-primary"
                                     /></v-btn>
                                 </template>
                             </v-tooltip>
@@ -108,16 +118,15 @@
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
         </v-snackbar>
-        <addUser ref="adduser" :getUsers="getUsers" />
-        <editUser ref="edituser" :getUsers="getUsers" />
+        <addCustomer ref="addcustomer" @addUserClicked="addUsersData" />
+        <editUser ref="editcustomer" @updateClicked="filterData" />
         <changePassword ref="changePasswordFromUser" />
-        <!-- v-if="isDelete" -->
     </v-row>
 </template>
 <script setup>
 import { onMounted, ref, watch, defineExpose } from 'vue';
 import { baseURlApi } from '@/api/axios';
-import addUser from '@/views/users/AddUser.vue';
+import addCustomer from '@/views/customers/AddCustomer.vue';
 import editUser from '@/views/users/EditUser.vue';
 import changePassword from '@/views/users/ChangePassword.vue';
 import dialogBox from '@/components/TicketComponents/dialog.vue';
@@ -135,10 +144,11 @@ const dialogText = ref('This will delete this user permanently, you can not undo
 const cancelText = ref('Cancel');
 const confirmText = ref('Delete');
 const title = ref('Delete User');
+const editId = ref(0);
 
 //refs
-const adduser = ref();
-const edituser = ref();
+const addcustomer = ref();
+const editcustomer = ref();
 const changePasswordFromUser = ref();
 const deleteDialog = ref();
 const refUserListTable = ref();
@@ -157,16 +167,16 @@ const breadcrumbs = ref([
 ]);
 
 const headers = ref([
-    { text: 'Name', value: 'name', sortable: true },
-    { text: 'Mobile', value: 'mobile' },
-    { text: 'Email', value: 'email' },
-    { text: 'User type', value: 'user_type', sortable: true },
+    { text: 'Name', value: 'first_name', sortable: true },
+    { text: 'Mobile', value: 'phone', sortable: true },
+    { text: 'Email', value: 'email', sortable: true },
+    { text: 'User type', value: 'user_type' },
     { text: 'Action', value: 'action' }
 ]);
 const serverItemsLength = ref(50);
-const current_page = ref(0);
-const sortBy = ref('first_name', 'user_type');
-const sortType = ref('desc','asc');
+const current_page = ref(1);
+const sortBy = 'first_name';
+const sortType = 'desc';
 const items = ref([]);
 const searchField = ref('name', 'mobile', 'email');
 const searchValue = ref('');
@@ -174,6 +184,7 @@ const total_record = ref();
 const deleteId = ref(0);
 const isLoading = ref(false);
 const resizableDiv = ref();
+const isFromAdd = ref(false);
 //props for toastification
 const showSnackbar = ref(true);
 const message = ref('');
@@ -181,6 +192,7 @@ const color = ref('');
 const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
+
 const serverOptions = {
     page: 1,
     sort_value: sortBy.value,
@@ -188,27 +200,51 @@ const serverOptions = {
 };
 const tableHeight = ref(0);
 //get users
-// function searchUser(){
-//      baseURlApi
-//         .get('/ search-user', searchValue.value)
-//         .then((res) => {
-//            console.log("res",resizeBy)
-//         })
-//         .catch((error) => {
-
-//         });
-// }
+function searchUser() {
+    const fd = new FormData();
+    if(searchValue.value.length > 0){
+    fd.append('search_key', searchValue.value);
+    baseURlApi
+        .post(`user/search-user?total_record=${current_page.value}`, fd)
+        .then((res) => {
+            console.log('res', res);
+        })
+        .catch((error) => {});
+    }
+}
 function getUsers() {
     isLoading.value = true;
-    const params = { total_record: 50, sort_value: sortBy.value, order_by: sortType.value, page: parseInt(current_page.value) + 1 };
+    const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
-        .get('/user/get-users', { params })
+        .get('customer/list', { params })
         .then((res) => {
             isLoading.value = false;
             serverItemsLength.value = res.data.data.total;
-            let countries = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
+            let itemsData = [];
+            if (isFromAdd.value) {
+                let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
 
-            items.value = countries.slice();
+                // Declare an empty object
+                let uniqueObject = {};
+
+                // Loop for the array elements
+                for (let i in newArray) {
+                    // Extract the title
+                    let objid = newArray[i]['id'];
+
+                    // Use the title as the index
+                    uniqueObject[objid] = newArray[i];
+                }
+
+                // Loop to push unique object into array
+                for (let i in uniqueObject) {
+                    itemsData.push(uniqueObject[i]);
+                }
+            } else {
+                itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data));
+            }
+
+            items.value = itemsData.slice();
             items.value = JSON.parse(JSON.stringify(items.value));
             const proxy = new Proxy(items.value, {
                 get(target, prop, receiver) {
@@ -217,12 +253,6 @@ function getUsers() {
             });
             items.value = [...proxy];
             items.value = [...JSON.parse(JSON.stringify(items.value))];
-            current_page.value = res.data.data.current_page;
-
-            // message.value = res.data.message;
-            // isSnackbar.value = true;
-            // icon.value = 'mdi-check-circle';
-            // color.value = 'success';
         })
         .catch((error) => {
             isLoading.value = false;
@@ -232,51 +262,26 @@ function getUsers() {
             icon.value = 'mdi-close-circle';
         });
 }
-function getUsersData() {
-    isLoading.value = true;
-    const params = { total_record: 50, sort_value: sortBy.value, order_by: sortType.value, page: 1 };
-    baseURlApi
-        .get('/user/get-users', { params })
-        .then((res) => {
-            isLoading.value = false;
-            serverItemsLength.value = res.data.data.total;
-            let countries = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
-
-            items.value = countries.slice();
-            items.value = JSON.parse(JSON.stringify(items.value));
-            const proxy = new Proxy(items.value, {
-                get(target, prop, receiver) {
-                    return target[prop];
-                }
-            });
-            items.value = [...proxy];
-            items.value = [...JSON.parse(JSON.stringify(items.value))];
-            current_page.value = res.data.data.current_page;
-
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
-        })
-        .catch((error) => {
-            isLoading.value = false;
-            isSnackbar.value = true;
-            message.value = error.message;
-            color.value = 'error';
-            icon.value = 'mdi-close-circle';
-        });
+function filterData(editedData) {
+    const existing = items.value.find((e) => e.id === editedData.id);
+    if (existing) Object.assign(existing, editedData);
 }
+function addUsersData(addedData) {
+    isFromAdd.value = true;
+    getUsers();
+}
+
 //set table height
 
 //open modal
 function openAddUserDialog() {
-    adduser.value?.open();
-    adduser.value?.getRoles();
+    addcustomer.value?.open();
 }
 function openEditDialog(id) {
-    edituser.value?.getRoles();
-    edituser.value?.open();
-    edituser.value?.getUsersData(id);
+    editId.value = id;
+    editcustomer.value?.getRoles();
+    editcustomer.value?.open();
+    editcustomer.value?.getUsersData(id);
 }
 function openChangePasswordDialog(id) {
     changePasswordFromUser.value?.open(id);
@@ -310,10 +315,12 @@ function deleteUser(id) {
 }
 onMounted(() => {
     const listElm = document.querySelector('#infinite-list');
-
     listElm.addEventListener('scroll', (e) => {
         if (items.value.length < serverItemsLength.value) {
             if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
+                console.log("scrolled")
+                current_page.value = current_page.value + 1;
+                isFromAdd.value = false;
                 getUsers();
             }
         }

@@ -221,6 +221,8 @@ function getUsers() {
             isLoading.value = false;
             serverItemsLength.value = res.data.data.total;
             let itemsData = [];
+            console.log(res.data.data.data
+            )
             if (isFromAdd.value) {
                 let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
 
@@ -243,7 +245,7 @@ function getUsers() {
             } else {
                 itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data));
             }
-
+            console.log(itemsData)
             items.value = itemsData.slice();
             items.value = JSON.parse(JSON.stringify(items.value));
             const proxy = new Proxy(items.value, {

@@ -2,16 +2,23 @@
     <div class="text-center">
         <v-dialog v-model="dialog" persistent class="dialog-mw">
             <v-card class="overflow-auto">
+                <v-toolbar dark color="primary">
+                    <!-- <v-btn icon dark @click="dialog = false">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn> -->
+                    <v-toolbar-title>Add user</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                </v-toolbar>
                 <v-form @submit.prevent="createUser" ref="createuserform">
                     <v-container>
-                        <v-card-title class="pa-5">
+                        <!-- <v-card-title class="pa-5">
                             <span class="text-h5">Add user</span>
-                        </v-card-title>
+                        </v-card-title> -->
                         <v-card-text>
                             <v-row>
                                 <!-- accept="image/png, image/jpeg,i image/jpg" -->
                                 <!---------------------------------- profil photo --------------------------------->
-                                <v-col cols="12" md="12">
+                                <v-col cols="12" md="12" class="d-flex">
                                     <v-label class="mb-2 font-weight-medium text-capitalize mr-4">Profile photo</v-label>
                                     <div>
                                         <v-avatar size="90" class="border">

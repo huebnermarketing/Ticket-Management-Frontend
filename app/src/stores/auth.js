@@ -16,7 +16,6 @@ export const useAuthStore = defineStore({
          async login(body) {
             // const {data} = await baseURlApi.post(`${baseUrl}/login`, body);
             const data =  await baseURlApi.post(`${baseUrl}/auth/login?permission=user-auth`, body);
-            console.log("dttdd",data)
             // update pinia state
             this.user = data.data;
             

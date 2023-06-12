@@ -242,6 +242,7 @@ const zipcode = ref('');
 const isLoading = ref(false);
 const companyId = ref(0);
 
+
 const userProfilePic = ref('');
 const userFevicon = ref('');
 const UserProfileFile = ref('');

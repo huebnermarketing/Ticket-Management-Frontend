@@ -82,7 +82,7 @@
                                         <v-radio :value=i>
                                             <template v-slot:label>
                                                 <JewishStarIcon stroke-width="1.5" size="22" class="text-medium-emphasis" style="background-color: red;"/>
-                                                <div>Of course it's <strong class="text-success">Google</strong></div>
+                                                <!-- <div>Of course it's <strong class="text-success">Google</strong></div> -->
                                             </template>
                                         </v-radio>
                                     </v-radio-group>

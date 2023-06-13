@@ -14,7 +14,7 @@ const MainRoutes = {
         {
             name: 'Users',
             path: '/users',
-            component: () => import('@/views/users/UserListing.vue')
+            component: () => import('')
         },
 //---------------------------------- Table Demo ---------------------------------------------//
 

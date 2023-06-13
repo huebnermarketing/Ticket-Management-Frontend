@@ -73,7 +73,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useContactStore } from '@/stores/apps/contact';
-import AddTicket from '@/views/tickets/Addticket.vue'
+// import AddTicket from '@/views/tickets/Addticket.vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import contact from '@/_mockApis/apps/contact';

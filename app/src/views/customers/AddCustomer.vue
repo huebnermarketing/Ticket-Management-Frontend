@@ -71,13 +71,26 @@
                             <span class="text-h5">Add Address</span>
                             <v-btn color="primary ml-4" @click="openAddAddressDialog()">Add</v-btn>
                         </v-card-title>
-                        <v-card-text class="border border-top-0">
-                            <v-card elevation="2" width="fit-content" class="m-0 p-5 address-card" v-for="(data, i) in addaddress" :key="i">
+                        <v-card-text class="border border-top-0 d-flex justify-start flex-wrap">
+                            <v-card elevation="2" class="m-0 p-5 address-card" v-for="(data, i) in addaddress" :key="i">
+                                {{ radios }}
+                                <div>
+                                    <v-radio-group v-model="radios">
+                                        <!-- <template v-slot:label>
+                                            <div>Your favourite <strong>search engine</strong></div>
+                                        </template> -->
+                                        <v-radio :value=i>
+                                            <template v-slot:label>
+                                                <JewishStarIcon stroke-width="1.5" size="22" class="text-medium-emphasis" style="background-color: red;"/>
+                                                <div>Of course it's <strong class="text-success">Google</strong></div>
+                                            </template>
+                                        </v-radio>
+                                    </v-radio-group>
+                                </div>
                                 <div class="p-2 w-inherit">
                                     <p class="font-weight-bold">{{ data.company_name }}</p>
                                     <div class="mt-2">
                                         <span class="font-weight-bold">{{ data.address_line1 }}, </span>
-                                        
                                     </div>
                                     <div class="mt-2">
                                         <span class="font-weight-bold">{{ data.area }}, </span>
@@ -98,7 +111,7 @@
                 </v-form>
             </v-card>
         </v-dialog>
-        <AddAddress ref="addNewaddress" @addAddressClicked="addaddressData"/>
+        <AddAddress ref="addNewaddress" @addAddressClicked="addaddressData" />
         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
@@ -108,9 +121,12 @@
 <script setup>
 import { ref, defineExpose, defineComponent, onMounted } from 'vue';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
-import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
-import AddAddress from './AddAddress.vue'
+import AddAddress from './AddAddress.vue';
+import { useCustomerAddressStore } from '@/stores/customerAddress';
+import { JewishStarIcon } from 'vue-tabler-icons';
+const store = useCustomerAddressStore();
+import { LockIcon, UserIcon, MailIcon } from 'vue-tabler-icons';
 
 //mixins
 const { confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule } =
@@ -123,8 +139,9 @@ const lastName = ref('');
 const userEmail = ref('');
 const mobile = ref('');
 const issubmit = ref(false);
-const addNewaddress = ref()
+const addNewaddress = ref();
 const addaddress = ref([]);
+const radios = ref(0);
 
 //props for toastification
 const showSnackbar = ref(true);
@@ -150,10 +167,10 @@ function limitFileSize() {
     let size = parseFloat(this.file1 ? this.file1.size : '') / (1024 * 1024).toFixed(2);
     size > 10 ? (this.fileSize = true) : (this.fileSize = false);
 }
-function addaddressData( addressList ) {
-  
-    addaddress.value =  addressList
-    console.log("array111111",addaddress.value, typeof Object.keys(addressList))
+function addaddressData(addressList) {
+    store.getnewAddress;
+    addaddress.value = store.getnewAddress;
+    console.log('array11', addaddress.value);
 }
 async function createUser() {
     const { valid } = await createcustomerform.value?.validate();
@@ -200,10 +217,10 @@ function openAddAddressDialog() {
     addNewaddress.value?.open();
 }
 onMounted(() => {
-    // getRoles();
+    addaddress.value = store.getnewAddress;
 });
 defineExpose({
-    open,
+    open
 });
 </script>
 <style>
@@ -214,10 +231,15 @@ defineExpose({
 .card-title-border {
     border-bottom: 0 !important;
 }
-.address-card{
+.address-card {
     padding: 18px !important;
     margin-top: 12px !important;
+    flex: 0 0 32%;
+    margin-right: 13px;
 }
+/* .address-card-main{
+    flex: 0 0 33.33% !important;
+} */
 /* .v-input__details {
     display: none !important;
 } */

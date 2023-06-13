@@ -118,7 +118,7 @@
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
         </v-snackbar>
-        <addUser ref="adduser" @addUserClicked="addUsersData" />
+        <AddUser ref="adduser" @addUserClicked="addUsersData" />
         <editUser ref="edituser" @updateClicked="filterData" />
         <changePassword ref="changePasswordFromUser" />
     </v-row>
@@ -126,9 +126,9 @@
 <script setup>
 import { onMounted, ref, watch, defineExpose } from 'vue';
 import { baseURlApi } from '@/api/axios';
-import addUser from '@/views/users/AddUser.vue';
-import editUser from '@/views/users/EditUser.vue';
-import changePassword from '@/views/users/ChangePassword.vue';
+import AddUser from '@/views/users/AddUser';
+import editUser from '@/views/users/editUser.vue';
+import changePassword from '@/views/users/changePassword.vue';
 import dialogBox from '@/components/TicketComponents/dialog.vue';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';

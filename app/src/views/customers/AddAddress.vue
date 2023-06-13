@@ -163,7 +163,8 @@ async function addAddress() {
            console.log("ddd 111232",typeof addressList)
 
     if (valid) {
-        store.newAddress.push ({
+        const data = []
+        data.push ({
         address_line1:address.value,
         company_name: companyName.value,
         area: area.value,
@@ -173,6 +174,7 @@ async function addAddress() {
         country: country.value,
         is_primary: 0
     })  
+    store.setAddress(...data)
        console.log("ddd 111",store.getnewAddress)
 
         emit('addAddressClicked', addressList);

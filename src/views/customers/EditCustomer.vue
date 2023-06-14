@@ -3,15 +3,18 @@
         <v-dialog v-model="dialog" fullscreen :scrim="false" transition="dialog-top-transition">
             <v-card class="overflow-auto">
                 <v-toolbar dark color="primary">
-                    <v-toolbar-title>Add Customer</v-toolbar-title>
+                    <v-toolbar-title>Edit Customer</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
-                <v-form @submit.prevent="createCustomer" ref="createcustomerform">
+                <v-form @submit.prevent="updateCustomer" ref="updatecustomerform">
                     <v-container>
                         <v-card-title class="pa-5 border card-title-border">
                             <span class="text-h5">Personal Details</span>
                         </v-card-title>
                         <v-card-text class="border border-top-0">
+                            <div class="loading" v-if="isLoading">
+                                <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
+                            </div>
                             <v-row class="mt-2">
                                 <!---------------------------------- First name --------------------------------->
                                 <v-col cols="12" md="6">
@@ -114,7 +117,13 @@
                                                         <path
                                                             d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z"
                                                             stroke-width="1"
-                                                            :fill="i == radios ? 'rgb(93,135,255)' : 'rgb(255,255,255)'"
+                                                            :fill="
+                                                                i == radios
+                                                                    ? 'rgb(93,135,255)'
+                                                                    : data.is_primary == 1
+                                                                    ? 'rgb(93,135,255)'
+                                                                    : 'rgb(255,255,255)'
+                                                            "
                                                         ></path>
                                                     </svg>
                                                 </div>
@@ -168,9 +177,7 @@
                 </v-form>
             </v-card>
         </v-dialog>
-        <AddAddress ref="addNewaddress" @addAddressClicked="addaddressData" />
-        <EditSingleAddress ref="editsingleaddress" @updateClicked="filterData" />
-        <!-- <EditSingleAddress ref="editsingleaddress" @updateClicked="filterData" :singleAddressDetail="singleAddressDetail" /> -->
+        <EditAddress ref="addNewaddress" @editAddressClicked="addaddressData" :customerId="customerId" />
         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
@@ -181,8 +188,7 @@
 import { ref, defineExpose, defineComponent, onMounted } from 'vue';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { baseURlApi } from '@/api/axios';
-import AddAddress from './AddAddress.vue';
-import EditSingleAddress from './EditSingleAddress.vue';
+import EditAddress from './EditAddress.vue';
 import icons from 'vue-tabler-icons';
 import { useCustomerAddressStore } from '@/stores/customerAddress';
 const store = useCustomerAddressStore();
@@ -198,16 +204,17 @@ const userEmail = ref('');
 const mobile = ref('');
 const issubmit = ref(false);
 const addNewaddress = ref();
-const editsingleaddress = ref();
 const addaddress = ref([]);
 const isEmptyAddress = ref(false);
+const isLoading = ref(false);
+
 const altMobile = ref([
     {
         altMobileNo: ''
     }
 ]);
 const radios = ref(0);
-const singleAddressDetail = ref({});
+const customerId = ref(0);
 
 //props for toastification
 const showSnackbar = ref(true);
@@ -216,32 +223,69 @@ const color = ref('');
 const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
-const createcustomerform = ref();
+const updatecustomerform = ref();
 
 /*emits*/
 const emit = defineEmits(['addCustomerClicked']);
 
 //methods
+function getCustomersData(id) {
+    isLoading.value = true;
+    customerId.value = id;
+    baseURlApi
+        .get(`customer/edit/${id}`)
+        .then((res) => {
+            isLoading.value = false;
+            const data = res.data.data;
+            console.log('get customer', data);
+            firstName.value = data.first_name ? data.first_name : '';
+            lastName.value = data.last_name;
+            userEmail.value = data.email.trim();
+            mobile.value = data.primary_mobile.trim();
+            let altMobileArr = [];
+
+            /*get alternativ mobile */
+            data.phones.map((item) => {
+                altMobileArr.push({
+                    altMobileNo: item.phone
+                });
+            });
+            altMobile.value = [...altMobileArr];
+            /*get addresses */
+            addaddress.value = data.locations;
+        })
+        .catch((error) => {
+            isLoading.value = false;
+        });
+}
 function closeDialog() {
-    createcustomerform.value?.reset();
-    createcustomerform.value?.resetValidation();
-    isEmptyAddress.value = false;
+    updatecustomerform.value?.reset();
+    updatecustomerform.value?.resetValidation();
     dialog.value = false;
 }
 function addaddressData(addressList) {
-    store.getnewAddress;
-    addaddress.value = store.getnewAddress;
-    if (addaddress.value.length == 1) {
-        addaddress.value[0].is_primary = 1;
-    }
-    if (addaddress.value.length > 0) isEmptyAddress.value = false;
+    store.getupdateAddress;
+    // addaddress.value = addaddress.value.concat(store.getupdateAddress);
+
+    baseURlApi
+        .get(`customer/address/get/${customerId.value}`)
+        .then((res) => {
+            isLoading.value = false;
+            const data = res.data.data;
+            addaddress.value = data;
+            console.log('adddress', data);
+            if (addaddress.value.length == 1) {
+                addaddress.value[0].is_primary = 1;
+            }
+            if (addaddress.value.length > 0) isEmptyAddress.value = false;
+        })
+        .catch((error) => {
+            isLoading.value = false;
+        });
 }
-async function createCustomer() {
-    const { valid } = await createcustomerform.value?.validate();
+async function updateCustomer() {
+    const { valid } = await updatecustomerform.value?.validate();
     if (addaddress.value.length <= 0) isEmptyAddress.value = true;
-    addaddress.value.map((item) => {
-        return delete item.id
-    })
     if (valid && !isEmptyAddress.value) {
         issubmit.value = true;
         var altPhone = altMobile.value.map((item) => {
@@ -253,7 +297,7 @@ async function createCustomer() {
             email: userEmail.value,
             primary_mobile: mobile.value,
             alternate_mobile: altPhone,
-            addresses: addaddress.value
+            primary_address_id: 7
         };
         if (lastName.value.length <= 0) {
             delete requestBody.last_name;
@@ -262,15 +306,14 @@ async function createCustomer() {
             delete requestBody.alternate_mobile;
         }
         baseURlApi
-            .post('customer/create', requestBody)
+            .post('customer/update', requestBody)
             .then((res) => {
                 const addedData = res.data.data;
-                emit('addCustomerClicked', addedData);
+                emit('updateClicked', addedData);
                 issubmit.value = false;
                 isEmptyAddress.value = false;
-                createcustomerform.value?.reset();
-                createcustomerform.value?.resetValidation();
-                addaddress.value = []
+                updatecustomerform.value?.reset();
+                updatecustomerform.value?.resetValidation();
                 dialog.value = false;
                 message.value = res.data.message;
                 isSnackbar.value = true;
@@ -298,7 +341,7 @@ function deleteInput(i) {
 }
 function open() {
     dialog.value = true;
-    store.$reset
+    store.$reset;
 }
 function primaryAddressChange(index) {
     return addaddress.value.map((item, i) => {
@@ -312,27 +355,14 @@ function primaryAddressChange(index) {
 function openAddAddressDialog() {
     addNewaddress.value?.open();
 }
-function filterData(data) {
-     console.log('existing1',data);
-    const existing = addaddress.value.find((e) => 
-        e.id === data.id
-        );
-   
-    if (existing) {
-        Object.assign(existing, data)
-        }
-}
-function openEditDialog(id, data) {
-    singleAddressDetail.value = data;
-    singleAddressDetail.value.id = id;
-    console.log('singlee', singleAddressDetail.value);
-    editsingleaddress.value?.open(singleAddressDetail.value);
-}
 onMounted(() => {
-    addaddress.value = store.getnewAddress;
+    // addaddressData()
+    // addaddress.value = addaddress.value.concat(store.getupdateAddress);
 });
 defineExpose({
-    open
+    open,
+    getCustomersData
+    // addaddressData
 });
 </script>
 <style>

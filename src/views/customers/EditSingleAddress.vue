@@ -6,10 +6,10 @@
                     <!-- <v-btn icon dark @click="dialog = false">
                         <v-icon>mdi-close</v-icon>
                     </v-btn> -->
-                    <v-toolbar-title>Add New Address</v-toolbar-title>
+                    <v-toolbar-title>Edit Address</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
-                <v-form @submit.prevent="addAddress" ref="createAddressForm">
+                <v-form @submit.prevent="addAddress" ref="editSingleAddressForm">
                     <v-container>
                         <!-- <v-card-title class="pa-5">
                             <span class="text-h5">Add user</span>
@@ -103,9 +103,10 @@ import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import { useCustomerAddressStore } from '@/stores/customerAddress';
-const store = useCustomerAddressStore()
+const store = useCustomerAddressStore();
 //mixins
-const { cityrule, staterule, zipcoderule, countyrule, arearule, companynamerule, addresslinerule, passwordrule, dropdownrule } = formValidationsRules();
+const { cityrule, staterule, zipcoderule, countyrule, arearule, companynamerule, addresslinerule, passwordrule, dropdownrule } =
+    formValidationsRules();
 const dialog = ref(false);
 const companyName = ref('');
 const address = ref('');
@@ -119,7 +120,6 @@ const companyId = ref(0);
 const issubmit = ref(false);
 let addressList = [];
 
-
 //props for toastification
 const showSnackbar = ref(true);
 const message = ref('');
@@ -127,71 +127,60 @@ const color = ref('');
 const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
-const createAddressForm = ref();
+const editSingleAddressForm = ref();
+const singleAddressDetails = ref({})
 
 // validations rules
 
 /*emits*/
-const emit = defineEmits(['addAddressClicked']);
+const emit = defineEmits(['updateClicked']);
+
+//props
 
 //methods
-function uploadImage(e) {
-    console.log('uploadedd');
-    isProfileImg.value = true;
-    const fd = new FormData();
-    const file = e.target.files[0];
-    UserProfileFile.value = file;
-    userProfilePic.value = URL.createObjectURL(e.target.files[0]);
-    fd.append('file', file);
-}
-function resetProfilepic() {
-    userProfilePic.value = '';
-    isProfileImg.value = false;
-}
 function closeDialog() {
-    createAddressForm.value?.reset();
+    editSingleAddressForm.value?.reset();
     dialog.value = false;
 }
-
-function limitFileSize() {
-    let size = parseFloat(this.file1 ? this.file1.size : '') / (1024 * 1024).toFixed(2);
-    size > 10 ? (this.fileSize = true) : (this.fileSize = false);
-}
 async function addAddress() {
-    
-    const { valid } = await createAddressForm.value?.validate();
-           console.log("ddd 111232",typeof addressList)
+    const { valid } = await editSingleAddressForm.value?.validate();
 
     if (valid) {
-        const data = []
-        data.push ({
-        address_line1:address.value,
-        company_name: companyName.value,
-        area: area.value,
-        city: city.value,
-        state: state.value,
-        zipcode:zipcode.value,
-        country: country.value,
-        is_primary: 0
-    })  
-    store.setAddress(...data)
-       console.log("ddd 111",store.getnewAddress)
+        const data = {
+            address_line1: address.value,
+            company_name: companyName.value,
+            area: area.value,
+            city: city.value,
+            state: state.value,
+            zipcode: zipcode.value,
+            country: country.value,
+            is_primary: singleAddressDetails.value.is_primary,
+            id: singleAddressDetails.value.id
+        };
+        // store.setAddress(...data)
+        //    console.log("ddd 111",store.getnewAddress)
 
-        emit('addAddressClicked', addressList);
+        emit('updateClicked', data);
         issubmit.value = false;
-        createAddressForm.value?.reset();
-        createAddressForm.value?.resetValidation();
-        country.value = 'india'
+        editSingleAddressForm.value?.reset();
+        editSingleAddressForm.value?.resetValidation();
+        // country.value = 'india'
         dialog.value = false;
     }
 }
-function open() {
+function open(singleAddressDetail) {
     dialog.value = true;
+    singleAddressDetails.value = singleAddressDetail
+    let propsObj = singleAddressDetail;
+    address.value = propsObj.address_line1,
+        companyName.value = propsObj.company_name,
+        area.value = propsObj.area,
+        city.value = propsObj.city,
+        state.value = propsObj.state,
+        zipcode.value = propsObj.zipcode,
+        country.value = propsObj.country;
 }
 
-onMounted(() => {
-    // getRoles();
-});
 defineExpose({
     open
 });

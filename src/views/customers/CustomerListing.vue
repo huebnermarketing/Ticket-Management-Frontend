@@ -68,11 +68,9 @@
                             {{ email }}
                         </div>
                     </template>
-                    <template #item-user_type="{ role }">
-                        <div class="player-wrapper text-capitalize">
-                            <v-chip :color="role.id == 1 ? 'primary' : role.id == 2 ? 'secondary' : role.id == 3 ? 'green' : ''">{{
-                                role.display_name
-                            }}</v-chip>
+                     <template #item-company_name="{ company_name }">
+                        <div class="player-wrapper">
+                            {{ company_name }}
                         </div>
                     </template>
                     <template #item-action="{ id }">
@@ -88,13 +86,6 @@
                                 <template v-slot:activator="{ props }">
                                     <v-btn class="table-icons-common" icon flat @click="deleteUser(id)" v-bind="props"
                                         ><TrashIcon stroke-width="1.5" size="20" class="text-error"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Change password">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="openChangePasswordDialog(id)" v-bind="props"
-                                        ><SendIcon stroke-width="1.5" size="20" class="text-primary"
                                     /></v-btn>
                                 </template>
                             </v-tooltip>
@@ -118,17 +109,15 @@
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
         </v-snackbar>
-        <addCustomer ref="addcustomer" @addUserClicked="addUsersData" />
-        <editUser ref="editcustomer" @updateClicked="filterData" />
-        <changePassword ref="changePasswordFromUser" />
+        <addCustomer ref="addcustomer" @addCustomerClicked="addCustomerData" />
+        <editCustomer ref="editcustomer" @updateClicked="filterData" />
     </v-row>
 </template>
 <script setup>
 import { onMounted, ref, watch, defineExpose } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import addCustomer from '@/views/customers/AddCustomer.vue';
-import editUser from '@/views/users/EditUser.vue';
-import changePassword from '@/views/users/ChangePassword.vue';
+import editCustomer from '@/views/customers/EditCustomer.vue';
 import dialogBox from '@/components/TicketComponents/dialog.vue';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
@@ -170,7 +159,7 @@ const headers = ref([
     { text: 'Name', value: 'first_name', sortable: true },
     { text: 'Mobile', value: 'phone', sortable: true },
     { text: 'Email', value: 'email', sortable: true },
-    { text: 'User type', value: 'user_type' },
+    { text: 'Company Name', value: 'company_name', sortable: true },
     { text: 'Action', value: 'action' }
 ]);
 const serverItemsLength = ref(50);
@@ -193,11 +182,6 @@ const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
 
-const serverOptions = {
-    page: 1,
-    sort_value: sortBy.value,
-    order_by: sortType.value
-};
 const tableHeight = ref(0);
 //get users
 function searchUser() {
@@ -205,7 +189,7 @@ function searchUser() {
     if(searchValue.value.length > 0){
     fd.append('search_key', searchValue.value);
     baseURlApi
-        .post(`user/search-user?total_record=${current_page.value}`, fd)
+        .post(`customer/search?total_record=${current_page.value}`, fd)
         .then((res) => {
             console.log('res', res);
         })
@@ -266,7 +250,7 @@ function filterData(editedData) {
     const existing = items.value.find((e) => e.id === editedData.id);
     if (existing) Object.assign(existing, editedData);
 }
-function addUsersData(addedData) {
+function addCustomerData(addedData) {
     isFromAdd.value = true;
     getUsers();
 }
@@ -279,9 +263,9 @@ function openAddUserDialog() {
 }
 function openEditDialog(id) {
     editId.value = id;
-    editcustomer.value?.getRoles();
     editcustomer.value?.open();
-    editcustomer.value?.getUsersData(id);
+    editcustomer.value?.getCustomersData(id);
+    // editcustomer.value?.addaddressData()
 }
 function openChangePasswordDialog(id) {
     changePasswordFromUser.value?.open(id);

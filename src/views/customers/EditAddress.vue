@@ -3,17 +3,11 @@
         <v-dialog v-model="dialog" persistent class="dialog-mw">
             <v-card class="overflow-auto">
                 <v-toolbar dark color="primary">
-                    <!-- <v-btn icon dark @click="dialog = false">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn> -->
                     <v-toolbar-title>Add New Address</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
                 <v-form @submit.prevent="addAddress" ref="createAddressForm">
                     <v-container>
-                        <!-- <v-card-title class="pa-5">
-                            <span class="text-h5">Add user</span>
-                        </v-card-title> -->
                         <v-card-text>
                             <v-row align="start" align-content-md="start" justify="start" style="max-width: 1000px">
                                 <!-- accept="image/png, image/jpeg,i image/jpg" -->
@@ -103,9 +97,10 @@ import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import { useCustomerAddressStore } from '@/stores/customerAddress';
-const store = useCustomerAddressStore()
+const store = useCustomerAddressStore();
 //mixins
-const { cityrule, staterule, zipcoderule, countyrule, arearule, companynamerule, addresslinerule, passwordrule, dropdownrule } = formValidationsRules();
+const { cityrule, staterule, zipcoderule, countyrule, arearule, companynamerule, addresslinerule, passwordrule, dropdownrule } =
+    formValidationsRules();
 const dialog = ref(false);
 const companyName = ref('');
 const address = ref('');
@@ -119,7 +114,6 @@ const companyId = ref(0);
 const issubmit = ref(false);
 let addressList = [];
 
-
 //props for toastification
 const showSnackbar = ref(true);
 const message = ref('');
@@ -129,10 +123,13 @@ const timer = ref(5000);
 const isSnackbar = ref(false);
 const createAddressForm = ref();
 
-// validations rules
+// props
+const props = defineProps({
+    customerId: Number
+});
 
 /*emits*/
-const emit = defineEmits(['addAddressClicked']);
+const emit = defineEmits(['editAddressClicked']);
 
 //methods
 function uploadImage(e) {
@@ -158,31 +155,51 @@ function limitFileSize() {
     size > 10 ? (this.fileSize = true) : (this.fileSize = false);
 }
 async function addAddress() {
-    
     const { valid } = await createAddressForm.value?.validate();
-           console.log("ddd 111232",typeof addressList)
 
     if (valid) {
-        const data = []
-        data.push ({
-        address_line1:address.value,
-        company_name: companyName.value,
-        area: area.value,
-        city: city.value,
-        state: state.value,
-        zipcode:zipcode.value,
-        country: country.value,
-        is_primary: 0
-    })  
-    store.setAddress(...data)
-       console.log("ddd 111",store.getnewAddress)
-
-        emit('addAddressClicked', addressList);
-        issubmit.value = false;
-        createAddressForm.value?.reset();
-        createAddressForm.value?.resetValidation();
-        country.value = 'india'
-        dialog.value = false;
+        const requestBody = {
+            customer_id: props.customerId,
+            address_line1: address.value,
+            company_name: companyName.value,
+            area: area.value,
+            city: city.value,
+            state: state.value,
+            zipcode: zipcode.value,
+            country: country.value,
+            is_primary: 0
+        };
+        baseURlApi
+            .post('customer/address/add', requestBody)
+            .then((res) => {
+                const data = [];
+                data.push({
+                    address_line1: address.value,
+                    customer_id: props.customerId,
+                    company_name: companyName.value,
+                    area: area.value,
+                    city: city.value,
+                    state: state.value,
+                    zipcode: zipcode.value,
+                    country: country.value,
+                    is_primary: 0
+                });
+                store.setUpdateAddress(...data);
+                // console.log("ddd 111",store.getupdateAddress)
+                emit('editAddressClicked', data);
+                issubmit.value = false;
+                createAddressForm.value?.reset();
+                createAddressForm.value?.resetValidation();
+                country.value = 'india';
+                dialog.value = false;
+            })
+            .catch((error) => {
+                issubmit.value = false;
+                isSnackbar.value = true;
+                message.value = error.message;
+                color.value = 'error';
+                icon.value = 'mdi-close-circle';
+            });
     }
 }
 function open() {

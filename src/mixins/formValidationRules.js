@@ -45,6 +45,20 @@ export const formValidationsRules = () => {
             return 'Mobile Number must be a numeric value.';
         }
     ];
+    const alternativemobilerule = [
+        (value) => {
+            if (value?.length > 0) {
+                if (value?.length <= 15 && value?.length >= 3) return true;
+                return 'Mobile Number must be between 3-15 digit.';
+            }
+        },
+        (value) => {
+            if (value?.length > 0) {
+                if (/^\d+$/.test(value)) return true;
+                return 'Mobile Number must be a numeric value.';
+            }
+        }
+    ];
 
     const emailrule = [
         (value) => {
@@ -71,7 +85,7 @@ export const formValidationsRules = () => {
             if (value?.length >= 6) return true;
             return 'The password should be a minimum of 6 characters';
         },
-        
+
     ];
     const confirmpasswordrule = [
         (value) => {
@@ -86,7 +100,7 @@ export const formValidationsRules = () => {
             if (value == newpwd.value) return true;
             return 'Password and Confirm password does not match.';
         },
-        
+
     ];
 
     const dropdownrule = [
@@ -167,7 +181,7 @@ export const formValidationsRules = () => {
             return 'Zip Code is required.';
         },
         (value) => {
-            if (value?.length <=8 && value?.length >=4) return true;
+            if (value?.length <= 8 && value?.length >= 4) return true;
             return 'Zip Code must have a length between 4 and 8.';
         }
         // (value) => {
@@ -175,5 +189,5 @@ export const formValidationsRules = () => {
         //     return 'Zip Code must be a numeric value.';
         // }
     ];
-    return {requiredrule,cityrule,staterule,zipcoderule,countyrule,arearule,addresslinerule,companynamerule,confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule};
+    return { alternativemobilerule, requiredrule, cityrule, staterule, zipcoderule, countyrule, arearule, addresslinerule, companynamerule, confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule };
 };

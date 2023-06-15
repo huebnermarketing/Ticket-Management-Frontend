@@ -1,5 +1,5 @@
 <script setup>
-import {userCardData} from '@/_mockApis/components/dashboard/modernData';
+import {userCardData} from '@/_mockApis/components/dashboard/modernData.js';
 </script>
 <template>
     <v-card elevation="10" >

@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { weeklyStatsData } from '@/_mockApis/components/dashboard/modernData';
+import { weeklyStatsData } from '@/_mockApis/components/dashboard/modernData.js';
 
 import { getPrimary } from '@/utils/UpdateColors';
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import {topProjectsData} from '@/_mockApis/components/dashboard/modernData'
+import {topProjectsData} from '@/_mockApis/components/dashboard/modernData.js'
 const select = ref('March 2023');
 const items = ref(['March 2023', 'April 2023', 'May 2023']);
 </script>

@@ -6,11 +6,11 @@ import {
     FileReportIcon,
   } from "vue-tabler-icons"
   const sidebarItem = [
-    {
-      title: "Dashboard",
-      icon: HomeIcon,
-      to: "/dashboard"
-    },
+    // {
+    //   title: "Dashboard",
+    //   icon: HomeIcon,
+    //   to: "/dashboard"
+    // },
     {
       title: "Tickets",
       icon: TicketIcon,
@@ -26,11 +26,11 @@ import {
       icon: FileReportIcon,
       to: "/reports"
     },
-    {
-      title: "Table Demo",
-      icon: FileReportIcon,
-      to: "/table-demo"
-    },
+    // {
+    //   title: "Table Demo",
+    //   icon: FileReportIcon,
+    //   to: "/table-demo"
+    // },
   ]
   export default sidebarItem
   

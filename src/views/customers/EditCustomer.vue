@@ -99,7 +99,7 @@
                             <v-card elevation="2" class="m-0 p-5 address-card" v-for="(data, i) in addaddress" :key="i">
                                 <div>
                                     <v-radio-group v-model="radios">
-                                        <v-radio :value="i" class="radio-primary-addres">
+                                        <v-radio :value="i" class="radio-primary-address">
                                             <template v-slot:label>
                                                 <div class="radio-label" @click="primaryAddressChange(i)">
                                                     <svg
@@ -445,6 +445,9 @@ defineExpose({
 });
 </script>
 <style>
+.radio-primary-address .v-selection-control__wrapper {
+    display: none !important;
+}
 .users-profile-image {
     object-fit: cover !important;
     width: inherit !important;
@@ -457,9 +460,6 @@ defineExpose({
     margin-top: 12px !important;
     flex: 0 0 32%;
     margin-right: 13px;
-}
-.radio-primary-address .v-selection-control__wrapper {
-    display: none !important;
 }
 .radio-label {
     width: inherit;

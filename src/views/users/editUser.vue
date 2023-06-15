@@ -328,7 +328,7 @@ defineExpose({
 } */
 </style>
 <style scoped>
-.user-switch .v-input__control div .v-selection-control__wrapper {
+/* .user-switch .v-input__control div .v-selection-control__wrapper {
     display: block !important;
-}
+} */
 </style>

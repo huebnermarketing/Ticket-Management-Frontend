@@ -3,20 +3,13 @@
         <v-dialog v-model="dialog" persistent class="dialog-mw">
             <v-card class="overflow-auto">
                 <v-toolbar dark color="primary">
-                    <!-- <v-btn icon dark @click="dialog = false">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn> -->
-                    <v-toolbar-title>Add New Address</v-toolbar-title>
+                    <v-toolbar-title>Edit Address</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
-                <v-form @submit.prevent="addAddress" ref="createAddressForm">
+                <v-form @submit.prevent="updateAddress" ref="updateAddressForm">
                     <v-container>
-                        <!-- <v-card-title class="pa-5">
-                            <span class="text-h5">Add user</span>
-                        </v-card-title> -->
                         <v-card-text>
                             <v-row align="start" align-content-md="start" justify="start" style="max-width: 1000px">
-                                <!-- accept="image/png, image/jpeg,i image/jpg" -->
                                 <!---------------------------------- Company name --------------------------------->
                                 <v-col cols="12" md="6" class="text-start">
                                     <v-label class="mb-2 font-weight-medium text-capitalize required">company name</v-label>
@@ -103,9 +96,10 @@ import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import { useCustomerAddressStore } from '@/stores/customerAddress';
-const store = useCustomerAddressStore()
+const store = useCustomerAddressStore();
 //mixins
-const { cityrule, staterule, zipcoderule, countyrule, arearule, companynamerule, addresslinerule, passwordrule, dropdownrule } = formValidationsRules();
+const { cityrule, staterule, zipcoderule, countyrule, arearule, companynamerule, addresslinerule, passwordrule, dropdownrule } =
+    formValidationsRules();
 const dialog = ref(false);
 const companyName = ref('');
 const address = ref('');
@@ -115,10 +109,9 @@ const state = ref('');
 const country = ref('india');
 const zipcode = ref('');
 const isLoading = ref(false);
-const companyId = ref(0);
+const addrId = ref(0);
 const issubmit = ref(false);
 let addressList = [];
-
 
 //props for toastification
 const showSnackbar = ref(true);
@@ -127,71 +120,91 @@ const color = ref('');
 const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
-const createAddressForm = ref();
+const updateSingleAddress = ref();
+const updateAddressForm = ref();
+const singleAddressDetails = ref({});
 
 // validations rules
 
 /*emits*/
-const emit = defineEmits(['addAddressClicked']);
+const emit = defineEmits(['updateAddressClicked']);
+
+//props
+const props = defineProps({
+    customerId: Number
+});
 
 //methods
-function uploadImage(e) {
-    console.log('uploadedd');
-    isProfileImg.value = true;
-    const fd = new FormData();
-    const file = e.target.files[0];
-    UserProfileFile.value = file;
-    userProfilePic.value = URL.createObjectURL(e.target.files[0]);
-    fd.append('file', file);
-}
-function resetProfilepic() {
-    userProfilePic.value = '';
-    isProfileImg.value = false;
-}
 function closeDialog() {
-    createAddressForm.value?.reset();
+    updateAddressForm.value?.reset();
+    updateAddressForm.value?.resetValidation();
     dialog.value = false;
 }
-
-function limitFileSize() {
-    let size = parseFloat(this.file1 ? this.file1.size : '') / (1024 * 1024).toFixed(2);
-    size > 10 ? (this.fileSize = true) : (this.fileSize = false);
-}
-async function addAddress() {
-    
-    const { valid } = await createAddressForm.value?.validate();
-           console.log("ddd 111232",typeof addressList)
-
+async function updateAddress() {
+    const { valid } = await updateAddressForm.value?.validate();
     if (valid) {
-        const data = []
-        data.push ({
-        address_line1:address.value,
-        company_name: companyName.value,
-        area: area.value,
-        city: city.value,
-        state: state.value,
-        zipcode:zipcode.value,
-        country: country.value,
-        is_primary: 0
-    })  
-    store.setAddress(...data)
-        emit('addAddressClicked', addressList);
-        issubmit.value = false;
-        createAddressForm.value?.reset();
-        createAddressForm.value?.resetValidation();
-        country.value = 'india'
-        dialog.value = false;
+        const requestBody = {
+            customer_id: props.customerId,
+            address_line1: address.value,
+            company_name: companyName.value,
+            area: area.value,
+            city: city.value,
+            state: state.value,
+            zipcode: zipcode.value,
+            country: country.value
+        };
+        baseURlApi
+            .post(`customer/address/update/${addrId.value}`, requestBody)
+            .then((res) => {
+                const data = [];
+                emit('updateAddressClicked', data);
+                issubmit.value = false;
+                updateAddressForm.value?.reset();
+                updateAddressForm.value?.resetValidation();
+                dialog.value = false;
+                 message.value = res.data.message;
+                isSnackbar.value = true;
+                icon.value = 'mdi-check-circle';
+                color.value = 'success';
+            })
+            .catch((error) => {
+                issubmit.value = false;
+                isSnackbar.value = true;
+                message.value = error.message;
+                color.value = 'error';
+                icon.value = 'mdi-close-circle';
+            });
     }
+}
+function getAddressData(id) {
+    console.log('calleddd', id);
+    // isLoading.value = true;
+    addrId.value = id;
+    baseURlApi
+        .get(`customer/address/get/${id}`)
+        .then((res) => {
+            console.log('calleddd1111', res);
+            // isLoading.value = false;
+            const data = res.data.data;
+            (address.value = data.address_line1),
+                (companyName.value = data.company_name),
+                (area.value = data.area),
+                (city.value = data.city),
+                (state.value = data.state),
+                (zipcode.value = data.zipcode),
+                (country.value = data.country);
+        })
+        .catch((error) => {
+            // isLoading.value = false;
+        });
 }
 function open() {
     dialog.value = true;
 }
 
-onMounted(() => {
-    // getRoles();
-});
 defineExpose({
-    open
+    open,
+    getAddressData
 });
 </script>
 <style>

@@ -2,7 +2,7 @@
     <div class="text-center">
         <v-dialog v-model="dialog" persistent class="dialog-mw">
             <v-card class="overflow-auto">
-                 <v-toolbar dark color="primary">
+                <v-toolbar dark color="primary">
                     <v-toolbar-title>Edit User</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
@@ -136,9 +136,12 @@
                                 <!---------------------------------- active user --------------------------------->
                                 <v-col cols="12" md="6">
                                     <div class="d-flex align-center">
-                                        <v-label class="mb-2 font-weight-medium text-capitalize required">Active</v-label>
-                                        <div class="ml-4">
+                                        <v-label class="mb-2 font-weight-medium text-capitalize required"
+                                            >Active</v-label
+                                        >
+                                        <div class="ml-4"> 
                                             <v-switch
+                                                class="user-switch"
                                                 v-model="isActiveUser"
                                                 inset
                                                 :color="isActiveUser ? 'primary' : 'secondary'"
@@ -256,6 +259,7 @@ function getUsersData(id) {
             data.profile_photo ? (isProfileImg.value = true) : (isProfileImg.value = false);
             userProfilePic.value = data.profile_photo;
             isActiveUser.value = data.is_active == 1 ? true : false;
+            console.log('vvvv1111', isActiveUser.value);
         })
         .catch((error) => {
             isLoading.value = false;
@@ -312,6 +316,9 @@ defineExpose({
 });
 </script>
 <style>
+/* .user-switch .v-input__control div .v-selection-control__wrapper {
+    display: block !important;
+} */
 .users-profile-image {
     object-fit: cover !important;
     width: inherit !important;
@@ -319,4 +326,9 @@ defineExpose({
 /* .v-input__details {
     display: none !important;
 } */
+</style>
+<style scoped>
+.user-switch .v-input__control div .v-selection-control__wrapper {
+    display: block !important;
+}
 </style>

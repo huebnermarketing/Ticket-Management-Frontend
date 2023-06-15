@@ -68,11 +68,11 @@
                             {{ email }}
                         </div>
                     </template>
-                     <template #item-company_name="{ company_name }">
+                     <!-- <template #item-company_name="{ company_name }">
                         <div class="player-wrapper">
                             {{ company_name }}
                         </div>
-                    </template>
+                    </template> -->
                     <template #item-action="{ id }">
                         <div class="d-flex align-center">
                             <v-tooltip text="Edit">
@@ -84,7 +84,7 @@
                             </v-tooltip>
                             <v-tooltip text="Delete">
                                 <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="deleteUser(id)" v-bind="props"
+                                    <v-btn class="table-icons-common" icon flat @click="deleteCustomer(id)" v-bind="props"
                                         ><TrashIcon stroke-width="1.5" size="20" class="text-error"
                                     /></v-btn>
                                 </template>
@@ -128,11 +128,11 @@ const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
 //dialog props
-const dialogTitle = ref('Are you sure you want to delete this user ?');
-const dialogText = ref('This will delete this user permanently, you can not undo this action.');
+const dialogTitle = ref('Are you sure you want to delete this customer ?');
+const dialogText = ref('This will delete this customer permanently, you can not undo this action.');
 const cancelText = ref('Cancel');
 const confirmText = ref('Delete');
-const title = ref('Delete User');
+const title = ref('Delete Customer');
 const editId = ref(0);
 
 //refs
@@ -159,7 +159,7 @@ const headers = ref([
     { text: 'Name', value: 'first_name', sortable: true },
     { text: 'Mobile', value: 'phone', sortable: true },
     { text: 'Email', value: 'email', sortable: true },
-    { text: 'Company Name', value: 'company_name', sortable: true },
+    // { text: 'Company Name', value: 'company_name', sortable: true },
     { text: 'Action', value: 'action' }
 ]);
 const serverItemsLength = ref(50);
@@ -187,7 +187,7 @@ const tableHeight = ref(0);
 function searchUser() {
     const fd = new FormData();
     if(searchValue.value.length > 0){
-    fd.append('search_key', searchValue.value);
+    fd.append('search_text', searchValue.value);
     baseURlApi
         .post(`customer/search?total_record=${current_page.value}`, fd)
         .then((res) => {
@@ -196,7 +196,7 @@ function searchUser() {
         .catch((error) => {});
     }
 }
-function getUsers() {
+function getCustomers() {
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
@@ -246,13 +246,16 @@ function getUsers() {
             icon.value = 'mdi-close-circle';
         });
 }
-function filterData(editedData) {
-    const existing = items.value.find((e) => e.id === editedData.id);
-    if (existing) Object.assign(existing, editedData);
+function filterData(addedData) {
+    console.log("existttt")
+    const existing = items.value.find((e) => e.id === addedData.id
+);
+    if (existing) Object.assign(existing, addedData);
+    console.log("existttt",items.value,addedData)
 }
 function addCustomerData(addedData) {
     isFromAdd.value = true;
-    getUsers();
+    getCustomers();
 }
 
 //set table height
@@ -275,10 +278,10 @@ function cancelClick() {
 }
 function confirmClick() {
     baseURlApi
-        .delete(`user/delete-user/${deleteId.value}`)
+        .delete(`customer/delete/${deleteId.value}`)
         .then((res) => {
             deleteDialog.value?.close();
-            getUsers();
+            getCustomers();
             message.value = res.data.message;
             isSnackbar.value = true;
             icon.value = 'mdi-check-circle';
@@ -293,7 +296,7 @@ function confirmClick() {
         });
 }
 //delete user
-function deleteUser(id) {
+function deleteCustomer(id) {
     deleteId.value = id;
     deleteDialog.value?.open();
 }
@@ -305,11 +308,11 @@ onMounted(() => {
                 console.log("scrolled")
                 current_page.value = current_page.value + 1;
                 isFromAdd.value = false;
-                getUsers();
+                getCustomers();
             }
         }
     });
-    getUsers();
+    getCustomers();
 });
 </script>
 

@@ -99,7 +99,7 @@
                             <v-card elevation="2" class="m-0 p-5 address-card" v-for="(data, i) in addaddress" :key="i">
                                 <div>
                                     <v-radio-group v-model="radios">
-                                        <v-radio :value="i">
+                                        <v-radio :value="i" class="radio-primary-addres">
                                             <template v-slot:label>
                                                 <div class="radio-label" @click="primaryAddressChange(i)">
                                                     <svg
@@ -142,14 +142,14 @@
                                         <span class="font-weight-medium h6">{{ data.zipcode }}</span>
                                     </div>
                                 </div>
-                                <div class="d-flex align-end justify-end mt-1" v-if="addaddress.length > 1">
+                                <div class="d-flex align-end justify-end mt-1" v-if="addaddress.length > 1 && data.is_primary == 0">
                                     <v-tooltip text="Edit">
                                         <template v-slot:activator="{}">
                                             <PencilIcon
                                                 stroke-width="1.5"
                                                 size="20"
                                                 class="text-primary cursor-pointer"
-                                                @click="openEditDialog(i, data)"
+                                                @click="openEditDialog(data.id)"
                                             />
                                         </template>
                                     </v-tooltip>
@@ -159,7 +159,7 @@
                                                 stroke-width="1.5"
                                                 size="20"
                                                 class="text-error ml-2 cursor-pointer"
-                                                @click="deleteUser(i)"
+                                                @click="deleteAddress(data.id)"
                                             />
                                         </template>
                                     </v-tooltip>
@@ -177,7 +177,18 @@
                 </v-form>
             </v-card>
         </v-dialog>
-        <EditAddress ref="addNewaddress" @editAddressClicked="addaddressData" :customerId="customerId" />
+        <AddAddressFromEditCustomer ref="addNewaddress" @editAddressClicked="addaddressData" :customerId="customerId" />
+        <UpdateAddressFromEditCustomer ref="updateaddressfromeditcustomer" @updateAddressClicked="filterData" :customerId="customerId" />
+        <dialogBox
+            ref="deleteDialog"
+            @confirClk="confirmClick()"
+            @cancelClk="cancelClick()"
+            :dialogText="dialogText"
+            :confirmText="confirmText"
+            :dialogTitle="dialogTitle"
+            :cancelText="cancelText"
+            :title="title"
+        />
         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
@@ -188,7 +199,9 @@
 import { ref, defineExpose, defineComponent, onMounted } from 'vue';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { baseURlApi } from '@/api/axios';
-import EditAddress from './EditAddress.vue';
+import AddAddressFromEditCustomer from './AddAddressFromEditCustomer.vue';
+import UpdateAddressFromEditCustomer from './UpdateAddressFromEditCustomer.vue';
+import dialogBox from '@/components/TicketComponents/dialog.vue';
 import icons from 'vue-tabler-icons';
 import { useCustomerAddressStore } from '@/stores/customerAddress';
 const store = useCustomerAddressStore();
@@ -204,9 +217,11 @@ const userEmail = ref('');
 const mobile = ref('');
 const issubmit = ref(false);
 const addNewaddress = ref();
+const updateaddressfromeditcustomer = ref();
 const addaddress = ref([]);
 const isEmptyAddress = ref(false);
 const isLoading = ref(false);
+const singleAddressDetail = ref({});
 
 const altMobile = ref([
     {
@@ -225,8 +240,17 @@ const timer = ref(5000);
 const isSnackbar = ref(false);
 const updatecustomerform = ref();
 
+//dialog props
+const dialogTitle = ref('Are you sure you want to delete this address ?');
+const dialogText = ref('This will delete this address permanently, you can not undo this action.');
+const cancelText = ref('Cancel');
+const confirmText = ref('Delete');
+const title = ref('Delete Address');
+const deleteDialog = ref();
+const deleteId = ref(0);
+
 /*emits*/
-const emit = defineEmits(['addCustomerClicked']);
+const emit = defineEmits(['updateClicked']);
 
 //methods
 function getCustomersData(id) {
@@ -245,11 +269,15 @@ function getCustomersData(id) {
             let altMobileArr = [];
 
             /*get alternativ mobile */
-            data.phones.map((item) => {
-                altMobileArr.push({
-                    altMobileNo: item.phone
-                });
-            });
+            data.phones.length > 0
+                ? data.phones.map((item) => {
+                      altMobileArr.push({
+                          altMobileNo: item.phone
+                      });
+                  })
+                : altMobileArr.push({
+                      altMobileNo: ''
+                  });
             altMobile.value = [...altMobileArr];
             /*get addresses */
             addaddress.value = data.locations;
@@ -263,7 +291,10 @@ function closeDialog() {
     updatecustomerform.value?.resetValidation();
     dialog.value = false;
 }
-function addaddressData(addressList) {
+function filterData() {
+    getCustomersData(customerId.value);
+}
+function addaddressData() {
     store.getupdateAddress;
     // addaddress.value = addaddress.value.concat(store.getupdateAddress);
 
@@ -291,13 +322,19 @@ async function updateCustomer() {
         var altPhone = altMobile.value.map((item) => {
             return item['altMobileNo'];
         });
+        let cId;
+        addaddress.value.map((data) => {
+            if (data.is_primary == 1) {
+                cId = data.id;
+            }
+        });
         const requestBody = {
             first_name: firstName.value,
             last_name: lastName.value,
             email: userEmail.value,
             primary_mobile: mobile.value,
             alternate_mobile: altPhone,
-            primary_address_id: 7
+            primary_address_id: cId
         };
         if (lastName.value.length <= 0) {
             delete requestBody.last_name;
@@ -306,9 +343,16 @@ async function updateCustomer() {
             delete requestBody.alternate_mobile;
         }
         baseURlApi
-            .post('customer/update', requestBody)
+            .post(`customer/update/${customerId.value}`, requestBody)
             .then((res) => {
-                const addedData = res.data.data;
+                const addedData = {
+                    email: res.data.data.email,
+                    first_name:res.data.data.first_name,
+                    id: res.data.data.customer_id,
+                    last_name:res.data.data.last_name,
+                    phone: res.data.data.phone
+                }
+
                 emit('updateClicked', addedData);
                 issubmit.value = false;
                 isEmptyAddress.value = false;
@@ -355,6 +399,41 @@ function primaryAddressChange(index) {
 function openAddAddressDialog() {
     addNewaddress.value?.open();
 }
+function openEditDialog(id) {
+    // singleAddressDetail.value = data;
+    // singleAddressDetail.value.id = id;
+    // console.log('singlee', singleAddressDetail.value);
+    updateaddressfromeditcustomer.value?.open();
+    updateaddressfromeditcustomer.value?.getAddressData(id);
+}
+//delete address
+function cancelClick() {
+    deleteDialog.value?.close();
+}
+function confirmClick() {
+    baseURlApi
+        .delete(`customer/address/delete/${deleteId.value}`)
+        .then((res) => {
+            deleteDialog.value?.close();
+            getCustomersData(customerId.value);
+            message.value = res.data.message;
+            isSnackbar.value = true;
+            icon.value = 'mdi-check-circle';
+            color.value = 'success';
+        })
+        .catch((error) => {
+            deleteDialog.value?.close();
+            isSnackbar.value = true;
+            message.value = error.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
+//delete user
+function deleteAddress(id) {
+    deleteId.value = id;
+    deleteDialog.value?.open();
+}
 onMounted(() => {
     // addaddressData()
     // addaddress.value = addaddress.value.concat(store.getupdateAddress);
@@ -379,7 +458,7 @@ defineExpose({
     flex: 0 0 32%;
     margin-right: 13px;
 }
-.v-selection-control__wrapper {
+.radio-primary-address .v-selection-control__wrapper {
     display: none !important;
 }
 .radio-label {

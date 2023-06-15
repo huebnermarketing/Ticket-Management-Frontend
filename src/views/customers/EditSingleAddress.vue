@@ -3,20 +3,13 @@
         <v-dialog v-model="dialog" persistent class="dialog-mw">
             <v-card class="overflow-auto">
                 <v-toolbar dark color="primary">
-                    <!-- <v-btn icon dark @click="dialog = false">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn> -->
                     <v-toolbar-title>Edit Address</v-toolbar-title>
                     <v-spacer></v-spacer>
                 </v-toolbar>
                 <v-form @submit.prevent="addAddress" ref="editSingleAddressForm">
                     <v-container>
-                        <!-- <v-card-title class="pa-5">
-                            <span class="text-h5">Add user</span>
-                        </v-card-title> -->
                         <v-card-text>
                             <v-row align="start" align-content-md="start" justify="start" style="max-width: 1000px">
-                                <!-- accept="image/png, image/jpeg,i image/jpg" -->
                                 <!---------------------------------- Company name --------------------------------->
                                 <v-col cols="12" md="6" class="text-start">
                                     <v-label class="mb-2 font-weight-medium text-capitalize required">company name</v-label>
@@ -172,7 +165,7 @@ function open(singleAddressDetail) {
     dialog.value = true;
     singleAddressDetails.value = singleAddressDetail
     let propsObj = singleAddressDetail;
-    address.value = propsObj.address_line1,
+        address.value = propsObj.address_line1,
         companyName.value = propsObj.company_name,
         area.value = propsObj.area,
         city.value = propsObj.city,

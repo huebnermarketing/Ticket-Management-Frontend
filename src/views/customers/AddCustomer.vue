@@ -96,7 +96,7 @@
                             <v-card elevation="2" class="m-0 p-5 address-card" v-for="(data, i) in addaddress" :key="i">
                                 <div>
                                     <v-radio-group v-model="radios">
-                                        <v-radio :value="i">
+                                        <v-radio :value="i" class="radio-primary-address">
                                             <template v-slot:label>
                                                 <div class="radio-label" @click="primaryAddressChange(i)">
                                                     <svg
@@ -133,7 +133,7 @@
                                         <span class="font-weight-medium h6">{{ data.zipcode }}</span>
                                     </div>
                                 </div>
-                                <div class="d-flex align-end justify-end mt-1" v-if="addaddress.length > 1">
+                                <div class="d-flex align-end justify-end mt-1" v-if="addaddress.length > 1 && data.is_primary == 0">
                                     <v-tooltip text="Edit">
                                         <template v-slot:activator="{}">
                                             <PencilIcon
@@ -150,7 +150,7 @@
                                                 stroke-width="1.5"
                                                 size="20"
                                                 class="text-error ml-2 cursor-pointer"
-                                                @click="deleteUser(i)"
+                                                @click="deleteAddress(i)"
                                             />
                                         </template>
                                     </v-tooltip>
@@ -170,6 +170,16 @@
         </v-dialog>
         <AddAddress ref="addNewaddress" @addAddressClicked="addaddressData" />
         <EditSingleAddress ref="editsingleaddress" @updateClicked="filterData" />
+        <dialogBox
+            ref="deleteDialog"
+            @confirClk="confirmClick()"
+            @cancelClk="cancelClick()"
+            :dialogText="dialogText"
+            :confirmText="confirmText"
+            :dialogTitle="dialogTitle"
+            :cancelText="cancelText"
+            :title="title"
+        />
         <!-- <EditSingleAddress ref="editsingleaddress" @updateClicked="filterData" :singleAddressDetail="singleAddressDetail" /> -->
         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
             <v-icon left>{{ icon }}</v-icon>
@@ -181,6 +191,7 @@
 import { ref, defineExpose, defineComponent, onMounted } from 'vue';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { baseURlApi } from '@/api/axios';
+import dialogBox from '@/components/TicketComponents/dialog.vue';
 import AddAddress from './AddAddress.vue';
 import EditSingleAddress from './EditSingleAddress.vue';
 import icons from 'vue-tabler-icons';
@@ -208,6 +219,8 @@ const altMobile = ref([
 ]);
 const radios = ref(0);
 const singleAddressDetail = ref({});
+const deleteDialog = ref();
+const deleteId = ref(0);
 
 //props for toastification
 const showSnackbar = ref(true);
@@ -217,6 +230,13 @@ const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
 const createcustomerform = ref();
+
+//dialog props
+const dialogTitle = ref('Are you sure you want to delete this address ?');
+const dialogText = ref('This will delete this address permanently, you can not undo this action.');
+const cancelText = ref('Cancel');
+const confirmText = ref('Delete');
+const title = ref('Delete Address');
 
 /*emits*/
 const emit = defineEmits(['addCustomerClicked']);
@@ -240,8 +260,8 @@ async function createCustomer() {
     const { valid } = await createcustomerform.value?.validate();
     if (addaddress.value.length <= 0) isEmptyAddress.value = true;
     addaddress.value.map((item) => {
-        return delete item.id
-    })
+        return delete item.id;
+    });
     if (valid && !isEmptyAddress.value) {
         issubmit.value = true;
         var altPhone = altMobile.value.map((item) => {
@@ -270,7 +290,7 @@ async function createCustomer() {
                 isEmptyAddress.value = false;
                 createcustomerform.value?.reset();
                 createcustomerform.value?.resetValidation();
-                addaddress.value = []
+                addaddress.value = [];
                 dialog.value = false;
                 message.value = res.data.message;
                 isSnackbar.value = true;
@@ -298,7 +318,8 @@ function deleteInput(i) {
 }
 function open() {
     dialog.value = true;
-    store.$reset
+    addaddress.value = [];
+    store.$reset;
 }
 function primaryAddressChange(index) {
     return addaddress.value.map((item, i) => {
@@ -313,20 +334,37 @@ function openAddAddressDialog() {
     addNewaddress.value?.open();
 }
 function filterData(data) {
-     console.log('existing1',data);
-    const existing = addaddress.value.find((e) => 
-        e.id === data.id
-        );
-   
+    console.log('existing1', data);
+    const existing = addaddress.value.find((e) => e.id === data.id);
+
     if (existing) {
-        Object.assign(existing, data)
-        }
+        Object.assign(existing, data);
+    }
 }
 function openEditDialog(id, data) {
     singleAddressDetail.value = data;
     singleAddressDetail.value.id = id;
     console.log('singlee', singleAddressDetail.value);
     editsingleaddress.value?.open(singleAddressDetail.value);
+}
+
+//delete address
+function cancelClick() {
+    deleteDialog.value?.close();
+}
+function confirmClick() {
+    addaddress.value.splice(deleteId.value, 1);
+    deleteDialog.value?.close();
+    deleteDialog.value?.close();
+    isSnackbar.value = true;
+    message.value = 'Address deleted successfully';
+    color.value = 'error';
+    icon.value = 'mdi-close-circle';
+}
+//delete user
+function deleteAddress(id) {
+    deleteId.value = id;
+    deleteDialog.value?.open();
 }
 onMounted(() => {
     addaddress.value = store.getnewAddress;
@@ -349,7 +387,7 @@ defineExpose({
     flex: 0 0 32%;
     margin-right: 13px;
 }
-.v-selection-control__wrapper {
+.radio-primary-address .v-selection-control__wrapper {
     display: none !important;
 }
 .radio-label {

@@ -1,5 +1,5 @@
 <template>
-    <v-row no-gutters>
+    <v-row>
         <v-col cols="12" md="12">
             <v-row justify="space-between" class="align-center mb-3">
                 <v-col cols="12" lg="4" md="6">
@@ -32,10 +32,11 @@
                     </div>
                 </transition>
             </div>
-            <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto">
+            <!-- <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto"> -->
+                 <div id="infinite-list">
                 <!-- :search-value="searchValue" -->
                 <EasyDataTable
-                    :rows-per-page="-1"
+                    :rows-per-page="1000"
                     sticky
                     fixed
                     :server-items-length="serverItemsLength"
@@ -217,45 +218,46 @@ function getUsers() {
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
-        .get('/user/get-users', { params })
+        .get('/user/get-users')
         .then((res) => {
             isLoading.value = false;
             serverItemsLength.value = res.data.data.total;
-            let itemsData = [];
-            console.log(res.data.data.data
-            )
-            if (isFromAdd.value) {
-                let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
+            items.value = res.data.data
+            // let itemsData = [];
+            // console.log(res.data.data.data
+            // )
+            // if (isFromAdd.value) {
+            //     let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
 
-                // Declare an empty object
-                let uniqueObject = {};
+            //     // Declare an empty object
+            //     let uniqueObject = {};
 
-                // Loop for the array elements
-                for (let i in newArray) {
-                    // Extract the title
-                    let objid = newArray[i]['id'];
+            //     // Loop for the array elements
+            //     for (let i in newArray) {
+            //         // Extract the title
+            //         let objid = newArray[i]['id'];
 
-                    // Use the title as the index
-                    uniqueObject[objid] = newArray[i];
-                }
+            //         // Use the title as the index
+            //         uniqueObject[objid] = newArray[i];
+            //     }
 
-                // Loop to push unique object into array
-                for (let i in uniqueObject) {
-                    itemsData.push(uniqueObject[i]);
-                }
-            } else {
-                itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data));
-            }
-            console.log(itemsData)
-            items.value = itemsData.slice();
-            items.value = JSON.parse(JSON.stringify(items.value));
-            const proxy = new Proxy(items.value, {
-                get(target, prop, receiver) {
-                    return target[prop];
-                }
-            });
-            items.value = [...proxy];
-            items.value = [...JSON.parse(JSON.stringify(items.value))];
+            //     // Loop to push unique object into array
+            //     for (let i in uniqueObject) {
+            //         itemsData.push(uniqueObject[i]);
+            //     }
+            // } else {
+            //     itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data));
+            // }
+            // console.log(itemsData)
+            // items.value = itemsData.slice();
+            // items.value = JSON.parse(JSON.stringify(items.value));
+            // const proxy = new Proxy(items.value, {
+            //     get(target, prop, receiver) {
+            //         return target[prop];
+            //     }
+            // });
+            // items.value = [...proxy];
+            // items.value = [...JSON.parse(JSON.stringify(items.value))];
         })
         .catch((error) => {
             isLoading.value = false;
@@ -267,11 +269,12 @@ function getUsers() {
 }
 
 function filterData(editedData) {
-    const existing = items.value.find((e) => e.id === editedData.id);
-    if (existing) Object.assign(existing, editedData);
+     getUsers();
+    // const existing = items.value.find((e) => e.id === editedData.id);
+    // if (existing) Object.assign(existing, editedData);
 }
 function addUsersData(addedData) {
-    isFromAdd.value = true;
+    // isFromAdd.value = true;
     getUsers();
 }
 
@@ -319,17 +322,17 @@ function deleteUser(id) {
     deleteDialog.value?.open();
 }
 onMounted(() => {
-    const listElm = document.querySelector('#infinite-list');
-    listElm.addEventListener('scroll', (e) => {
-        if (items.value.length < serverItemsLength.value) {
-            if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
-                console.log("scrolled")
-                current_page.value = current_page.value + 1;
-                isFromAdd.value = false;
-                getUsers();
-            }
-        }
-    });
+    // const listElm = document.querySelector('#infinite-list');
+    // listElm.addEventListener('scroll', (e) => {
+    //     if (items.value.length < serverItemsLength.value) {
+    //         if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
+    //             console.log("scrolled")
+    //             current_page.value = current_page.value + 1;
+    //             isFromAdd.value = false;
+    //             getUsers();
+    //         }
+    //     }
+    // });
     getUsers();
 });
 </script>
@@ -339,7 +342,7 @@ onMounted(() => {
     display: none !important;
 }
 .vue3-easy-data-table__message {
-    min-height: calc(100vh - 100px) !important;
+    min-height: calc(100vh - 600px) !important;
 }
 .loading {
     text-align: center;

@@ -10,6 +10,6 @@ const emailRules = ref([(v: string) => !!v || 'E-mail is required', (v: string) 
     <v-form ref="form" v-model="valid" lazy-validation action="/dashboards/analytical" class="mt-sm-13 mt-8">
         <v-label class="text-subtitle-1 font-weight-semibold pb-2 text-lightText">Email Address</v-label>
         <VTextField v-model="email" :rules="emailRules" required ></VTextField>
-        <v-btn size="large" color="primary" to="/" block  submit flat>Forgot Password</v-btn>
+        <v-btn size="large" color="primary" to="/" block  submit flat class="mt-2">Forgot Password</v-btn>
     </v-form>
 </template>

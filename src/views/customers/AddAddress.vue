@@ -112,7 +112,7 @@ const address = ref('');
 const city = ref('');
 const area = ref('');
 const state = ref('');
-const country = ref('india');
+const country = ref('India');
 const zipcode = ref('');
 const isLoading = ref(false);
 const companyId = ref(0);
@@ -175,7 +175,7 @@ async function addAddress() {
         is_primary: 0
     })  
     store.setAddress(...data)
-        emit('addAddressClicked', addressList);
+        emit('addAddressClicked', data);
         issubmit.value = false;
         createAddressForm.value?.reset();
         createAddressForm.value?.resetValidation();

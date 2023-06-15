@@ -321,7 +321,7 @@ onMounted(() => {
     display: none !important;
 }
 .vue3-easy-data-table__message {
-    min-height: calc(100vh - 100px) !important;
+    min-height: calc(100vh - 600px) !important;
 }
 .loading {
     text-align: center;

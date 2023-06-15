@@ -1,5 +1,5 @@
 <script setup>
-import { topCardsData } from '@/_mockApis/components/dashboard/modernData';
+import { topCardsData } from '@/_mockApis/components/dashboard/modernData.js';
 </script>
 <template>
     <v-row>

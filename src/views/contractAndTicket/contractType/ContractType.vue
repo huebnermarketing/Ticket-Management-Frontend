@@ -37,7 +37,7 @@
                 <EasyDataTable
                     sticky
                     :must-sort="true"
-                    :rows-per-page="300"
+                    :rows-per-page="1000"
                     :server-items-length="serverItemsLength"
                     :headers="headers"
                     :fixed-header="true"
@@ -352,7 +352,7 @@ onMounted(() => {
     display: none !important;
 }
 .vue3-easy-data-table__message {
-    min-height: calc(100vh - 100px) !important;
+    min-height: calc(100vh - 600px) !important;
 }
 .loading {
     text-align: center;

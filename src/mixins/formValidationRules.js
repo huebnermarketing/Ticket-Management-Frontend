@@ -5,12 +5,12 @@ export const formValidationsRules = () => {
     const firstnamerule = [
         (value) => {
             if (value) return true;
-            return 'First Name is required.';
+            return 'First name is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
 
-            return 'First Name must be greater than 2 characters.';
+            return 'First name must be greater than 2 characters.';
         }
     ];
     const requiredrule = [
@@ -22,12 +22,12 @@ export const formValidationsRules = () => {
     const lastnamerule = [
         (value) => {
             if (value) return true;
-            return 'Last Name is required.';
+            return 'Last name is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
 
-            return 'Last Name must be greater than 2 characters.';
+            return 'Last name must be greater than 2 characters.';
         }
     ];
     const mobilerule = [
@@ -38,24 +38,24 @@ export const formValidationsRules = () => {
         (value) => {
             if (value?.length <= 15 && value?.length >= 3) return true;
 
-            return 'Mobile Number must be between 3-15 digit.';
-        },
-        (value) => {
-            if (/^\d+$/.test(value)) return true;
-            return 'Mobile Number must be a numeric value.';
+            return 'Mobile number must be between 3-15 digit.';
         }
+        // (value) => {
+        //     if (/^\d+$/.test(value)) return true;
+        //     return 'Mobile number must be a numeric value.';
+        // }
     ];
     const alternativemobilerule = [
         (value) => {
             if (value?.length > 0) {
                 if (value?.length <= 15 && value?.length >= 3) return true;
-                return 'Mobile Number must be between 3-15 digit.';
+                return 'Mobile number must be between 3-15 digit.';
             }
         },
         (value) => {
             if (value?.length > 0) {
                 if (/^\d+$/.test(value)) return true;
-                return 'Mobile Number must be a numeric value.';
+                return 'Mobile number must be a numeric value.';
             }
         }
     ];
@@ -70,10 +70,16 @@ export const formValidationsRules = () => {
             return 'Email must be in valid email address format';
         }
     ];
+    const emailPatternrule = [
+        (value) => {
+            if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)) return true;
+            return 'Email must be in valid email address format';
+        }
+    ];
     const rule = [
         (confirmpwd, newpwd) => {
             if (confirmpwd == newpwd) return true;
-            return 'Password and Confirm password does not match.';
+            return 'Password and confirm password does not match.';
         }
     ];
     const passwordrule = [
@@ -98,7 +104,7 @@ export const formValidationsRules = () => {
         },
         (value) => {
             if (value == newpwd.value) return true;
-            return 'Password and Confirm password does not match.';
+            return 'Password and confirm password does not match.';
         },
 
     ];
@@ -112,23 +118,23 @@ export const formValidationsRules = () => {
     const companynamerule = [
         (value) => {
             if (value) return true;
-            return 'Company Name is required.';
+            return 'Company name is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
 
-            return 'Company Name must be greater than 2 characters.';
+            return 'Company name must be greater than 2 characters.';
         }
     ];
     const addresslinerule = [
         (value) => {
             if (value) return true;
-            return 'Address Line is required.';
+            return 'Address line is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
 
-            return 'Address Line must be greater than 2 characters.';
+            return 'Address line must be greater than 2 characters.';
         }
     ];
     const arearule = [
@@ -145,12 +151,12 @@ export const formValidationsRules = () => {
     const countyrule = [
         (value) => {
             if (value) return true;
-            return 'County Name is required.';
+            return 'County name is required.';
         },
         (value) => {
             if (value?.length >= 2) return true;
 
-            return 'County Name must be greater than 2 characters.';
+            return 'County name must be greater than 2 characters.';
         }
     ];
     const cityrule = [
@@ -189,5 +195,5 @@ export const formValidationsRules = () => {
         //     return 'Zip Code must be a numeric value.';
         // }
     ];
-    return { alternativemobilerule, requiredrule, cityrule, staterule, zipcoderule, countyrule, arearule, addresslinerule, companynamerule, confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule };
+    return { emailPatternrule,alternativemobilerule, requiredrule, cityrule, staterule, zipcoderule, countyrule, arearule, addresslinerule, companynamerule, confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule };
 };

@@ -38,14 +38,14 @@
                                 </v-col>
                                 <!---------------------------------- Email ------------------------------------------->
                                 <v-col cols="12" md="6">
-                                    <v-label class="mb-2 font-weight-medium text-capitalize required">Email ID</v-label>
+                                    <v-label class="mb-2 font-weight-medium text-capitalize">Email ID</v-label>
                                     <v-text-field
                                         v-model="userEmail"
                                         color="primary"
                                         variant="outlined"
                                         type="email"
                                         autocomplete="off"
-                                        :rules="emailrule"
+                                        :rules="emailPatternrule"
                                     />
                                 </v-col>
                                 <!---------------------------------- Alternative Number --------------------------------->
@@ -114,7 +114,7 @@
                                                         <path
                                                             d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z"
                                                             stroke-width="1"
-                                                            :fill="i == radios ? 'rgb(93,135,255)' : 'rgb(255,255,255)'"
+                                                            :fill="i == radios || data.is_primary? 'rgb(93,135,255)' : 'rgb(255,255,255)'"
                                                         ></path>
                                                     </svg>
                                                 </div>
@@ -126,14 +126,14 @@
                                     <p class="font-weight-medium h6">{{ data.company_name }}</p>
                                     <div class="mt-2">
                                         <span class="font-weight-medium h6">{{ data.address_line1 }}, </span>
+                                         <span class="font-weight-medium h6">{{ data.area }}, </span>
                                     </div>
                                     <div class="mt-2">
-                                        <span class="font-weight-medium h6">{{ data.area }}, </span>
-                                        <span class="font-weight-medium h6">{{ data.city }}</span>
+                                        <span class="font-weight-medium h6">{{ data.city }}, </span>
                                         <span class="font-weight-medium h6">{{ data.zipcode }}</span>
                                     </div>
                                 </div>
-                                <div class="d-flex align-end justify-end mt-1" v-if="addaddress.length > 1 && data.is_primary == 0">
+                                <div class="d-flex align-end justify-end mt-1">
                                     <v-tooltip text="Edit">
                                         <template v-slot:activator="{}">
                                             <PencilIcon
@@ -144,7 +144,7 @@
                                             />
                                         </template>
                                     </v-tooltip>
-                                    <v-tooltip text="Delete">
+                                    <v-tooltip text="Delete" v-if="addaddress.length > 1 && data.is_primary == 0">
                                         <template v-slot:activator="{}">
                                             <TrashIcon
                                                 stroke-width="1.5"
@@ -199,7 +199,7 @@ import { useCustomerAddressStore } from '@/stores/customerAddress';
 const store = useCustomerAddressStore();
 
 //mixins
-const { alternativemobilerule, firstnamerule, lastnamerule, mobilerule, emailrule } = formValidationsRules();
+const { emailPatternrule,alternativemobilerule, firstnamerule, lastnamerule, mobilerule } = formValidationsRules();
 
 const dialog = ref(false);
 
@@ -248,11 +248,13 @@ function closeDialog() {
     isEmptyAddress.value = false;
     dialog.value = false;
 }
-function addaddressData(addressList) {
+function addaddressData(data) {
     store.getnewAddress;
-    addaddress.value = store.getnewAddress;
+    addaddress.value = addaddress.value.concat(data);
+    console.log("addd",addaddress.value,'ffff',addaddress.value)
     if (addaddress.value.length == 1) {
         addaddress.value[0].is_primary = 1;
+        console.log("enyert",addaddress.value,'ffff',addaddress.value)    
     }
     if (addaddress.value.length > 0) isEmptyAddress.value = false;
 }
@@ -267,6 +269,7 @@ async function createCustomer() {
         var altPhone = altMobile.value.map((item) => {
             return item['altMobileNo'];
         });
+        console.log("alttt phone",altPhone)
         const requestBody = {
             first_name: firstName.value,
             last_name: lastName.value,
@@ -275,10 +278,10 @@ async function createCustomer() {
             alternate_mobile: altPhone,
             addresses: addaddress.value
         };
-        if (lastName.value.length <= 0) {
+        if (lastName.value == '') {
             delete requestBody.last_name;
         }
-        if (requestBody.alternate_mobile[0] == '') {
+        if (altPhone[0] == null || altPhone[0] == '') {
             delete requestBody.alternate_mobile;
         }
         baseURlApi
@@ -367,7 +370,7 @@ function deleteAddress(id) {
     deleteDialog.value?.open();
 }
 onMounted(() => {
-    addaddress.value = store.getnewAddress;
+    // addaddress.value = store.getnewAddress;
 });
 defineExpose({
     open

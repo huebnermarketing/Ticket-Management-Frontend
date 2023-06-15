@@ -5,8 +5,9 @@
     <v-menu :close-on-content-click="true">
         <template v-slot:activator="{ props }">
             <v-btn class="custom-hover-primary" variant="text" v-bind="props" icon>
-                <v-avatar size="35">
-                    <img :src="userData.profile_photo" width="35" alt="Julia"  height="35" style="object-fit: cover !important"/>
+                <v-avatar size="35" class="border">
+                    <img v-if="userData.profile_photo" :src="userData.profile_photo" width="35" alt="Julia" height="35" style="object-fit: cover !important" />
+                    <img v-if="!userData.profile_photo" src="@/assets/images/profile/user.png" width="35" alt="Julia" height="35" style="object-fit: cover !important" />
                 </v-avatar>
             </v-btn>
         </template>
@@ -14,8 +15,21 @@
             <div class="px-8 pt-6">
                 <h6 class="text-h5 font-weight-medium">User Profile</h6>
                 <div class="d-flex align-center mt-4 pb-6">
-                    <v-avatar size="80">
-                        <img :src="userData.profile_photo" width="80" height="80" style="object-fit: cover !important" />
+                    <v-avatar size="80" class="border">
+                        <img
+                            v-if="userData.profile_photo"
+                            :src="userData.profile_photo"
+                            width="80"
+                            height="80"
+                            style="object-fit: cover !important"
+                        />
+                        <img
+                            v-if="!userData.profile_photo"
+                            src="@/assets/images/profile/user.png"
+                            width="80"
+                            height="80"
+                            style="object-fit: cover !important"
+                        />
                     </v-avatar>
                     <div class="ml-3">
                         <h6 class="text-h6 mb-n1">{{ userData.first_name }} {{ userData.last_name }}</h6>
@@ -33,7 +47,7 @@
                 <v-list class="py-0 theme-list" lines="two">
                     <v-list-item v-for="item in profileDD" :key="item.title" class="py-2 px-4 custom-text-primary" :to="item.href">
                         <template v-slot:prepend>
-                            <v-avatar size="48" class="mr-3" rounded="md" >
+                            <v-avatar size="48" class="mr-3" rounded="md">
                                 <SettingsIcon size="18" stroke-width="1.5" />
                             </v-avatar>
                             <!-- <v-avatar size="48" color="lightprimary" class="mr-3" rounded="md"  v-if="i == 1">

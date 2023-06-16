@@ -3,12 +3,12 @@ import { ref, watch, computed } from 'vue';
 import { useCustomizerStore } from '../../../stores/customizer';
 import { useEcomStore } from '@/stores/apps/eCommerce';
 import { GridDotsIcon, LanguageIcon, SearchIcon, Menu2Icon, BellRingingIcon, ShoppingCartIcon } from 'vue-tabler-icons';
-import LanguageDD from './LanguageDD.vue';
-import NotificationDD from './NotificationDD.vue';
+// import LanguageDD from './LanguageDD.vue';
+// import NotificationDD from './NotificationDD.vue';
 import ProfileDD from './ProfileDD.vue';
-import Searchbar from './Searchbar.vue';
-import RightMobileSidebar from './RightMobileSidebar.vue';
-import Navigations from './Navigations.vue';
+// import Searchbar from './Searchbar.vue';
+// import RightMobileSidebar from './RightMobileSidebar.vue';
+// import Navigations from './Navigations.vue';
 
 const customizer = useCustomizerStore();
 const showSearch = ref(false);

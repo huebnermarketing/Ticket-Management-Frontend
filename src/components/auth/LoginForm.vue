@@ -80,7 +80,7 @@ async function Login() {
                 color.value = 'success';
                 localStorage.setItem('auth-token', res.data.data.access_token);
                 localStorage.setItem('user', JSON.stringify(res.data.data.user));
-                router.push(location.search.substr(1).split('redirect=')[1] || '/dashboard');
+                router.push(location.search.substr(1).split('redirect=')[1] || '/tickets');
             })
             .catch((error) => {
                 loginForm.value?.reset();

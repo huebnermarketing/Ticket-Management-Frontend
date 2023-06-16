@@ -22,20 +22,19 @@ router.beforeEach(async (to, from, next) => {
     const authRequired = !publicPages.includes(to.path);
 
     if (auth.user && publicPages.includes(to.path || to.fullPath)) {
-        return next('/dashboard')
+        return next('/tickets');
     } else if (to.matched.some((record) => record.meta.requiresAuth)) {
         if (authRequired) {
-            if (!auth.user){
+            if (!auth.user) {
                 auth.returnUrl = to.fullPath;
-                return next('/login?redirect='+ to.fullPath);
-            } 
-            else {
-                return next()
+                return next('/login?redirect=' + to.fullPath);
+            } else {
+                return next();
             }
         } else {
-            return next('/dashboard')
+            return next('/tickets');
         }
     } else {
-        return auth.user?next('/dashboard'):next();
+        return auth.user ? next('/tickets') : next();
     }
 });

@@ -28,8 +28,6 @@ import VueScrollTo from 'vue-scrollto';
 //LightBox
 import VueEasyLightbox from 'vue-easy-lightbox';
 
-import persisted from 'pinia-plugin-persistedstate'
-
 const i18n = createI18n({
     locale: 'en',
     messages: messages,
@@ -43,9 +41,7 @@ app.use(router);
 app.component('EasyDataTable', Vue3EasyDataTable);
 app.use(PerfectScrollbar);
 
-const pinia = createPinia();
-// pinia.use(persisted)
-app.use(pinia);
+app.use(createPinia());
 
 app.use(VCalendar, {});
 app.use(VueTablerIcons);

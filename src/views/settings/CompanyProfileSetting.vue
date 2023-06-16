@@ -42,7 +42,7 @@
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="isProfileImg"
                             @click="refs['file-input'].click()"
-                        >Edit</label
+                            >Edit</label
                         >
                         <label
                             color="error"
@@ -58,10 +58,10 @@
                     <div class="text-start">
                         <v-label class="mb-2 font-weight-medium text-capitalize mr-4">favicon</v-label>
                         <v-avatar size="50" class="border">
-                            <img v-if="!userFevicon" src="@/assets/images/profile/uploadLogo.png" height="20" alt="image" />
+                            <img v-if="!userFavicon" src="@/assets/images/profile/faviconDEfault.png" height="20" alt="image" />
                             <img
-                                v-if="userFevicon"
-                                :src="userFevicon"
+                                v-if="userFavicon"
+                                :src="userFavicon"
                                 height="50"
                                 alt="image"
                                 class="users-profile-image object-fit-cover w-inherit"
@@ -70,7 +70,7 @@
                         <label
                             for="favicon"
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
-                            v-if="!isFevicon"
+                            v-if="!isFavicon"
                             @click="refs['favicon-input'].click()"
                             >Choose file</label
                         >
@@ -81,20 +81,20 @@
                             class="d-none"
                             id="favicon"
                             accept="image/jpeg,image/jpg,image/png"
-                            @change="uploadFevicon($event)"
+                            @change="uploadFavicon($event)"
                         />
                         <label
                             for="favicon"
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
-                            v-if="isFevicon"
+                            v-if="isFavicon"
                             @click="refs['favicon-input'].click()"
-                        >Edit</label
+                            >Edit</label
                         >
                         <label
                             color="error"
                             class="mb-0 ml-3 text-error font-weight-bold cursor-pointer text-decoration-underline"
-                            v-if="isFevicon"
-                            @click="resetFevicon()"
+                            v-if="isFavicon"
+                            @click="resetFavicon()"
                             >Remove</label
                         >
                     </div>
@@ -111,7 +111,6 @@
                         v-model="companyName"
                         variant="outlined"
                         color="primary"
-                        placeholder="Rivulet Digital"
                         :rules="companynamerule"
                     >
                     </v-text-field>
@@ -119,59 +118,32 @@
                 <!---------------------------------- Address line --------------------------------->
                 <v-col cols="12" md="6" class="text-start">
                     <v-label class="mb-2 font-weight-medium text-capitalize required">Address line 1</v-label>
-                    <v-text-field
-                        v-model="address"
-                        variant="outlined"
-                        color="primary"
-                        placeholder="Please enter address"
-                        :rules="addresslinerule"
-                    ></v-text-field>
+                    <v-text-field v-model="address" variant="outlined" color="primary" :rules="addresslinerule"></v-text-field>
                 </v-col>
                 <!---------------------------------- Area  --------------------------------->
                 <v-col cols="12" md="6" class="text-start">
                     <v-label class="mb-2 font-weight-medium text-capitalize required">Area</v-label>
-                    <v-text-field v-model="area" color="primary" variant="outlined" type="text" placeholder="Bodakdev" :rules="arearule" />
+                    <v-text-field v-model="area" color="primary" variant="outlined" type="text" :rules="arearule" />
                 </v-col>
                 <!---------------------------------- zip code ------------------------------------------->
                 <v-col cols="12" md="6" class="text-start">
                     <v-label class="mb-2 font-weight-medium text-capitalize required">Zip code</v-label>
-                    <v-text-field
-                        v-model="zipcode"
-                        color="primary"
-                        variant="outlined"
-                        placeholder="Ahmedabad"
-                        autocomplete="off"
-                        :rules="zipcoderule"
-                    />
+                    <v-text-field v-model="zipcode" color="primary" variant="outlined" autocomplete="off" :rules="zipcoderule" />
                 </v-col>
                 <!---------------------------------- City ------------------------------------------->
                 <v-col cols="12" md="6" class="text-start">
                     <v-label class="mb-2 font-weight-medium text-capitalize required">City</v-label>
-                    <v-text-field
-                        v-model="city"
-                        color="primary"
-                        variant="outlined"
-                        placeholder="Ahmedabad"
-                        autocomplete="off"
-                        :rules="cityrule"
-                    />
+                    <v-text-field v-model="city" color="primary" variant="outlined" autocomplete="off" :rules="cityrule" />
                 </v-col>
                 <!---------------------------------- state  --------------------------------->
                 <v-col cols="12" md="6" class="text-start">
                     <v-label class="mb-2 font-weight-medium text-capitalize required">State</v-label>
-                    <v-text-field v-model="state" color="primary" variant="outlined" type="text" placeholder="Gujarat" :rules="staterule" />
+                    <v-text-field v-model="state" color="primary" variant="outlined" type="text" :rules="staterule" />
                 </v-col>
                 <!---------------------------------- country ------------------------------------------->
                 <v-col cols="12" md="6" class="text-start">
                     <v-label class="mb-2 font-weight-medium text-capitalize required">country</v-label>
-                    <v-text-field
-                        v-model="country"
-                        color="primary"
-                        variant="outlined"
-                        placeholder="India"
-                        autocomplete="off"
-                        :rules="countyrule"
-                    />
+                    <v-text-field v-model="country" color="primary" variant="outlined" autocomplete="off" :rules="countyrule" />
                 </v-col>
                 <!---------------------------------- currency --------------------------------->
                 <v-col cols="12" md="6" class="text-start">
@@ -194,23 +166,13 @@
                     </v-select>
                     <v-spacer></v-spacer>
                     <!-- Action buttons -->
-                    <v-col cols="12" class="text-right mt-5" style="padding:0">
+                </v-col>
+                <!---------------------------------- Action ------------------------------------>
+                 <v-col cols="12" class="text-left mt-5">
                         <v-btn color="primary" type="submit" v-if="!issubmit" class="p-0">Update Profile</v-btn>
                         <v-btn color="primary" v-if="issubmit" disabled>Update Profile</v-btn>
                     </v-col>
-                </v-col>
-                <!---------------------------------- Action ------------------------------------>
             </v-row>
-            <dialogBox
-                ref="deleteDialog"
-                @confirClk="confirmClick()"
-                @cancelClk="cancelClick()"
-                :dialogText="dialogText"
-                :confirmText="confirmText"
-                :dialogTitle="dialogTitle"
-                :cancelText="cancelText"
-                :title="title"
-            />
         </v-form>
 
         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
@@ -237,18 +199,17 @@ const address = ref('');
 const city = ref('');
 const area = ref('');
 const state = ref('');
-const country = ref('india');
+const country = ref('India');
 const zipcode = ref('');
 const isLoading = ref(false);
 const companyId = ref(0);
 
-
 const userProfilePic = ref('');
-const userFevicon = ref('');
+const userFavicon = ref('');
 const UserProfileFile = ref('');
-const userFeviconFile = ref('');
+const userFaviconFile = ref('');
 const isProfileImg = ref(false);
-const isFevicon = ref(false);
+const isFavicon = ref(false);
 const issubmit = ref(false);
 //dialog props
 const dialogTitle = ref('Are you sure you want to cancel this action ?');
@@ -258,7 +219,7 @@ const confirmText = ref('Confirm');
 const title = ref('Cancel update profile');
 
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -272,14 +233,14 @@ const filesizelimitrule = [
         if ($event.target.value[0] < 200000) return true;
         return 'Avatar size should be less than 2 MB!';
     }
-]
+];
 
- const selectRule = [
-        () => {
-            if (currency.value ? Object.keys(currency.value).length > 0 : '') return true;
-            return 'Please select an item.';
-        }
-    ]
+const selectRule = [
+    () => {
+        if (currency.value ? Object.keys(currency.value).length > 0 : '') return true;
+        return 'Please select an item.';
+    }
+];
 
 //currency dropdown customize items options
 function getFieldText(item) {
@@ -299,28 +260,29 @@ function uploadImage(e) {
     userProfilePic.value = URL.createObjectURL(e.target.files[0]);
     fd.append('file', file);
 }
-function uploadFevicon(e) {
-    isFevicon.value = true;
+function uploadFavicon(e) {
+    isFavicon.value = true;
     const fd = new FormData();
     const file = e.target.files[0];
-    userFeviconFile.value = file;
-    userFevicon.value = URL.createObjectURL(e.target.files[0]);
+    userFaviconFile.value = file;
+    userFavicon.value = URL.createObjectURL(e.target.files[0]);
     fd.append('file', file);
 }
 function resetProfilepic() {
+    UserProfileFile.value = '';
     userProfilePic.value = '';
     isProfileImg.value = false;
 }
-function resetFevicon() {
-    userFevicon.value = '';
-    isFevicon.value = false;
+function resetFavicon() {
+    userFaviconFile.value = '';
+    userFavicon.value = '';
+    isFavicon.value = false;
 }
 function getCompanyprofileData() {
     isLoading.value = true;
     baseURlApi
         .get('settings/company/get')
         .then((res) => {
-            console.log('ress', res.data.data);
             isLoading.value = false;
             currencyOptions.value = res.data.data.all_currency;
             currency.value = res.data.data.company_setting.currency;
@@ -330,17 +292,16 @@ function getCompanyprofileData() {
             area.value = res.data.data.company_setting.area;
             state.value = res.data.data.company_setting.state;
             country.value = res.data.data.company_setting.country;
-            userProfilePic.value = res.data.data.company_setting.company_logo;
-            userFevicon.value = res.data.data.company_setting.company_favicon;
+            userProfilePic.value = res.data.data.company_setting.company_logo ? res.data.data.company_setting.company_logo : '';
+            userFavicon.value = res.data.data.company_setting.company_favicon ? res.data.data.company_setting.company_favicon : '';
             zipcode.value = res.data.data.company_setting.zipcode;
             companyId.value = res.data.data.company_setting.id;
-            // isSnackbar.value = true;
-            // message.value = res.data.message;
-            // icon.value = 'mdi-check-circle';
-            // color.value = 'success';
+            isProfileImg.value = res.data.data.company_setting.company_logo ? true : false;
+            isFavicon.value = res.data.data.company_setting.company_favicon ? true : false;
         })
         .catch((error) => {
             isLoading.value = false;
+            showSnackbar.value = true;
             isSnackbar.value = true;
             message.value = error.message;
             color.value = 'error';
@@ -357,11 +318,10 @@ async function updateProfile() {
     if (valid) {
         issubmit.value = true;
         const fd = new FormData();
-        console.log('rolee', currency.value.id);
         fd.append('company_id', companyId.value);
         fd.append('company_name', companyName.value);
         fd.append('company_logo', UserProfileFile.value);
-        fd.append('company_favicon', userFeviconFile.value);
+        fd.append('company_favicon', userFaviconFile.value);
         fd.append('address_line1', address.value);
         fd.append('area', area.value);
         fd.append('zipcode', zipcode.value);
@@ -373,19 +333,24 @@ async function updateProfile() {
         baseURlApi
             .post('settings/company/update', fd)
             .then((res) => {
-                console.log('rsss', res.data);
                 issubmit.value = false;
                 companyProfileForm.value?.reset();
                 companyProfileForm.value?.resetValidation();
-                userProfilePic.value = '';
-                userFevicon.value = '';
+                resetFavicon();
+                resetProfilepic();
+                getCompanyprofileData();
+                showSnackbar.value = true;
                 message.value = res.data.message;
                 isSnackbar.value = true;
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
             })
             .catch((error) => {
+                resetFavicon();
+                resetProfilepic();
+                getCompanyprofileData();
                 issubmit.value = false;
+                showSnackbar.value = true;
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';

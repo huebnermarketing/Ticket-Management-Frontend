@@ -31,7 +31,7 @@
                 </transition>
             </div>
             <div id="infinite-list">
-                <v-form @submit.prevent="updateContract()" ref="contractEditForm">
+                <v-form @submit.prevent="" ref="contractEditForm">
                     <EasyDataTable
                         sticky
                         :must-sort="true"
@@ -84,9 +84,10 @@
                                             class="table-icons-common"
                                             icon
                                             flat
+                                            type="submit"
                                             @click="updateTicketStatus(id)"
                                             v-bind="props"
-                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                         <v-btn
                                             v-if="isEditable && id == editID && isEdit"
@@ -95,7 +96,7 @@
                                             flat
                                             disabled
                                             v-bind="props"
-                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                     </template>
                                 </v-tooltip>
@@ -167,11 +168,12 @@ const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
 //dialog props
+const dialog = ref(false);
 const dialogTitle = ref('Are you sure you want to delete this Ticket Status ?');
 const dialogText = ref('This will delete this Ticket Status permanently, you can not undo this action.');
 const cancelText = ref('Cancel');
 const confirmText = ref('Delete');
-const title = ref('Delete Problem Type');
+const title = ref('Delete Ticket Status');
 
 //refs
 const deleteDialog = ref();
@@ -187,7 +189,7 @@ const deleteId = ref(0);
 const isLoading = ref(false);
 const resizableDiv = ref();
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -227,6 +229,7 @@ async function updateTicketStatus(id) {
                 editID.value = 0;
                 isEdit.value = false;
                 isEditable.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';
@@ -245,6 +248,7 @@ function editProblem(id) {
             editTicketStatus.value = res.data.data.status_name;
         })
         .catch((error) => {
+            showSnackbar.value = true
             isSnackbar.value = true;
             message.value = error.message;
             color.value = 'error';
@@ -255,7 +259,7 @@ function editProblem(id) {
 //listing
 function getTicketStatus() {
     isLoading.value = true;
-    isSnackbar.value = false;
+    // isSnackbar.value = false;
     baseURlApi
         .get('settings/ticket-status/list')
         .then((res) => {
@@ -268,6 +272,7 @@ function getTicketStatus() {
         })
         .catch((error) => {
             isLoading.value = false;
+            showSnackbar.value = true
             isSnackbar.value = true;
             message.value = error.message;
             color.value = 'error';
@@ -279,12 +284,12 @@ function getTicketStatus() {
 function cancelUpdate(id) {
     isEditable.value = false;
     editID.value = 0;
-    getTicketStatus();
+    // getTicketStatus();
 }
 
 //add ticket status
 async function addProblems() {
-    isSnackbar.value = false;
+    // isSnackbar.value = false;
     const { valid } = await ticketStatusForm.value?.validate();
     if (valid) {
         issubmit.value = true;
@@ -295,9 +300,10 @@ async function addProblems() {
             .post('settings/ticket-status/add', requestBody)
             .then((res) => {
                 issubmit.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 icon.value = 'mdi-check-circle';
+                message.value = res.data.message;
                 color.value = 'success';
                 ticketStatusForm.value?.reset();
                 ticketStatusForm.value?.resetValidation();
@@ -306,6 +312,7 @@ async function addProblems() {
             })
             .catch((error) => {
                 issubmit.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';
@@ -326,13 +333,15 @@ function confirmClick() {
         .then((res) => {
             deleteDialog.value?.close();
             getTicketStatus();
-            message.value = res.data.message;
+            showSnackbar.value = true
             isSnackbar.value = true;
             icon.value = 'mdi-check-circle';
+            message.value = res.data.message;
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true
             isSnackbar.value = true;
             message.value = error.message;
             color.value = 'error';

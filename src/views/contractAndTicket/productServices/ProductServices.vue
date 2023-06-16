@@ -13,7 +13,6 @@
                                 v-model="productService"
                                 variant="outlined"
                                 color="primary"
-                                placeholder="Laptop"
                                 :rules="requiredrule"
                             >
                             </v-text-field>
@@ -32,7 +31,7 @@
                 </transition>
             </div>
             <div id="infinite-list">
-                <v-form @submit.prevent="updateContract()" ref="problemEditForm">
+                <v-form @submit.prevent="" ref="problemEditForm">
                     <EasyDataTable
                         sticky
                         :must-sort="true"
@@ -85,9 +84,10 @@
                                             class="table-icons-common"
                                             icon
                                             flat
+                                            type="submit"
                                             @click="updateProductService(id)"
                                             v-bind="props"
-                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                         <v-btn
                                             v-if="isEditable && id == editID && isEdit"
@@ -96,7 +96,7 @@
                                             flat
                                             disabled
                                             v-bind="props"
-                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                     </template>
                                 </v-tooltip>
@@ -168,6 +168,7 @@ const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
 //dialog props
+const dialog = ref(false);
 const dialogTitle = ref('Are you sure you want to delete this Product Service ?');
 const dialogText = ref('This will delete this Product Service permanently, you can not undo this action.');
 const cancelText = ref('Cancel');
@@ -188,7 +189,7 @@ const deleteId = ref(0);
 const isLoading = ref(false);
 const resizableDiv = ref();
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -216,9 +217,10 @@ async function updateProductService(id) {
             .then((res) => {
                 isEdit.value = false;
                 isEditable.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 icon.value = 'mdi-check-circle';
+                message.value = res.data.message;
                 color.value = 'success';
                 getProductServices();
                 editID.value = 0;
@@ -228,6 +230,7 @@ async function updateProductService(id) {
                 editID.value = 0;
                 isEdit.value = false;
                 isEditable.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';
@@ -247,6 +250,7 @@ function editProblem(id) {
         })
         .catch((error) => {
             isSnackbar.value = true;
+            showSnackbar.value = true
             message.value = error.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
@@ -256,7 +260,7 @@ function editProblem(id) {
 //listing
 function getProductServices() {
     isLoading.value = true;
-    isSnackbar.value = false;
+    // isSnackbar.value = false;
     baseURlApi
         .get('settings/product-service/list')
         .then((res) => {
@@ -270,6 +274,7 @@ function getProductServices() {
         .catch((error) => {
             isLoading.value = false;
             isSnackbar.value = true;
+            showSnackbar.value = true
             message.value = error.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
@@ -280,12 +285,12 @@ function getProductServices() {
 function cancelUpdate(id) {
     isEditable.value = false;
     editID.value = 0;
-    getProductServices();
+    // getProductServices();
 }
 
 //add product service
 async function addProductService() {
-    isSnackbar.value = false;
+    // isSnackbar.value = false;
     const { valid } = await productServicesForm.value?.validate();
     if (valid) {
         issubmit.value = true;
@@ -296,9 +301,10 @@ async function addProductService() {
             .post('settings/product-service/add', requestBody)
             .then((res) => {
                 issubmit.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 icon.value = 'mdi-check-circle';
+                message.value = res.data.message;
                 color.value = 'success';
                 productServicesForm.value?.reset();
                 productServicesForm.value?.resetValidation();
@@ -307,6 +313,7 @@ async function addProductService() {
             })
             .catch((error) => {
                 issubmit.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';
@@ -327,13 +334,15 @@ function confirmClick() {
         .then((res) => {
             deleteDialog.value?.close();
             getProductServices();
-            message.value = res.data.message;
+            showSnackbar.value = true
             isSnackbar.value = true;
             icon.value = 'mdi-check-circle';
+            message.value = res.data.message;
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true
             isSnackbar.value = true;
             message.value = error.message;
             color.value = 'error';

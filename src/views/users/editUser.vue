@@ -8,9 +8,6 @@
                 </v-toolbar>
                 <v-form @submit.prevent="updateUser" ref="edituserform">
                     <v-container>
-                        <!-- <v-card-title class="pa-5">
-                            <span class="text-h5">Edit User</span>
-                        </v-card-title> -->
                         <v-card-text>
                             <div class="loading" v-if="isLoading">
                                 <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
@@ -63,9 +60,6 @@
                                             >Remove</label
                                         >
                                     </div>
-                                    <!-- <div class="text-subtitle-1 text-medium-emphasis text-center my-sm-8 my-6">
-                                    Allowed JPG, GIF or PNG. Max size of 800K
-                                </div> -->
                                 </v-col>
                                 <!---------------------------------- First name --------------------------------->
                                 <v-col cols="12" md="6">
@@ -76,7 +70,6 @@
                                         v-model="firstName"
                                         variant="outlined"
                                         color="primary"
-                                        placeholder="jhon"
                                         :rules="firstnamerule"
                                     >
                                     </v-text-field>
@@ -88,7 +81,6 @@
                                         v-model="lastName"
                                         variant="outlined"
                                         color="primary"
-                                        placeholder="doe"
                                         :rules="lastnamerule"
                                     >
                                     </v-text-field>
@@ -101,7 +93,6 @@
                                         color="primary"
                                         variant="outlined"
                                         type="text"
-                                        placeholder="9103388993"
                                         :rules="mobilerule"
                                     />
                                 </v-col>
@@ -113,9 +104,8 @@
                                         color="primary"
                                         variant="outlined"
                                         type="email"
-                                        placeholder="john.deo@gmail.com"
                                         autocomplete="off"
-                                        :rules="emailrule"
+                                        disabled
                                     />
                                 </v-col>
                                 <!---------------------------------- User Role --------------------------------->
@@ -134,7 +124,7 @@
                                     ></v-select>
                                 </v-col>
                                 <!---------------------------------- active user --------------------------------->
-                                <v-col cols="12" md="6">
+                                <v-col cols="12" md="6"  v-if="userId !== user.id && role_id >= user.roles[0].id">
                                     <div class="d-flex align-center">
                                         <v-label class="mb-2 font-weight-medium text-capitalize required"
                                             >Active</v-label
@@ -190,12 +180,13 @@ const UserProfileFile = ref('');
 const isProfileImg = ref(false);
 const issubmit = ref(false);
 const userId = ref(0);
+const role_id = ref(0)
 const isActiveUser = ref(true);
 const isLoading = ref(false);
 const fileSize = ref(false);
 
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -205,6 +196,8 @@ const edituserform = ref();
 
 //emits
 const emit = defineEmits(['updateClicked']);
+/*Login user detail*/
+const user = JSON.parse(localStorage.getItem('user'))
 
 function uploadImage(e) {
     isProfileImg.value = true;
@@ -242,10 +235,11 @@ function limitFileSize(e) {
     console.log('lmm');
 }
 
-function getUsersData(id) {
+function getUsersData(id,roleId) {
     userProfilePic.value = '';
     isLoading.value = true;
     userId.value = id;
+    role_id.value = roleId
     baseURlApi
         .get(`user/edit-user/${id}`)
         .then((res) => {
@@ -259,7 +253,6 @@ function getUsersData(id) {
             data.profile_photo ? (isProfileImg.value = true) : (isProfileImg.value = false);
             userProfilePic.value = data.profile_photo;
             isActiveUser.value = data.is_active == 1 ? true : false;
-            console.log('vvvv1111', isActiveUser.value);
         })
         .catch((error) => {
             isLoading.value = false;
@@ -296,6 +289,7 @@ async function updateUser() {
             })
             .catch((error) => {
                 issubmit.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';

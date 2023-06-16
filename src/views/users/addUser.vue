@@ -75,7 +75,6 @@
                                         v-model="firstName"
                                         variant="outlined"
                                         color="primary"
-                                        placeholder="jhon"
                                         :rules="firstnamerule"
                                     >
                                     </v-text-field>
@@ -87,7 +86,6 @@
                                         v-model="lastName"
                                         variant="outlined"
                                         color="primary"
-                                        placeholder="doe"
                                         :rules="lastnamerule"
                                     ></v-text-field>
                                 </v-col>
@@ -99,7 +97,6 @@
                                         color="primary"
                                         variant="outlined"
                                         type="text"
-                                        placeholder="9103388993"
                                         :rules="mobilerule"
                                     />
                                 </v-col>
@@ -111,7 +108,6 @@
                                         color="primary"
                                         variant="outlined"
                                         type="email"
-                                        placeholder="john.deo@gmail.com"
                                         autocomplete="off"
                                         :rules="emailrule"
                                     />
@@ -139,7 +135,6 @@
                                         variant="outlined"
                                         type="password"
                                         v-model="newpwd"
-                                        placeholder="Please enter password"
                                         :rules="passwordrule"
                                     />
                                 </v-col>
@@ -151,7 +146,6 @@
                                         variant="outlined"
                                         type="password"
                                         v-model="confirmpwd"
-                                        placeholder="Please re-enter password"
                                         :rules="confirmpasswordrule"
                                     />
                                 </v-col>

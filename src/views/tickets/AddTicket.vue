@@ -28,13 +28,12 @@
                                     v-model="customerName"
                                     variant="outlined"
                                     color="primary"
-                                    placeholder="jhon doe   "
                                 ></v-text-field>
                             </v-col>
                             <!---------------------------------- Mobile Number --------------------------------->
                             <v-col cols="12" md="6">
                                 <v-label class="mb-2 font-weight-medium text-capitalize">Mobile Number</v-label>
-                                <v-text-field v-model="mobile" color="primary" variant="outlined" type="text" placeholder="9103388993" />
+                                <v-text-field v-model="mobile" color="primary" variant="outlined" type="text" />
                             </v-col>
                             <!---------------------------------- Address --------------------------------->
                             <v-col cols="12" md="6">
@@ -57,7 +56,6 @@
                                     v-model="companyName"
                                     variant="outlined"
                                     color="primary"
-                                    placeholder="Rivulet Digital"
                                 ></v-text-field>
                             </v-col>
                             <!---------------------------------- address line 1 --------------------------------->
@@ -67,7 +65,6 @@
                                     v-model="addressLineOne"
                                     variant="outlined"
                                     color="primary"
-                                    placeholder="near sindhubhavan road"
                                 ></v-text-field>
                             </v-col>
                             <!---------------------------------- Email ------------------------------------------->
@@ -78,33 +75,32 @@
                                     color="primary"
                                     variant="outlined"
                                     type="email"
-                                    placeholder="john.deo@gmail.com"
                                 />
                             </v-col>
                             <!---------------------------------- area --------------------------------->
                             <v-col cols="12" md="6">
                                 <v-label class="mb-2 font-weight-medium text-capitalize">area</v-label>
-                                <v-text-field v-model="area" variant="outlined" color="primary" placeholder="Bodakdev"></v-text-field>
+                                <v-text-field v-model="area" variant="outlined" color="primary"></v-text-field>
                             </v-col>
                             <!---------------------------------- city --------------------------------->
                             <v-col cols="12" md="6">
                                 <v-label class="mb-2 font-weight-medium text-capitalize">City</v-label>
-                                <v-text-field v-model="city" variant="outlined" color="primary" placeholder="Ahmedabad"></v-text-field>
+                                <v-text-field v-model="city" variant="outlined" color="primary" ></v-text-field>
                             </v-col>
                             <!---------------------------------- zip code --------------------------------->
                             <v-col cols="12" md="6">
                                 <v-label class="mb-2 font-weight-medium text-capitalize">Zip Code</v-label>
-                                <v-text-field v-model="zipcode" variant="outlined" color="primary" placeholder="380054"></v-text-field>
+                                <v-text-field v-model="zipcode" variant="outlined" color="primary" ></v-text-field>
                             </v-col>
                             <!---------------------------------- state --------------------------------->
                             <v-col cols="12" md="6">
                                 <v-label class="mb-2 font-weight-medium text-capitalize">State</v-label>
-                                <v-text-field v-model="state" variant="outlined" color="primary" placeholder="Gujarat"></v-text-field>
+                                <v-text-field v-model="state" variant="outlined" color="primary" ></v-text-field>
                             </v-col>
                             <!---------------------------------- country --------------------------------->
                             <v-col cols="12" md="6">
                                 <v-label class="mb-2 font-weight-medium text-capitalize">Country</v-label>
-                                <v-text-field v-model="countryName" variant="outlined" color="primary" placeholder="India"></v-text-field>
+                                <v-text-field v-model="countryName" variant="outlined" color="primary" ></v-text-field>
                             </v-col>
 
                             <v-divider></v-divider>
@@ -130,7 +126,6 @@
                                     v-model="problemTitle"
                                     variant="outlined"
                                     color="primary"
-                                    placeholder="Problem title"
                                 ></v-text-field>
                             </v-col>
                             <!---------------------------------- description --------------------------------->
@@ -140,7 +135,6 @@
                                     v-model="description"
                                     auto-grow
                                     variant="outlined"
-                                    placeholder="150, Ring Road"
                                     rows="2"
                                     color="primary"
                                     row-height="25"
@@ -155,7 +149,6 @@
                                     variant="outlined"
                                     type="date"
                                     v-model="dueDate"
-                                    placeholder="12-12-2023"
                                 ></v-text-field>
                             </v-col>
                             <!---------------------------------- Assign Engineer --------------------------------->
@@ -208,7 +201,6 @@
                                     v-model="ticketAmount"
                                     variant="outlined"
                                     color="primary"
-                                    placeholder="Please enter ticket amount"
                                 ></v-text-field>
                             </v-col>
                              <!---------------------------------- Payment status --------------------------------->
@@ -232,7 +224,6 @@
                                     v-model="collectedAmount"
                                     variant="outlined"
                                     color="primary"
-                                    placeholder="Please enter collected amount"
                                 ></v-text-field>
                             </v-col>
                               <!---------------------------------- Remaining amount --------------------------------->
@@ -242,7 +233,6 @@
                                     v-model="remainingAmount"
                                     variant="outlined"
                                     color="primary"
-                                    placeholder="Please enter remaining amount"
                                 ></v-text-field>
                             </v-col>
                              <!---------------------------------- payment mode --------------------------------->
@@ -296,13 +286,12 @@
                                     color="primary"
                                     variant="outlined"
                                     type="email"
-                                    placeholder="john.deo@gmail.com"
                                 />
                             </v-col>
                             <!---------------------------------- Mobile Number --------------------------------->
                             <v-col cols="12" md="6">
                                 <v-label class="mb-2 font-weight-medium text-capitalize">Mobile Number</v-label>
-                                <v-text-field v-model="mobile" color="primary" variant="outlined" type="text" placeholder="9103388993" />
+                                <v-text-field v-model="mobile" color="primary" variant="outlined" type="text"/>
                             </v-col>
                             <!---------------------------------- Address --------------------------------->
                             <v-col cols="12" md="6">

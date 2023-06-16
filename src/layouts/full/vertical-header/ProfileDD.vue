@@ -45,19 +45,22 @@
             <!-- <perfect-scrollbar style="height: calc(100vh - 240px); max-height: 240px"> -->
             <perfect-scrollbar>
                 <v-list class="py-0 theme-list" lines="two">
-                    <v-list-item v-for="item in profileDD" :key="item.title" class="py-2 px-4 custom-text-primary" :to="item.href">
+                    <v-list-item v-for="(item,i) in profileDD" :key="item.title" class="py-2 px-4 custom-text-primary" :to="item.href">
                         <template v-slot:prepend>
-                            <v-avatar size="48" class="mr-3" rounded="md">
+                            <!-- <v-avatar size="48" class="mr-3" rounded="md">
                                 <SettingsIcon size="18" stroke-width="1.5" />
-                            </v-avatar>
-                            <!-- <v-avatar size="48" color="lightprimary" class="mr-3" rounded="md"  v-if="i == 1">
-                                <UserIcon size="18" stroke-width="1.5" />
                             </v-avatar> -->
+                            <v-avatar size="48" color="lightprimary" class="mr-3" rounded="md"  v-if="i == 1">
+                                <UserIcon size="18" stroke-width="1.5" />
+                            </v-avatar>
+                             <v-avatar size="48" color="lightprimary" class="mr-3" rounded="md"  v-if="i == 0">
+                                <SettingsIcon size="18" stroke-width="1.5"/>
+                            </v-avatar>
                         </template>
                         <div>
                             <h6 class="text-subtitle-1 font-weight-bold custom-title">{{ item.title }}</h6>
                         </div>
-                        <p class="text-subtitle-1 font-weight-regular textSecondary">{{ item.subtitle }}</p>
+                        <p class="text-subtitle-1 font-weight-regular textSecondary">{{ item.subtitle }}some text</p>
                     </v-list-item>
                 </v-list>
             </perfect-scrollbar>
@@ -106,12 +109,14 @@ const profileDD = [
         // avatar: JSON.parse(localStorage.getItem('user')).profile_photo,
         title: 'Company Setting',
         href: '/pages/company-settings',
+        subtitle:'Manage organizational level settings',
         icon: SettingsIcon
     },
     {
         // avatar: JSON.parse(localStorage.getItem('user')).profile_photo,
         title: 'User Profile',
         href: '/apps/user/profile',
+        subtitle:' Account Settings',
         icon: UserIcon
     }
 ];

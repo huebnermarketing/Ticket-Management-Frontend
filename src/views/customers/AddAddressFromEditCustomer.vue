@@ -147,6 +147,7 @@ function resetProfilepic() {
 }
 function closeDialog() {
     createAddressForm.value?.reset();
+    country.value = "India"
     dialog.value = false;
 }
 

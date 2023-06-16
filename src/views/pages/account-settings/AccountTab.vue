@@ -39,7 +39,15 @@ const country = ref('');
 const zipcode = ref('');
 const companyId = ref(0);
 const issubmit = ref(false);
+const showSnackbar = ref(false);
 const updateUserprofile = ref();
+
+/*snakebar*/
+const message = ref('');
+const color = ref('');
+const icon = ref('');
+const timer = ref(5000);
+const isSnackbar = ref(false);
 
 /*loading*/
 const isLoading = ref(false);
@@ -81,6 +89,7 @@ function getUserData() {
             state.value = userDetail.state.trim();
             country.value = userDetail.country.trim();
             zipcode.value = userDetail.zipcode.trim();
+            isProfileImg.value = data.profile_photo ? true : false;
         })
         .catch((error) => {
             isLoading.value = false;
@@ -95,7 +104,7 @@ async function updateUserProfile() {
         fd.append('first_name', firstName.value.trim());
         fd.append('last_name', lastName.value.trim());
         fd.append('phone', mobile.value.trim());
-        fd.append('profile_photo', UserProfileFile.value);
+        fd.append('profile_photo', UserProfileFile.value ? UserProfileFile.value : null);
         fd.append('email', userEmail.value.trim());
         fd.append('address', address.value.trim());
         fd.append('area', area.value.trim());
@@ -109,8 +118,9 @@ async function updateUserProfile() {
                 issubmit.value = false;
                 createuserform.value?.reset();
                 createuserform.value?.resetValidation();
-                props.getUsers();
-                dialog.value = false;
+                resetProfilepic();
+                showSnackbar.value = true;
+                getUserData();
                 message.value = res.data.message;
                 isSnackbar.value = true;
                 icon.value = 'mdi-check-circle';
@@ -118,6 +128,9 @@ async function updateUserProfile() {
             })
             .catch((error) => {
                 issubmit.value = false;
+                resetProfilepic();
+                getUserData();
+                showSnackbar.value = true;
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';
@@ -141,7 +154,7 @@ async function changePassword() {
                 isPasssubmit.value = false;
                 changepasswordform.value?.reset();
                 changepasswordform.value?.resetValidation();
-                dialog.value = false;
+                showSnackbar.value = true;
                 message.value = res.data.message;
                 isSnackbar.value = true;
                 icon.value = 'mdi-check-circle';
@@ -149,6 +162,7 @@ async function changePassword() {
             })
             .catch((error) => {
                 isPasssubmit.value = false;
+                showSnackbar.value = true;
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';
@@ -157,7 +171,6 @@ async function changePassword() {
     }
 }
 function uploadImage(e) {
-    console.log('uploadedd');
     isProfileImg.value = true;
     const fd = new FormData();
     const file = e.target.files[0];
@@ -166,6 +179,7 @@ function uploadImage(e) {
     fd.append('file', file);
 }
 function resetProfilepic() {
+    UserProfileFile.value = '';
     userProfilePic.value = '';
     isProfileImg.value = false;
 }
@@ -198,10 +212,10 @@ onMounted(() => {
                                         <img
                                             v-if="userProfilePic"
                                             :src="userProfilePic"
-                                            height="90"
+                                            height="120"
                                             alt="image"
                                             style="height: inherit !important"
-                                            class="users-profile-image object-fit-cover w-inherit"
+                                            class="users-profile-image object-fit-cover w-inherit object-fit"
                                         />
                                     </v-avatar>
                                     <label
@@ -326,18 +340,7 @@ onMounted(() => {
                                 </v-col>
                                 <!---------------------------------- Action ------------------------------------>
                             </v-row>
-                            <dialogBox
-                                ref="deleteDialog"
-                                @confirClk="confirmClick()"
-                                @cancelClk="cancelClick()"
-                                :dialogText="dialogText"
-                                :confirmText="confirmText"
-                                :dialogTitle="dialogTitle"
-                                :cancelText="cancelText"
-                                :title="title"
-                            />
-                            <v-spacer></v-spacer>
-                            <v-col cols="12" class="text-right">
+                            <v-col cols="12" class="text-left pl-0">
                                 <v-btn color="primary" type="submit" v-if="!issubmit">Update Profile</v-btn>
                                 <v-btn color="primary" v-if="issubmit" disabled>Update Profile</v-btn>
                             </v-col>
@@ -355,12 +358,12 @@ onMounted(() => {
                     <v-form @submit.prevent="changePassword" ref="changepasswordform">
                         <v-card-item style="max-width: 800px">
                             <h5 class="text-h5 mb-7">Change Password</h5>
-                            <v-col cols="12" md="6">
+                            <v-col cols="12" md="6" class="pl-0">
                                 <!-- <div class="mt-5"> -->
                                 <v-label class="mb-2 font-weight-medium">New Password</v-label>
                                 <v-text-field color="primary" variant="outlined" type="password" v-model="newpwd" :rules="passwordrule" />
                             </v-col>
-                            <v-col cols="12" md="6">
+                            <v-col cols="12" md="6" class="pl-0">
                                 <v-label class="mb-2 font-weight-medium">Confirm Password</v-label>
                                 <v-text-field
                                     color="primary"
@@ -372,8 +375,8 @@ onMounted(() => {
                             </v-col>
 
                             <!-- </div> -->
-                            <v-col cols="12" md="6">
-                                <div class="text-end">
+                            <v-col cols="12" md="6" class="pl-0">
+                                <div class="text-left">
                                     <v-btn color="error" class="mr-3" @click="closeDialog()" v-if="!isPasssubmit">Cancel</v-btn>
                                     <v-btn color="primary" type="submit" v-if="!isPasssubmit">Save</v-btn>
                                     <v-btn color="error" class="mr-3" v-if="isPasssubmit" disabled>Cancel</v-btn>

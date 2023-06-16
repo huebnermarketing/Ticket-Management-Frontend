@@ -2,11 +2,24 @@
     <v-sheet rounded="md" color="lightsecondary" class="px-4 py-3 ExtraBox">
         <div class="d-flex align-center hide-menu">
             <v-avatar size="40">
-                <img src="@/assets/images/profile/user-1.jpg" alt="user" height="40" />
+                <img
+                    v-if="userData.profile_photo"
+                    :src="userData.profile_photo"
+                    alt="user"
+                    height="40"
+                    style="object-fit: cover !important"
+                />
+                <img
+                    v-if="!userData.profile_photo"
+                    src="@/assets/images/profile/user.png"
+                    alt="user"
+                    height="40"
+                    style="object-fit: cover !important"
+                />
             </v-avatar>
             <div class="ml-4">
-                <h4 class="mb-n1 text-h6 textPrimary">Mathew</h4>
-                <span class="text-subtitle-2 textSecondary">Designer</span>
+                <h4 class="mb-n1 text-h6 textPrimary">{{ userData.first_name }}</h4>
+                <span class="text-subtitle-2 textSecondary">{{ userData.roles[0].display_name }}</span>
             </div>
             <div class="ml-auto">
                 <v-btn variant="text" icon rounded="md" color="primary" @click="loggedout()">
@@ -22,14 +35,14 @@
     </v-snackbar>
 </template>
 <script setup>
-import {ref} from 'vue';
+import { ref } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 const { logout } = useAuthStore();
-
+const userData = JSON.parse(localStorage.getItem('user'));
 
 const showSnackbar = ref(true);
 const message = ref('');
@@ -42,13 +55,13 @@ const isSnackbar = ref(false);
 
 // const headers = { Authorization: `Bearer ${auth_token}` };
 function loggedout() {
-      logout()
+    logout()
         .then((res) => {
             message.value = res.data.message;
             isSnackbar.value = true;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
-            localStorage.clear()
+            localStorage.clear();
             location.href = '/login';
         })
         .catch((error) => {
@@ -57,7 +70,7 @@ function loggedout() {
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
-};
+}
 </script>
 <style lang="scss">
 .ExtraBox {

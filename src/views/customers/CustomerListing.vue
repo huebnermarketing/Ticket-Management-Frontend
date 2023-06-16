@@ -175,7 +175,7 @@ const isLoading = ref(false);
 const resizableDiv = ref();
 const isFromAdd = ref(false);
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -241,6 +241,7 @@ function getCustomers() {
         .catch((error) => {
             isLoading.value = false;
             isSnackbar.value = true;
+            showSnackbar.value = true
             message.value = error.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
@@ -282,13 +283,15 @@ function confirmClick() {
         .then((res) => {
             deleteDialog.value?.close();
             getCustomers();
-            message.value = res.data.message;
+            showSnackbar.value = true
             isSnackbar.value = true;
+            message.value = res.data.message;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true
             isSnackbar.value = true;
             message.value = error.message;
             color.value = 'error';

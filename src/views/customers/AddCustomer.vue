@@ -223,7 +223,7 @@ const deleteDialog = ref();
 const deleteId = ref(0);
 
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -251,7 +251,6 @@ function closeDialog() {
 function addaddressData(data) {
     store.getnewAddress;
     addaddress.value = addaddress.value.concat(data);
-    console.log("addd",addaddress.value,'ffff',addaddress.value)
     if (addaddress.value.length == 1) {
         addaddress.value[0].is_primary = 1;
         console.log("enyert",addaddress.value,'ffff',addaddress.value)    
@@ -269,7 +268,6 @@ async function createCustomer() {
         var altPhone = altMobile.value.map((item) => {
             return item['altMobileNo'];
         });
-        console.log("alttt phone",altPhone)
         const requestBody = {
             first_name: firstName.value,
             last_name: lastName.value,
@@ -295,14 +293,16 @@ async function createCustomer() {
                 createcustomerform.value?.resetValidation();
                 addaddress.value = [];
                 dialog.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
+                message.value = res.data.message;
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
             })
             .catch((error) => {
                 issubmit.value = false;
                 isEmptyAddress.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';
@@ -347,7 +347,6 @@ function filterData(data) {
 function openEditDialog(id, data) {
     singleAddressDetail.value = data;
     singleAddressDetail.value.id = id;
-    console.log('singlee', singleAddressDetail.value);
     editsingleaddress.value?.open(singleAddressDetail.value);
 }
 
@@ -359,6 +358,7 @@ function confirmClick() {
     addaddress.value.splice(deleteId.value, 1);
     deleteDialog.value?.close();
     deleteDialog.value?.close();
+    showSnackbar.value = true
     isSnackbar.value = true;
     message.value = 'Address deleted successfully';
     color.value = 'error';

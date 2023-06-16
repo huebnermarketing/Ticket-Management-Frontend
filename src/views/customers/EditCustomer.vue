@@ -41,7 +41,7 @@
                                 </v-col>
                                 <!---------------------------------- Email ------------------------------------------->
                                 <v-col cols="12" md="6">
-                                    <v-label class="mb-2 font-weight-medium text-capitalize required">Email ID</v-label>
+                                    <v-label class="mb-2 font-weight-medium text-capitalize">Email ID</v-label>
                                     <v-text-field
                                         v-model="userEmail"
                                         color="primary"
@@ -232,7 +232,7 @@ const radios = ref(0);
 const customerId = ref(0);
 
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -359,14 +359,16 @@ async function updateCustomer() {
                 updatecustomerform.value?.reset();
                 updatecustomerform.value?.resetValidation();
                 dialog.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
+                message.value = res.data.message;
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
             })
             .catch((error) => {
                 issubmit.value = false;
                 isEmptyAddress.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 message.value = error.message;
                 color.value = 'error';
@@ -416,13 +418,15 @@ function confirmClick() {
         .then((res) => {
             deleteDialog.value?.close();
             getCustomersData(customerId.value);
-            message.value = res.data.message;
+            showSnackbar.value = true
             isSnackbar.value = true;
+            message.value = res.data.message;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true
             isSnackbar.value = true;
             message.value = error.message;
             color.value = 'error';

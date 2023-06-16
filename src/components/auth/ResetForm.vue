@@ -2,8 +2,8 @@
     <v-form class="mt-sm-13 mt-8" ref="resetpass">
         <v-label class="text-subtitle-1 font-weight-semibold pb-2 text-lightText">Email Address</v-label>
         <VTextField v-model="email" :rules="emailrule" required></VTextField>
-        <v-btn size="large" color="primary" disabled block flat v-if="isClicked" class="mt-2">Forgot Password</v-btn>
-        <v-btn size="large" color="primary" @click="forgotPassword()" block flat v-if="!isClicked" class="mt-2">Forgot Password</v-btn>
+        <v-btn size="large" color="primary" disabled block flat v-if="isClicked" class="mt-2">Forgot Password </v-btn>
+        <v-btn size="large" type='submit' color="primary" @click="forgotPassword()" block flat v-if="!isClicked" class="mt-2">Forgot Password</v-btn>
          <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" :top="'top'" v-if="isSnackbar">
         <v-icon left>{{ icon }}</v-icon>
         {{ message }}
@@ -43,11 +43,14 @@ async function forgotPassword() {
                 isClicked.value = false;
                 message.value = res.data.message;
                 isSnackbar.value = true;
+                showSnackbar.value = true
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
             })
             .catch((error) => {
+                console.log("err",error.response.data.message)
                 isClicked.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
                 message.value = error.response.data.message;
                 color.value = 'error';

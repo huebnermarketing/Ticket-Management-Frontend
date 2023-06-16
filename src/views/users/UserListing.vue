@@ -37,9 +37,10 @@
                 <!-- :search-value="searchValue" -->
                 <!-- //:server-items-length="serverItemsLength" // -->
                 <EasyDataTable
-                    :rows-per-page="1000"
+                    :rows-per-page="10000"
                     sticky
                     fixed
+                    :server-items-length="serverItemsLength"
                     :headers="headers"
                     :fixed-headers="true"
                     :hide-footer="true"
@@ -50,6 +51,7 @@
                     :loading="isLoading"
                     :sort-by="sortBy"
                     :sort-type="sortType"
+                    must-sort
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                     <template #item-first_name="{ first_name, last_name }">
@@ -186,7 +188,7 @@ const headers = ref([
 ]);
 const serverItemsLength = ref(50);
 const current_page = ref(1);
-const sortBy = 'email';
+const sortBy = 'first_name';
 const sortType = 'desc';
 const items = ref([]);
 const searchField = ref('name', 'mobile', 'email');

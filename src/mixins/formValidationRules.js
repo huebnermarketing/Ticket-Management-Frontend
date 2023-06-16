@@ -72,7 +72,7 @@ export const formValidationsRules = () => {
     ];
     const emailPatternrule = [
         (value) => {
-            if(value.length > 0){
+            if(value){
             if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)) return true;
             return 'Email must be in valid email address format';
             }

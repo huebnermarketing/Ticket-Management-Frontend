@@ -35,7 +35,7 @@
             <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto">
                 <!-- :search-value="searchValue" -->
                 <EasyDataTable
-                    :rows-per-page="-1"
+                    :rows-per-page="10000"
                     sticky
                     fixed
                     :server-items-length="serverItemsLength"
@@ -47,10 +47,11 @@
                     :theme-color="themeColor"
                     :search="searchField"
                     table-class-name="customize-table"
-                    ref="refUserListTable"
+                    ref="refCustomerListTable"
                     :loading="isLoading"
                     :sort-by="sortBy"
                     :sort-type="sortType"
+                    must-sort
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                     <template #item-first_name="{ first_name, last_name }">
@@ -140,7 +141,7 @@ const addcustomer = ref();
 const editcustomer = ref();
 const changePasswordFromUser = ref();
 const deleteDialog = ref();
-const refUserListTable = ref();
+const refCustomerListTable = ref();
 
 const breadcrumbs = ref([
     {
@@ -248,6 +249,8 @@ function getCustomers() {
         });
 }
 function filterData(addedData) {
+     // const existing = items.value.find((e) => e.id === editedData.id);
+    // if (existing) Object.assign(existing, editedData);
     console.log("existttt")
     const existing = items.value.find((e) => e.id === addedData.id
 );

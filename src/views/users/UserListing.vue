@@ -51,6 +51,8 @@
                     :loading="isLoading"
                     :sort-by="sortBy"
                     :sort-type="sortType"
+                    :search="searchField"
+                    :search-value="searchValue"
                     must-sort
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
@@ -218,7 +220,7 @@ function searchUser() {
             .catch((error) => {
                 showSnackbar.value = true;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -273,7 +275,7 @@ function getUsers() {
             isLoading.value = false;
             showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -324,7 +326,7 @@ function confirmClick() {
             deleteDialog.value?.close();
             showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });

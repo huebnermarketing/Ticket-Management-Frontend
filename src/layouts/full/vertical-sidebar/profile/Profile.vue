@@ -1,16 +1,17 @@
 <template>
     <v-sheet rounded="md" color="lightsecondary" class="px-4 py-3 ExtraBox">
+        <div class="d-none">{{ userProfile }}</div>
         <div class="d-flex align-center hide-menu">
             <v-avatar size="40">
                 <img
-                    v-if="userData.profile_photo"
-                    :src="userData.profile_photo"
+                    v-if="userProfile || userData.profile_photo"
+                    :src="userProfile.value ? userProfile.value : userData.profile_photo"
                     alt="user"
                     height="40"
                     style="object-fit: cover !important"
                 />
                 <img
-                    v-if="!userData.profile_photo"
+                    v-if="!userData.profile_photo && userProfile.value == ''"
                     src="@/assets/images/profile/user.png"
                     alt="user"
                     height="40"
@@ -35,14 +36,18 @@
     </v-snackbar>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { ref, computed} from 'vue';
 import { baseURlApi } from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute, useRouter } from 'vue-router';
+import { useCustomerAddressStore } from '@/stores/customerAddress';
+const store = useCustomerAddressStore();
 const route = useRoute();
 const router = useRouter();
 const { logout } = useAuthStore();
 const userData = JSON.parse(localStorage.getItem('user'));
+const userProfile = ref('');
+
 
 const showSnackbar = ref(true);
 const message = ref('');
@@ -66,11 +71,14 @@ function loggedout() {
         })
         .catch((error) => {
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
 }
+ userProfile.value = computed(() => {
+    return store.getUserProfile;
+});
 </script>
 <style lang="scss">
 .ExtraBox {

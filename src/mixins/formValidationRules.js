@@ -197,5 +197,10 @@ export const formValidationsRules = () => {
         //     return 'Zip Code must be a numeric value.';
         // }
     ];
-    return { emailPatternrule,alternativemobilerule, requiredrule, cityrule, staterule, zipcoderule, countyrule, arearule, addresslinerule, companynamerule, confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule };
+    const limitFileSize = [
+        value => {
+            return !value || !value.length || value[0].size < 2000000 || 'File size should be less than 2 MB!'
+          },
+    ]
+    return { limitFileSize,emailPatternrule,alternativemobilerule, requiredrule, cityrule, staterule, zipcoderule, countyrule, arearule, addresslinerule, companynamerule, confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule };
 };

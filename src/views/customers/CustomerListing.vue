@@ -192,7 +192,6 @@ function searchUser() {
     baseURlApi
         .post(`customer/search?total_record=${current_page.value}`, fd)
         .then((res) => {
-            console.log('res', res);
         })
         .catch((error) => {});
     }
@@ -243,7 +242,7 @@ function getCustomers() {
             isLoading.value = false;
             isSnackbar.value = true;
             showSnackbar.value = true
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -251,11 +250,9 @@ function getCustomers() {
 function filterData(addedData) {
      // const existing = items.value.find((e) => e.id === editedData.id);
     // if (existing) Object.assign(existing, editedData);
-    console.log("existttt")
     const existing = items.value.find((e) => e.id === addedData.id
 );
     if (existing) Object.assign(existing, addedData);
-    console.log("existttt",items.value,addedData)
 }
 function addCustomerData(addedData) {
     isFromAdd.value = true;
@@ -296,7 +293,7 @@ function confirmClick() {
             deleteDialog.value?.close();
             showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -311,7 +308,6 @@ onMounted(() => {
     listElm.addEventListener('scroll', (e) => {
         if (items.value.length < serverItemsLength.value) {
             if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
-                console.log("scrolled")
                 current_page.value = current_page.value + 1;
                 isFromAdd.value = false;
                 getCustomers();

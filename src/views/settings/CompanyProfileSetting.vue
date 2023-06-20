@@ -1,5 +1,7 @@
 <template>
     <div class="text-center">
+        <div class="d-none">{{ userProfile }}</div>
+
         <v-form @submit.prevent="updateProfile" ref="companyProfileForm">
             <div class="loading" v-if="isLoading">
                 <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
@@ -22,26 +24,24 @@
                             />
                         </v-avatar>
                         <label
-                            for="profileImage"
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="!isProfileImg"
-                            @click="refs['file-input'].click()"
+                            @click="$refs.companylogo.click()"
                             >Choose file</label
                         >
                         <!-- file input for upload and edit profile -->
                         <input
                             type="file"
-                            ref="file-input"
                             class="d-none"
+                            ref="companylogo"
                             id="profileImage"
                             accept="image/jpeg,image/jpg,image/png"
                             @change="uploadImage($event)"
                         />
                         <label
-                            for="profileImage"
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="isProfileImg"
-                            @click="refs['file-input'].click()"
+                            @click="$refs.companylogo.click()"
                             >Edit</label
                         >
                         <label
@@ -68,26 +68,24 @@
                             />
                         </v-avatar>
                         <label
-                            for="favicon"
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="!isFavicon"
-                            @click="refs['favicon-input'].click()"
+                            @click="$refs.faviconinput.click()"
                             >Choose file</label
                         >
                         <!-- file input for upload and edit profile -->
                         <input
                             type="file"
-                            ref="favicon-input"
+                            ref="faviconinput"
                             class="d-none"
                             id="favicon"
                             accept="image/jpeg,image/jpg,image/png"
                             @change="uploadFavicon($event)"
                         />
                         <label
-                            for="favicon"
                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                             v-if="isFavicon"
-                            @click="refs['favicon-input'].click()"
+                            @click="$refs.faviconinput.click()"
                             >Edit</label
                         >
                         <label
@@ -168,10 +166,10 @@
                     <!-- Action buttons -->
                 </v-col>
                 <!---------------------------------- Action ------------------------------------>
-                 <v-col cols="12" class="text-left mt-5">
-                        <v-btn color="primary" type="submit" v-if="!issubmit" class="p-0">Update Profile</v-btn>
-                        <v-btn color="primary" v-if="issubmit" disabled>Update Profile</v-btn>
-                    </v-col>
+                <v-col cols="12" class="text-left mt-5">
+                    <v-btn color="primary" type="submit" v-if="!issubmit" class="p-0">Update Profile</v-btn>
+                    <v-btn color="primary" v-if="issubmit" disabled>Update Profile</v-btn>
+                </v-col>
             </v-row>
         </v-form>
 
@@ -188,6 +186,8 @@ import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import dialogBox from '@/components/TicketComponents/dialog.vue';
 import { zipObject } from 'lodash';
+import { useCustomerAddressStore } from '@/stores/customerAddress';
+const store = useCustomerAddressStore();
 //mixins
 const { cityrule, staterule, zipcoderule, countyrule, arearule, companynamerule, addresslinerule, passwordrule, dropdownrule } =
     formValidationsRules();
@@ -226,6 +226,7 @@ const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
 const companyProfileForm = ref();
+const companylogo = ref();
 
 // validations rules
 const filesizelimitrule = [
@@ -253,6 +254,10 @@ function confirmClick() {
     companyProfileForm.value?.resetValidation();
 }
 function uploadImage(e) {
+    // UserProfileFile.value = ''
+    // userProfilePic.value = ''
+    //     $vm0.refs['companylogo'].value = null;
+
     isProfileImg.value = true;
     const fd = new FormData();
     const file = e.target.files[0];
@@ -272,11 +277,14 @@ function resetProfilepic() {
     UserProfileFile.value = '';
     userProfilePic.value = '';
     isProfileImg.value = false;
+    companylogo.value = null;
+    document.querySelector('#profileImage').value = '';
 }
 function resetFavicon() {
     userFaviconFile.value = '';
     userFavicon.value = '';
     isFavicon.value = false;
+    document.querySelector('#favicon').value = '';
 }
 function getCompanyprofileData() {
     isLoading.value = true;
@@ -284,26 +292,34 @@ function getCompanyprofileData() {
         .get('settings/company/get')
         .then((res) => {
             isLoading.value = false;
-            currencyOptions.value = res.data.data.all_currency;
-            currency.value = res.data.data.company_setting.currency;
-            companyName.value = res.data.data.company_setting.company_name;
-            address.value = res.data.data.company_setting.address_line1;
-            city.value = res.data.data.company_setting.city;
-            area.value = res.data.data.company_setting.area;
-            state.value = res.data.data.company_setting.state;
-            country.value = res.data.data.company_setting.country;
-            userProfilePic.value = res.data.data.company_setting.company_logo ? res.data.data.company_setting.company_logo : '';
-            userFavicon.value = res.data.data.company_setting.company_favicon ? res.data.data.company_setting.company_favicon : '';
-            zipcode.value = res.data.data.company_setting.zipcode;
-            companyId.value = res.data.data.company_setting.id;
-            isProfileImg.value = res.data.data.company_setting.company_logo ? true : false;
-            isFavicon.value = res.data.data.company_setting.company_favicon ? true : false;
+            const data = res.data.data;
+            if (data.company_setting.company_logo) store.setCompanyLogo(data.company_setting.company_logo);
+            if (data.company_setting.company_logo) store.setCompanyLogo(data.company_setting.company_logo);
+            if (data.company_setting.company_name) store.setCompanyName(data.company_setting.company_name);
+            UserProfileFile.value = data.company_setting.company_logo;
+            userFaviconFile.value = data.company_setting.company_favicon;
+            data.company_setting.company_logo ? (isProfileImg.value = true) : (isProfileImg.value = false);
+            data.company_setting.company_favicon ? (isFavicon.value = true) : (isFavicon.value = false);
+            currencyOptions.value = data.all_currency;
+            currency.value = data.company_setting.currency;
+            companyName.value = data.company_setting.company_name;
+            address.value = data.company_setting.address_line1;
+            city.value = data.company_setting.city;
+            area.value = data.company_setting.area;
+            state.value = data.company_setting.state;
+            country.value = data.company_setting.country;
+            userProfilePic.value = data.company_setting.company_logo ? data.company_setting.company_logo : '';
+            userFavicon.value = data.company_setting.company_favicon ? data.company_setting.company_favicon : '';
+            zipcode.value = data.company_setting.zipcode;
+            companyId.value = data.company_setting.id;
+            isProfileImg.value = data.company_setting.company_logo ? true : false;
+            isFavicon.value = data.company_setting.company_favicon ? true : false;
         })
         .catch((error) => {
             isLoading.value = false;
             showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -320,8 +336,8 @@ async function updateProfile() {
         const fd = new FormData();
         fd.append('company_id', companyId.value);
         fd.append('company_name', companyName.value);
-        fd.append('company_logo', UserProfileFile.value);
-        fd.append('company_favicon', userFaviconFile.value);
+        fd.append('company_logo', UserProfileFile.value ? UserProfileFile.value : '');
+        fd.append('company_favicon', userFaviconFile.value ? userFaviconFile.value : '');
         fd.append('address_line1', address.value);
         fd.append('area', area.value);
         fd.append('zipcode', zipcode.value);
@@ -352,7 +368,7 @@ async function updateProfile() {
                 issubmit.value = false;
                 showSnackbar.value = true;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });

@@ -1,6 +1,8 @@
 <template>
     <div class="text-center">
         <v-dialog v-model="dialog" persistent class="dialog-mw">
+            <div class="d-none">{{ userProfile }}</div>
+
             <v-card class="overflow-auto">
                 <v-toolbar dark color="primary">
                     <v-toolbar-title>Edit User</v-toolbar-title>
@@ -30,26 +32,36 @@
                                             />
                                         </v-avatar>
                                         <label
-                                            for="profileImage"
                                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                                             v-if="!isProfileImg"
-                                            @click="refs['file-input'].click()"
+                                            @click="$refs.fileinputs.click()"
                                             >Choose file</label
                                         >
                                         <!-- file input for upload and edit profile -->
                                         <input
+                                           :rules="limitFileSize"
                                             type="file"
-                                            ref="file-input"
+                                            ref="fileinputs"
                                             class="d-none"
-                                            id="profileImage"
+                                            id="profileImage2"
                                             accept="image/jpeg,image/jpg,image/png"
                                             @change="uploadImage($event)"
                                         />
+                                        <!-- <v-file-input
+                                            :rules="limitFileSize"
+                                            v-model="filename"
+                                            ref="fileinput"
+                                            id="profileImage2"
+                                            accept="image/png, image/jpeg, image/jpg"
+                                            prepend-icon="mdi-camera"
+                                            label="Avatar"
+                                            clearable="true"
+                                            @change="uploadImage($event)"
+                                        ></v-file-input> -->
                                         <label
-                                            for="profileImage"
                                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                                             v-if="isProfileImg"
-                                            @click="refs['file-input'].click()"
+                                            @click="$refs.fileinputs.click()"
                                             >Edit</label
                                         >
                                         <label
@@ -77,24 +89,13 @@
                                 <!---------------------------------- Last name --------------------------------->
                                 <v-col cols="12" md="6">
                                     <v-label class="mb-2 font-weight-medium text-capitalize required">last Name</v-label>
-                                    <v-text-field
-                                        v-model="lastName"
-                                        variant="outlined"
-                                        color="primary"
-                                        :rules="lastnamerule"
-                                    >
+                                    <v-text-field v-model="lastName" variant="outlined" color="primary" :rules="lastnamerule">
                                     </v-text-field>
                                 </v-col>
                                 <!---------------------------------- Mobile Number --------------------------------->
                                 <v-col cols="12" md="6">
                                     <v-label class="mb-2 font-weight-medium text-capitalize required">Mobile Number</v-label>
-                                    <v-text-field
-                                        v-model="mobile"
-                                        color="primary"
-                                        variant="outlined"
-                                        type="text"
-                                        :rules="mobilerule"
-                                    />
+                                    <v-text-field v-model="mobile" color="primary" variant="outlined" type="text" :rules="mobilerule" />
                                 </v-col>
                                 <!---------------------------------- Email ------------------------------------------->
                                 <v-col cols="12" md="6">
@@ -124,12 +125,10 @@
                                     ></v-select>
                                 </v-col>
                                 <!---------------------------------- active user --------------------------------->
-                                <v-col cols="12" md="6"  v-if="userId !== user.id && role_id >= user.roles[0].id">
+                                <v-col cols="12" md="6" v-if="userId !== user.id && role_id >= user.roles[0].id">
                                     <div class="d-flex align-center">
-                                        <v-label class="mb-2 font-weight-medium text-capitalize required"
-                                            >Active</v-label
-                                        >
-                                        <div class="ml-4"> 
+                                        <v-label class="mb-2 font-weight-medium text-capitalize required">Active</v-label>
+                                        <div class="ml-4">
                                             <v-switch
                                                 class="user-switch"
                                                 v-model="isActiveUser"
@@ -161,11 +160,15 @@
     </div>
 </template>
 <script setup>
-import { ref, defineExpose, defineComponent, onMounted } from 'vue';
+import { ref, defineExpose, defineComponent, onMounted, computed } from 'vue';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
-const { firstnamerule, filesizelimitrule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule } =
+import { useCustomerAddressStore } from '@/stores/customerAddress';
+const store = useCustomerAddressStore();
+const userProfile = ref('');
+
+const { limitFileSize,firstnamerule, filesizelimitrule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule } =
     formValidationsRules();
 
 const dialog = ref(false);
@@ -180,10 +183,12 @@ const UserProfileFile = ref('');
 const isProfileImg = ref(false);
 const issubmit = ref(false);
 const userId = ref(0);
-const role_id = ref(0)
+const role_id = ref(0);
 const isActiveUser = ref(true);
 const isLoading = ref(false);
 const fileSize = ref(false);
+const filename = ref('')
+// const fileinput = ref()
 
 //props for toastification
 const showSnackbar = ref(false);
@@ -197,7 +202,10 @@ const edituserform = ref();
 //emits
 const emit = defineEmits(['updateClicked']);
 /*Login user detail*/
-const user = JSON.parse(localStorage.getItem('user'))
+const user = JSON.parse(localStorage.getItem('user'));
+userProfile.value = computed(() => {
+    return store.getUserProfile;
+});
 
 function uploadImage(e) {
     isProfileImg.value = true;
@@ -209,7 +217,9 @@ function uploadImage(e) {
 }
 function resetProfilepic() {
     userProfilePic.value = '';
+    UserProfileFile.value = '';
     isProfileImg.value = false;
+    document.querySelector('#profileImage2').value = '';
 }
 function getRoles() {
     baseURlApi
@@ -219,7 +229,7 @@ function getRoles() {
         })
         .catch((error) => {
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -228,18 +238,18 @@ function closeDialog() {
     edituserform.value?.reset();
     dialog.value = false;
 }
-function limitFileSize(e) {
-    const file1 = e.target.files[0];
-    let size = parseFloat(file1 ? file1.size : '') / (1024 * 1024).toFixed(2);
-    size > 10 ? (fileSize.value = true) : (fileSize.value = false);
-    console.log('lmm');
-}
+// function limitFileSize(e) {
+//     const file1 = e.target.files[0];
+//     let size = parseFloat(file1 ? file1.size : '') / (1024 * 1024).toFixed(2);
+//     size > 10 ? (fileSize.value = true) : (fileSize.value = false);
+//     console.log('lmm');
+// }
 
-function getUsersData(id,roleId) {
+function getUsersData(id, roleId) {
     userProfilePic.value = '';
     isLoading.value = true;
     userId.value = id;
-    role_id.value = roleId
+    role_id.value = roleId;
     baseURlApi
         .get(`user/edit-user/${id}`)
         .then((res) => {
@@ -289,9 +299,9 @@ async function updateUser() {
             })
             .catch((error) => {
                 issubmit.value = false;
-                showSnackbar.value = true
+                showSnackbar.value = true;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });

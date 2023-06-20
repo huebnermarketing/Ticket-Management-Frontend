@@ -105,7 +105,7 @@ async function changePassword() {
                 issubmit.value = false;
                 showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });

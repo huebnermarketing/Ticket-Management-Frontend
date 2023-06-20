@@ -232,7 +232,7 @@ async function updateProductService(id) {
                 isEditable.value = false;
                 showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -251,7 +251,7 @@ function editProblem(id) {
         .catch((error) => {
             isSnackbar.value = true;
             showSnackbar.value = true
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -275,7 +275,7 @@ function getProductServices() {
             isLoading.value = false;
             isSnackbar.value = true;
             showSnackbar.value = true
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -315,7 +315,7 @@ async function addProductService() {
                 issubmit.value = false;
                 showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -344,7 +344,7 @@ function confirmClick() {
             deleteDialog.value?.close();
             showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });

@@ -213,6 +213,7 @@
                                             variant="outlined"
                                             color="primary"
                                             :rules="requiredrule"
+                                             maxlength="50"
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- description --------------------------------->
@@ -226,6 +227,7 @@
                                             color="primary"
                                             row-height="25"
                                             shaped
+                                             maxlength="500"
                                         ></v-textarea>
                                     </v-col>
                                     <!---------------------------------- Due Date --------------------------------->
@@ -356,7 +358,7 @@
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- payment mode --------------------------------->
-                                    <v-col cols="12" md="6">
+                                    <v-col cols="12" md="6" v-if="paymentStatus.id == 2 || paymentStatus.id == 3">
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">payment mode</v-label>
                                         <v-select
                                             v-model="paymentMode"
@@ -536,7 +538,7 @@ const area = ref('');
 const city = ref('');
 const zipcode = ref('');
 const state = ref('');
-const countryName = ref('');
+const countryName = ref('India');
 const companyName = ref('');
 const description = ref('');
 const problemTitle = ref('');
@@ -752,6 +754,17 @@ function getTickets() {
             problemTypeOptions.value = data.problem_types;
             assignErOptions.value = data.assign_engineer;
             ticketStatusOptions.value = data.ticket_status;
+            data.ticket_status.map((data)=>{
+                if(data.id == 1){
+                 ticketStatus.value = data   
+                }
+            })
+            data.payment_status.map((data)=>{
+                 if(data.id == 1){
+                 paymentStatus.value = data   
+                }
+            })
+            // ticketStatus.value = 
             appointmentTypeOptions.value = data.appointment_type;
             paymentStatusOptions.value = data.payment_status;
             paymentModeOptions.value = data.payment_mode;

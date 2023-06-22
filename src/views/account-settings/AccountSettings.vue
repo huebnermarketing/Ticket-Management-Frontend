@@ -8,7 +8,7 @@ import UiParentCard from '@/components/shared/UiParentCard.vue';
 import { UserCircleIcon,BellIcon,ArticleIcon,LockIcon } from 'vue-tabler-icons';
 
 //components
-import AccountTab from '@/views/pages/account-settings/AccountTab.vue';
+import AccountTab from '@/views/account-settings/AccountTab.vue';
 // import NotificationTab from '@/components/pages/account-settings/NotificationTab.vue';
 // import BillsTab from '@/components/pages/account-settings/BillsTab.vue';
 // import SecurityTab from '@/components/pages/account-settings/SecurityTab.vue';

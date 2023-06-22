@@ -260,7 +260,6 @@ function addaddressData(data) {
     addaddress.value = addaddress.value.concat(data);
     if (addaddress.value.length == 1) {
         addaddress.value[0].is_primary = 1;
-        console.log("enyert",addaddress.value,'ffff',addaddress.value)    
     }
     if (addaddress.value.length > 0) isEmptyAddress.value = false;
 }
@@ -307,12 +306,11 @@ async function createCustomer() {
                 color.value = 'success';
             })
             .catch((error) => {
-                console.log("errrrr",error)
                 issubmit.value = false;
                 isEmptyAddress.value = false;
                 showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -345,7 +343,6 @@ function openAddAddressDialog() {
     addNewaddress.value?.open();
 }
 function filterData(data) {
-    console.log('existing1', data);
     const existing = addaddress.value.find((e) => e.id === data.id);
 
     if (existing) {

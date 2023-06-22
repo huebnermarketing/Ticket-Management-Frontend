@@ -1,15 +1,20 @@
 <template>
-    <v-container>
-        <v-row class="justify-center">
-            <v-col cols="12" md="4" sm="5" lg="2" class="text-center" >
-                <div class="mt-8 mb-4">
-                    <img src="@/assets/images/logos/logoIcon.svg" alt="favicon" />
-                    <p class="text-subtitle-1 mt-2 text-13">
-                        All rights reserved by Modernize. Designed &amp; Developed by
-                        <a href="https://adminmart.com/" class="a_link"  target="_blank">AdminMart</a>
-                    </p>
-                </div>
-            </v-col>
-        </v-row>
-    </v-container>
+    <div class="copyright-main">
+        <div>
+            <p class="clearfix mb-0">
+                <span class="float-md-left d-block d-md-inline-block mt-25"> Copyright © {{ new Date().getFullYear() }} All rights reserved.</span>
+                <!-- <span class="float-md-left d-md-inline-block mt-25 ml-1">
+                    <a class="ml-25">All rights reserved. </a>
+                </span> -->
+            </p>
+        </div>
+    </div>
 </template>
+<style scoped>
+.copyright-main {
+    position: absolute;
+    bottom: 0;
+    padding: 24px 24px 12px 24px;
+    position: fixed;
+}
+</style>

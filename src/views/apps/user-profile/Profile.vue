@@ -1,7 +1,7 @@
 <script setup>
 
 // components
-import AccountSetting from '@/views/pages/account-settings/AccountSettings.vue'
+import AccountSetting from '@/views/account-settings/AccountSettings.vue'
 </script>
 
 <template>

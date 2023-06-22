@@ -230,7 +230,7 @@ async function updateContract(id) {
                 isEditable.value = false;
                 showSnackbar.value = true;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -250,7 +250,7 @@ function editContract(id) {
         .catch((error) => {
             showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -274,7 +274,7 @@ function getContracts() {
             isLoading.value = false;
             showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -314,7 +314,7 @@ async function addContract() {
                 issubmit.value = false;
                 showSnackbar.value = true;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -343,7 +343,7 @@ function confirmClick() {
             deleteDialog.value?.close();
             showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });

@@ -192,7 +192,6 @@ function searchUser() {
     baseURlApi
         .post(`customer/search?total_record=${current_page.value}`, fd)
         .then((res) => {
-            console.log('res', res);
         })
         .catch((error) => {});
     }
@@ -225,8 +224,12 @@ function getCustomers() {
                 for (let i in uniqueObject) {
                     itemsData.push(uniqueObject[i]);
                 }
+                console.log("one")
             } else {
+                console.log("res.daa",res.data.data)
                 itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data));
+                                console.log("two")
+
             }
 
             items.value = itemsData.slice();
@@ -237,13 +240,14 @@ function getCustomers() {
                 }
             });
             items.value = [...proxy];
-            items.value = [...JSON.parse(JSON.stringify(items.value))];
+            items.value = [...JSON.parse(JSON.stringify(items.value))][0] !== null ? [...JSON.parse(JSON.stringify(items.value))] : [];
+            console.log("ite",items.value)
         })
         .catch((error) => {
             isLoading.value = false;
             isSnackbar.value = true;
             showSnackbar.value = true
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -251,11 +255,9 @@ function getCustomers() {
 function filterData(addedData) {
      // const existing = items.value.find((e) => e.id === editedData.id);
     // if (existing) Object.assign(existing, editedData);
-    console.log("existttt")
     const existing = items.value.find((e) => e.id === addedData.id
 );
     if (existing) Object.assign(existing, addedData);
-    console.log("existttt",items.value,addedData)
 }
 function addCustomerData(addedData) {
     isFromAdd.value = true;
@@ -296,7 +298,7 @@ function confirmClick() {
             deleteDialog.value?.close();
             showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -311,7 +313,6 @@ onMounted(() => {
     listElm.addEventListener('scroll', (e) => {
         if (items.value.length < serverItemsLength.value) {
             if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
-                console.log("scrolled")
                 current_page.value = current_page.value + 1;
                 isFromAdd.value = false;
                 getCustomers();

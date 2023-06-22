@@ -43,8 +43,10 @@
                 <v-icon left>{{ icon }}</v-icon>
                 {{ message }}
             </v-snackbar>
-        </v-row>
+        </v-row>    
     </div>
+ <Footer />         
+
 </template>
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -52,6 +54,7 @@ import Logo from '@/layouts/full/logo/Logo.vue';
 import { baseURlApi } from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute, useRouter } from 'vue-router';
+import Footer from '@/components/landingpage/layout/Footer.vue';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
 const route = useRoute();
 const router = useRouter();

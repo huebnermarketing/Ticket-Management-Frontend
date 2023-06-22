@@ -131,7 +131,6 @@
                     </EasyDataTable>
                 </v-form>
             </div>
-            {{showSnackbar}}{{isSnackbar}}
             <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
                 <v-icon left>{{ icon }}</v-icon>
                 {{ message }}
@@ -230,7 +229,7 @@ async function updateProblem(id) {
                 isEditable.value = false;
                 showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -250,7 +249,7 @@ function editProblem(id) {
         .catch((error) => {
             showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -273,7 +272,7 @@ function getProblems() {
             isLoading.value = false;
             showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -312,7 +311,7 @@ async function addProblems() {
                 issubmit.value = false;
                 showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -341,7 +340,7 @@ function confirmClick() {
             deleteDialog.value?.close();
             showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });

@@ -261,7 +261,6 @@ function getCustomersData(id) {
         .then((res) => {
             isLoading.value = false;
             const data = res.data.data;
-            console.log('get customer', data);
             firstName.value = data.first_name ? data.first_name : '';
             lastName.value = data.last_name;
             userEmail.value = data.email.trim();
@@ -353,7 +352,6 @@ async function updateCustomer() {
                     last_name: lastName.value,
                     phone: mobile.value
                 };
-                console.log("resssss",res.data)
                 emit('updateClicked', addedData);
                 issubmit.value = false;
                 isEmptyAddress.value = false;
@@ -371,7 +369,7 @@ async function updateCustomer() {
                 isEmptyAddress.value = false;
                 showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -429,7 +427,7 @@ function confirmClick() {
             deleteDialog.value?.close();
             showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });

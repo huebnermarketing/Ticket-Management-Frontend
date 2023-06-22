@@ -20,12 +20,18 @@ const MainRoutes = {
         {
             name: 'Tickets',
             path: '/tickets',
-            component: () => import('@/views/tickets/TicketListing.vue')
-        },
-        {
-            name: 'AddTickets',
-            path: '/tickets/add-ticket',
-            component: () => import('@/views/tickets/AddTicket.vue')
+            exact:true,
+            // redirect: 'list-tickets',
+            // component: () => <div></div>,
+            component: () => import('@/views/tickets/TicketListing.vue'),
+            children: [
+                {
+                    name: 'AddTickets',
+                    path: '/tickets/add-ticket',
+                    exact:true,
+                    component: () => import('@/views/tickets/AddTicket.vue'),
+                },
+            ]
         },
 //---------------------------------- Contracts ---------------------------------------------//
         {
@@ -49,12 +55,12 @@ const MainRoutes = {
         {
             name: 'Account Setting',
             path: '/pages/account-settings',
-            component: () => import('@/views/pages/account-settings/AccountSettings.vue')
+            component: () => import('@/views/account-settings/AccountSettings.vue')
         },
         {
             name: 'Account Setting',
             path: '/pages/company-settings',
-            component: () => import('@/views/pages/company-settings/CompanySettings.vue')
+            component: () => import('@/views/company-settings/CompanySettings.vue')
         },
     ]
 };

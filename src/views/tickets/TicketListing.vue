@@ -1,6 +1,6 @@
 
 <template>
-    <v-row no-gutters>
+    <v-row no-gutters v-show="router.currentRoute.value.name==='Tickets'">
         <v-col cols="12" md="12">
             <v-row justify="space-between" class="align-center mb-3">
                 <v-col cols="12">
@@ -20,7 +20,7 @@
                 </v-col>
                 <v-col cols="12" md="3">
                     <div class="d-flex gap-2 justify-end">
-                        <v-btn btn color="primary" @click="openAddUserDialog()">
+                        <v-btn btn color="primary" @click="openAddTicket()">
                             <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add Ticket
                         </v-btn>
                         <!-- <v-btn btn color="primary">
@@ -62,9 +62,9 @@
                     must-sort
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
-                    <template #item-id="{ id }">
+                    <template #item-id="{ unique_id }">
                         <div class="player-wrapper text-capitalize">
-                            {{ id }}
+                            {{ unique_id }}
                         </div>
                     </template>
                     <template #item-customer_name="{ customer }">
@@ -131,9 +131,9 @@
                     </template>
                     <template #item-priority="{ ticket_priority }">
                         <div class="player-wrapper">
-                            <v-chip :color="ticket_priority.id == 1 ? 'primary' : 'error'">
-                                <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-primary" />
-                                <ArrowNarrowDownIcon v-if="ticket_priority.id == 2" stroke-width="1.5" size="20" class="text-error" />
+                            <v-chip :color="ticket_priority.id == 1 ? 'error' : 'success'">
+                                <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-error" />
+                                <ArrowNarrowDownIcon v-if="ticket_priority.id == 2" stroke-width="1.5" size="20" class="text-success" />
                             </v-chip>
                         </div>
                     </template>
@@ -200,6 +200,7 @@
         <addCustomer ref="addcustomer" @addCustomerClicked="addCustomerData" />
         <editCustomer ref="editcustomer" @updateClicked="filterData" />
     </v-row>
+    <router-view />
 </template>
 <script setup>
 import { onMounted, ref, watch, defineExpose } from 'vue';
@@ -207,12 +208,13 @@ import { baseURlApi } from '@/api/axios';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import TopCards from '@/components/cards/TopCards.vue';
 
-import addCustomer from '@/views/customers/AddCustomer.vue';
-import editCustomer from '@/views/customers/EditCustomer.vue';
+// import addCustomer from '@/views/customers/AddCustomer.vue';
+// import editCustomer from '@/views/customers/EditCustomer.vue';
 import dialogBox from '@/components/TicketComponents/dialog.vue';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import 'vue3-easy-data-table/dist/style.css';
+import { router } from '@/router';
 const themeColor = ref('rgb(var(--v-theme-secondary))');
 
 const page = ref({ title: 'Users' });
@@ -282,6 +284,7 @@ const timer = ref(5000);
 const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
+
 //get users
 function searchUser() {
     const fd = new FormData();
@@ -329,14 +332,14 @@ function getTickets() {
                 {
                     title: 'Partially Paid',
                     number: ticketDashboard.value.partially_paid,
-                    bgcolor: 'lightwarning',
-                    textcolor: 'warning'
+                    bgcolor: 'lightprimary',
+                    textcolor: 'primary'
                 },
                 {
                     title: 'Unpaid',
                     number: ticketDashboard.value.unpaid,
-                    bgcolor: 'lightprimary',
-                    textcolor: 'primary'
+                    bgcolor: 'lightwarning',
+                    textcolor: 'warning'
                 }
             );
             console.log('dataa11', res.data.data.allTicket.data);
@@ -398,8 +401,11 @@ function addCustomerData(addedData) {
 //set table height
 
 //open modal
-function openAddUserDialog() {
-    addcustomer.value?.open();
+function openAddTicket() {
+    console.log('rouuu',router)
+    router.push({
+        name:'AddTickets'
+    })
 }
 function openEditDialog(id) {
     editId.value = id;

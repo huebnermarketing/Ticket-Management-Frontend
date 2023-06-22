@@ -131,7 +131,6 @@
                     </EasyDataTable>
                 </v-form>
             </div>
-            {{showSnackbar}}{{isSnackbar}}
             <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
                 <v-icon left>{{ icon }}</v-icon>
                 {{ message }}

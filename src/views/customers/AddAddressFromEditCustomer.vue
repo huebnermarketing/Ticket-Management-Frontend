@@ -133,7 +133,6 @@ const emit = defineEmits(['editAddressClicked']);
 
 //methods
 function uploadImage(e) {
-    console.log('uploadedd');
     isProfileImg.value = true;
     const fd = new FormData();
     const file = e.target.files[0];
@@ -147,6 +146,7 @@ function resetProfilepic() {
 }
 function closeDialog() {
     createAddressForm.value?.reset();
+    country.value = "India"
     dialog.value = false;
 }
 
@@ -196,7 +196,7 @@ async function addAddress() {
             .catch((error) => {
                 issubmit.value = false;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });

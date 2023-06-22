@@ -5,7 +5,7 @@ const props = defineProps({
 </script>
 <template>
     <v-row>
-        <v-col cols="12" lg="3" md="6" sm="6" v-for="card in topCardsData" :key="card.title">
+        <v-col cols="12" lg="2" md="4" sm="4" v-for="card in topCardsData" :key="card.title">
             <div
                 :class="'text-decoration-none d-flex align-center justify-center text-center rounded-md pa-6  bg-' + card.bgcolor"
             >

@@ -1,74 +1,240 @@
-<template>
-    <v-row>
-        <v-col cols="12">
-            <!-- <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb> -->
 
-            <TopCards :topCardsData="topCardsData" />
+<template>
+    <v-row no-gutters v-show="router.currentRoute.value.name==='Tickets'">
+        <v-col cols="12" md="12">
+            <v-row justify="space-between" class="align-center mb-3">
+                <v-col cols="12">
+                    <!-- <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb> -->
+
+                    <TopCards :topCardsData="topCardsData" />
+                </v-col>
+                <v-col cols="12" lg="4" md="6">
+                    <v-text-field
+                        density="compact"
+                        @input="searchUser()"
+                        v-model="searchValue"
+                        label="Search"
+                        hide-details
+                        variant="outlined"
+                    ></v-text-field>
+                </v-col>
+                <v-col cols="12" md="3">
+                    <div class="d-flex gap-2 justify-end">
+                        <v-btn btn color="primary" @click="openAddTicket()">
+                            <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add Ticket
+                        </v-btn>
+                        <!-- <v-btn btn color="primary">
+                            <FilterIcon stroke-width="1.5" size="20" class="text-white" />
+                        </v-btn> -->
+                    </div>
+                </v-col>
+            </v-row>
+            <!-- style="height:300px !important; overflow-y: scroll !important" -->
+
+            <div v-if="current_page > 1">
+                <transition name="fade">
+                    <div class="loading" v-if="isLoading">
+                        <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
+                    </div>
+                </transition>
+            </div>
+            <div id="infinite-list" style="max-height: calc(100vh - 380px); overflow-y: auto">
+                <!-- :search-value="searchValue" -->
+                <EasyDataTable
+                    :rows-per-page="10000"
+                    sticky
+                    fixed
+                    id="ticketlist"
+                    responsive
+                    :server-items-length="serverItemsLength"
+                    :headers="headers"
+                    :fixed-headers="true"
+                    :hide-footer="true"
+                    :items="items"
+                    :search-value="searchValue"
+                    :theme-color="themeColor"
+                    :search="searchField"
+                    table-class-name="customize-table"
+                    ref="refCustomerListTable"
+                    :loading="isLoading"
+                    :sort-by="sortBy"
+                    :sort-type="sortType"
+                    must-sort
+                >
+                    <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
+                    <template #item-id="{ unique_id }">
+                        <div class="player-wrapper text-capitalize">
+                            {{ unique_id }}
+                        </div>
+                    </template>
+                    <template #item-customer_name="{ customer }">
+                        <div class="player-wrapper text-capitalize">
+                            {{ customer.first_name + ' ' + customer.last_name }}
+                        </div>
+                    </template>
+                    <template #item-problem_title="{ problem_title }">
+                        <div class="player-wrapper text-capitalize">
+                            {{ problem_title }}
+                        </div>
+                    </template>
+                    <template #item-mobile="{ customer }">
+                        <div class="d-none">
+                            {{
+                                customer.phones.map((data) => {
+                                    if (data.is_primary == 1) {
+                                        mobile = data.phone;
+                                    }
+                                })
+                            }}
+                        </div>
+                        <div class="player-wrapper">
+                            {{ mobile }}
+                        </div>
+                    </template>
+                    <template #item-company_name="{ customer_location }">
+                        <div class="player-wrapper">
+                            {{ customer_location.company_name }}
+                        </div>
+                    </template>
+                    <template #item-due_date="{ due_date }">
+                        <div class="player-wrapper">
+                            {{ due_date }}
+                        </div>
+                    </template>
+                    <template #item-engineer="{ assigned_engineer }">
+                        <div class="player-wrapper">
+                            <v-avatar size="35" class="border">
+                                <img
+                                    v-if="assigned_engineer.profile_photo"
+                                    :src="assigned_engineer.profile_photo"
+                                    width="35"
+                                    alt="Julia"
+                                    height="35"
+                                    style="object-fit: cover !important"
+                                />
+                                <img
+                                    v-if="!assigned_engineer.profile_photo"
+                                    src="@/assets/images/profile/user.png"
+                                    width="35"
+                                    alt="Julia"
+                                    height="35"
+                                    style="object-fit: cover !important"
+                                />
+                            </v-avatar>
+                            <span class="ml-2">{{ assigned_engineer.first_name + ' ' + assigned_engineer.last_name }}</span>
+                        </div>
+                    </template>
+                    <template #item-appointment_type="{ appointment_type }">
+                        <div class="player-wrapper">
+                            {{ appointment_type.appointment_name }}
+                        </div>
+                    </template>
+                    <template #item-priority="{ ticket_priority }">
+                        <div class="player-wrapper">
+                            <v-chip :color="ticket_priority.id == 1 ? 'error' : 'success'">
+                                <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-error" />
+                                <ArrowNarrowDownIcon v-if="ticket_priority.id == 2" stroke-width="1.5" size="20" class="text-success" />
+                            </v-chip>
+                        </div>
+                    </template>
+                    <template #item-ticket_status="{ ticket_status }">
+                        <div class="player-wrapper">
+                            <v-chip :color="'primary'">{{ ticket_status.status_name }} </v-chip>
+                        </div>
+                    </template>
+                    <template #item-payment_status="{ payment_status }">
+                        <div class="player-wrapper">
+                            <v-chip :color="payment_status.id == 3 ? 'primary' : payment_status.id == 2 ? 'secondary' : 'error'"
+                                >{{ payment_status.payment_type }}
+                            </v-chip>
+                        </div>
+                    </template>
+                    <!-- <template #item-company_name="{ company_name }">
+                        <div class="player-wrapper">
+                            {{ company_name }}
+                        </div>
+                    </template> -->
+                    <template #item-action="{ id }">
+                        <div class="d-flex align-center">
+                            <v-tooltip text="View">
+                                <template v-slot:activator="{ props }">
+                                    <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
+                                        ><EyeIcon stroke-width="1.5" size="20" class="text-primary"
+                                    /></v-btn>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip text="Edit">
+                                <template v-slot:activator="{ props }">
+                                    <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
+                                        ><PencilIcon stroke-width="1.5" size="20" class="text-secondary"
+                                    /></v-btn>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip text="Delete">
+                                <template v-slot:activator="{ props }">
+                                    <v-btn class="table-icons-common" icon flat @click="deleteCustomer(id)" v-bind="props"
+                                        ><TrashIcon stroke-width="1.5" size="20" class="text-error"
+                                    /></v-btn>
+                                </template>
+                            </v-tooltip>
+                        </div>
+                    </template>
+                </EasyDataTable>
+            </div>
         </v-col>
-        <v-col cols="12">
-            <v-card elevation="10">
-                <v-card-text>
-                    <DataTable  />
-                </v-card-text>
-            </v-card>
-        </v-col>
+        <dialogBox
+            ref="deleteDialog"
+            @confirClk="confirmClick()"
+            @cancelClk="cancelClick()"
+            :dialogText="dialogText"
+            :confirmText="confirmText"
+            :dialogTitle="dialogTitle"
+            :cancelText="cancelText"
+            :title="title"
+        />
+
+        <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
+            <v-icon left>{{ icon }}</v-icon>
+            {{ message }}
+        </v-snackbar>
+        <addCustomer ref="addcustomer" @addCustomerClicked="addCustomerData" />
+        <editCustomer ref="editcustomer" @updateClicked="filterData" />
     </v-row>
+    <router-view />
 </template>
 <script setup>
-import { ref } from 'vue';
-import UserListing from '@/views/users/UserListing.vue';
+import { onMounted, ref, watch, defineExpose } from 'vue';
+import { baseURlApi } from '@/api/axios';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import DataTable from '@/components/table/commonTables/DataTable.vue';
-
 import TopCards from '@/components/cards/TopCards.vue';
-const headers = [
-    { title: 'Actions1', key: 'actions1', sortable: true },
-    { title: 'Actions2', key: 'actions2', sortable: true },
-    { title: 'Actions3', key: 'actions3', sortable: true },
-    { title: 'Actions4', key: 'actions4', sortable: true },
-    { title: 'Actions5', key: 'actions5', sortable: true },
-    { title: 'Actions6', key: 'actions6', sortable: true }
-];
 
-const items =  [
-  {
-    id: "#123",
-    avatar: 'user1',
-    userinfo: "Hanna Gover",
-    usermail: "hgover@gmail.com",
-    phone: "+123 456 789",
-    jdate: "12-10-2014",
-    role: "Designer",
-    rolestatus: "primary"
-  },
-    {
-    id: "#452",
-    avatar: 'user2',
-    userinfo: "Daniel Kristeen",
-    usermail: "hgover@gmail.com",
-    phone: "+234 456 789",
-    jdate: "10-09-2014",
-    role: "Developer",
-    rolestatus: "secondary"
-  },
-  {
-    id: "#565",
-    avatar: 'user3',
-    userinfo: "Julian Josephs",
-    usermail: "hgover@gmail.com",
-    phone: "+345 456 789",
-    jdate: "01-10-2013",
-    role: "Accountant",
-    rolestatus: "error"
-  },]
-const userDetails = ref({
-    addButton: 'Add Ticket',
-    addIcon: 'mdi-plus',
-    headers: headers,
-    items:items
-});
+// import addCustomer from '@/views/customers/AddCustomer.vue';
+// import editCustomer from '@/views/customers/EditCustomer.vue';
+import dialogBox from '@/components/TicketComponents/dialog.vue';
+import Vue3EasyDataTable from 'vue3-easy-data-table';
+import UiParentCard from '@/components/shared/UiParentCard.vue';
+import 'vue3-easy-data-table/dist/style.css';
+import { router } from '@/router';
+const themeColor = ref('rgb(var(--v-theme-secondary))');
 
 const page = ref({ title: 'Users' });
+const isOpenDialog = ref(false);
+
+//dialog props
+const dialogTitle = ref('Are you sure you want to delete this customer ?');
+const dialogText = ref('This will delete this customer permanently, you can not undo this action.');
+const cancelText = ref('Cancel');
+const confirmText = ref('Delete');
+const title = ref('Delete Customer');
+const editId = ref(0);
+
+//refs
+const addcustomer = ref();
+const editcustomer = ref();
+const changePasswordFromUser = ref();
+const deleteDialog = ref();
+const refCustomerListTable = ref();
+const ticketDashboard = ref({});
 const breadcrumbs = ref([
     {
         text: 'tickets',
@@ -81,30 +247,247 @@ const breadcrumbs = ref([
         href: '#'
     }
 ]);
-const topCardsData = ref([
-    {
-        title: 'Total Open Ticket',
-        number: '96',
-        bgcolor: 'lightprimary',
-        textcolor: 'primary'
-    },
-    {
-        title: 'Estimated Amount',
-        number: '3,650',
-        bgcolor: 'lightwarning',
-        textcolor: 'warning'
-    },
-    {
-        title: 'Remaining Amount',
-        number: '96',
-        bgcolor: 'lightprimary',
-        textcolor: 'primary'
-    },
-    {
-        title: 'Open Contract Ticket',
-        number: '3,650',
-        bgcolor: 'lightwarning',
-        textcolor: 'warning'
-    }
+const topCardsData = ref([]);
+
+const headers = ref([
+    { text: 'Id', value: 'id', sortable: true },
+    { text: 'Customer Name', value: 'customer_name', sortable: true },
+    { text: 'Problem Title', value: 'problem_title', sortable: true },
+    { text: 'Mobile', value: 'mobile', sortable: true },
+    { text: 'Company Name', value: 'company_name', sortable: true },
+    { text: 'Due Date', value: 'due_date', sortable: true },
+    { text: 'Engineer', value: 'engineer', sortable: true },
+    { text: 'Appointment Type', value: 'appointment_type', sortable: true },
+    { text: 'Priority', value: 'priority', sortable: true },
+    { text: 'Ticket Status', value: 'ticket_status', sortable: true },
+    { text: 'Payment Status', value: 'payment_status', sortable: true },
+    { text: 'Action', value: 'action' }
 ]);
+const serverItemsLength = ref(50);
+const current_page = ref(1);
+const sortBy = 'first_name';
+const sortType = 'desc';
+const items = ref([]);
+const searchField = ref('name', 'mobile', 'email');
+const searchValue = ref('');
+const total_record = ref();
+const deleteId = ref(0);
+const isLoading = ref(false);
+const resizableDiv = ref();
+const isFromAdd = ref(false);
+//props for toastification
+const showSnackbar = ref(false);
+const message = ref('');
+const color = ref('');
+const icon = ref('');
+const timer = ref(5000);
+const isSnackbar = ref(false);
+
+const tableHeight = ref(0);
+
+//get users
+function searchUser() {
+    const fd = new FormData();
+    if (searchValue.value.length > 0) {
+        fd.append('search_text', searchValue.value);
+        baseURlApi
+            .post(`customer/search?total_record=${current_page.value}`, fd)
+            .then((res) => {})
+            .catch((error) => {});
+    }
+}
+function getTickets() {
+    isLoading.value = true;
+    const params = { total_record: 50, page: parseInt(current_page.value) };
+    baseURlApi
+        .get('ticket/list', { params })
+        .then((res) => {
+            isLoading.value = false;
+            ticketDashboard.value = res.data.data.ticketDashboard;
+            topCardsData.value.push(
+                {
+                    title: 'Unresolved',
+                    number: ticketDashboard.value.unresolved,
+                    bgcolor: 'lightprimary',
+                    textcolor: 'primary'
+                },
+                {
+                    title: 'Overdue',
+                    number: ticketDashboard.value.overdue,
+                    bgcolor: 'lightwarning',
+                    textcolor: 'warning'
+                },
+                {
+                    title: 'Due Today',
+                    number: ticketDashboard.value.due_today,
+                    bgcolor: 'lightprimary',
+                    textcolor: 'primary'
+                },
+                {
+                    title: 'Due This Week',
+                    number: ticketDashboard.value.due_this_week,
+                    bgcolor: 'lightwarning',
+                    textcolor: 'warning'
+                },
+                {
+                    title: 'Partially Paid',
+                    number: ticketDashboard.value.partially_paid,
+                    bgcolor: 'lightprimary',
+                    textcolor: 'primary'
+                },
+                {
+                    title: 'Unpaid',
+                    number: ticketDashboard.value.unpaid,
+                    bgcolor: 'lightwarning',
+                    textcolor: 'warning'
+                }
+            );
+            console.log('dataa11', res.data.data.allTicket.data);
+            serverItemsLength.value = res.data.data.allTicket.total;
+            let itemsData = [];
+            if (isFromAdd.value) {
+                let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data);
+
+                // Declare an empty object
+                let uniqueObject = {};
+
+                // Loop for the array elements
+                for (let i in newArray) {
+                    // Extract the title
+                    let objid = newArray[i]['id'];
+
+                    // Use the title as the index
+                    uniqueObject[objid] = newArray[i];
+                }
+
+                // Loop to push unique object into array
+                for (let i in uniqueObject) {
+                    itemsData.push(uniqueObject[i]);
+                }
+            } else {
+                itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data));
+            }
+
+            items.value = itemsData.slice();
+            items.value = JSON.parse(JSON.stringify(items.value));
+            const proxy = new Proxy(items.value, {
+                get(target, prop, receiver) {
+                    return target[prop];
+                }
+            });
+            items.value = [...proxy];
+            items.value = [...JSON.parse(JSON.stringify(items.value))];
+        })
+        .catch((error) => {
+            isLoading.value = false;
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
+function filterData(addedData) {
+    // const existing = items.value.find((e) => e.id === editedData.id);
+    // if (existing) Object.assign(existing, editedData);
+    const existing = items.value.find((e) => e.id === addedData.id);
+    if (existing) Object.assign(existing, addedData);
+}
+function addCustomerData(addedData) {
+    isFromAdd.value = true;
+    getTickets();
+}
+
+//set table height
+
+//open modal
+function openAddTicket() {
+    console.log('rouuu',router)
+    router.push({
+        name:'AddTickets'
+    })
+}
+function openEditDialog(id) {
+    editId.value = id;
+    editcustomer.value?.open();
+    editcustomer.value?.getCustomersData(id);
+    // editcustomer.value?.addaddressData()
+}
+function openChangePasswordDialog(id) {
+    changePasswordFromUser.value?.open(id);
+}
+function cancelClick() {
+    deleteDialog.value?.close();
+}
+function confirmClick() {
+    baseURlApi
+        .delete(`customer/delete/${deleteId.value}`)
+        .then((res) => {
+            deleteDialog.value?.close();
+            getTickets();
+            showSnackbar.value = true;
+            isSnackbar.value = true;
+            message.value = res.data.message;
+            icon.value = 'mdi-check-circle';
+            color.value = 'success';
+        })
+        .catch((error) => {
+            deleteDialog.value?.close();
+            showSnackbar.value = true;
+            isSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
+//delete user
+function deleteCustomer(id) {
+    deleteId.value = id;
+    deleteDialog.value?.open();
+}
+onMounted(() => {
+    const listElm = document.querySelector('#infinite-list');
+    listElm.addEventListener('scroll', (e) => {
+        if (items.value.length < serverItemsLength.value) {
+            if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
+                current_page.value = current_page.value + 1;
+                isFromAdd.value = false;
+                getTickets();
+            }
+        }
+    });
+    getTickets();
+});
 </script>
+
+<style>
+.vue3-easy-data-table__footer {
+    display: none !important;
+}
+.vue3-easy-data-table__message {
+    min-height: calc(100vh - 600px) !important;
+}
+.loading {
+    text-align: center;
+    position: absolute;
+    color: #fff;
+    z-index: 100 !important;
+    background: rgb(93, 135, 255);
+    padding: 8px 18px;
+    border-radius: 5px;
+    left: calc(50% - 45px);
+    top: calc(50% - 18px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+#ticketlist div table {
+    overflow: scroll !important;
+}
+</style>

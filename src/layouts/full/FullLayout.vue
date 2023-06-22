@@ -5,6 +5,7 @@ import VerticalHeaderVue from './vertical-header/VerticalHeader.vue';
 import HorizontalHeader from './horizontal-header/HorizontalHeader.vue';
 import HorizontalSidebar from './horizontal-sidebar/HorizontalSidebar.vue';
 import Customizer from './customizer/Customizer.vue';
+
 import { useCustomizerStore } from '../../stores/customizer';
 
 const customizer = useCustomizerStore();

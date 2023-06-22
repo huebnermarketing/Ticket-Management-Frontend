@@ -17,7 +17,6 @@
                                         variant="outlined"
                                         type="password"
                                         v-model="newpwd"
-                                        placeholder="Please enter password"
                                         :rules="passwordrule"
                                     />
                                 </v-col>
@@ -29,7 +28,6 @@
                                         variant="outlined"
                                         type="password"
                                         v-model="confirmpwd"
-                                        placeholder="Please re-enter password"
                                         :rules="confirmpasswordrule"
                                     />
                                 </v-col>
@@ -66,7 +64,7 @@ const issubmit = ref(false);
 const userId = ref(0);
 
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -97,15 +95,17 @@ async function changePassword() {
                 changepasswordform.value?.reset();
                 changepasswordform.value?.resetValidation();
                 dialog.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
+                message.value = res.data.message;
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
             })
             .catch((error) => {
                 issubmit.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });

@@ -40,7 +40,9 @@ fakeBackend();
 app.use(router);
 app.component('EasyDataTable', Vue3EasyDataTable);
 app.use(PerfectScrollbar);
+
 app.use(createPinia());
+
 app.use(VCalendar, {});
 app.use(VueTablerIcons);
 // app.use(print);

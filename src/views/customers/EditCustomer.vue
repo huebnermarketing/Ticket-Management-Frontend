@@ -41,7 +41,7 @@
                                 </v-col>
                                 <!---------------------------------- Email ------------------------------------------->
                                 <v-col cols="12" md="6">
-                                    <v-label class="mb-2 font-weight-medium text-capitalize required">Email ID</v-label>
+                                    <v-label class="mb-2 font-weight-medium text-capitalize">Email ID</v-label>
                                     <v-text-field
                                         v-model="userEmail"
                                         color="primary"
@@ -118,7 +118,7 @@
                                                             d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z"
                                                             stroke-width="1"
                                                             :fill="
-                                                                i == radios || data.is_primary
+                                                                i == radios && data.is_primary == 1
                                                                     ? 'rgb(93,135,255)'
                                                                     : data.is_primary == 1
                                                                     ? 'rgb(93,135,255)'
@@ -232,7 +232,7 @@ const radios = ref(0);
 const customerId = ref(0);
 
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -261,7 +261,6 @@ function getCustomersData(id) {
         .then((res) => {
             isLoading.value = false;
             const data = res.data.data;
-            console.log('get customer', data);
             firstName.value = data.first_name ? data.first_name : '';
             lastName.value = data.last_name;
             userEmail.value = data.email.trim();
@@ -295,24 +294,25 @@ function filterData() {
     getCustomersData(customerId.value);
 }
 function addaddressData() {
-    store.getupdateAddress;
+    getCustomersData(customerId.value)
+    // store.getupdateAddress;
     // addaddress.value = addaddress.value.concat(store.getupdateAddress);
 
-    baseURlApi
-        .get(`customer/address/get/${customerId.value}`)
-        .then((res) => {
-            isLoading.value = false;
-            const data = res.data.data;
-            addaddress.value = data;
-            console.log('adddress', data);
-            if (addaddress.value.length == 1) {
-                addaddress.value[0].is_primary = 1;
-            }
-            if (addaddress.value.length > 0) isEmptyAddress.value = false;
-        })
-        .catch((error) => {
-            isLoading.value = false;
-        });
+    // baseURlApi
+    //     .get(`customer/address/get/${customerId.value}`)
+    //     .then((res) => {
+    //         isLoading.value = false;
+    //         const data = res.data.data;
+    //         addaddress.value = data;
+    //         console.log('adddress', data);
+    //         if (addaddress.value.length == 1) {
+    //             addaddress.value[0].is_primary = 1;
+    //         }
+    //         if (addaddress.value.length > 0) isEmptyAddress.value = false;
+    //     })
+    //     .catch((error) => {
+    //         isLoading.value = false;
+    //     });
 }
 async function updateCustomer() {
     const { valid } = await updatecustomerform.value?.validate();
@@ -346,29 +346,30 @@ async function updateCustomer() {
             .post(`customer/update/${customerId.value}`, requestBody)
             .then((res) => {
                 const addedData = {
-                    email: res.data.data.email,
-                    first_name: res.data.data.first_name,
-                    id: res.data.data.customer_id,
-                    last_name: res.data.data.last_name,
-                    phone: res.data.data.phone
+                    email: userEmail.value,
+                    first_name:firstName.value,
+                    id: customerId.value,
+                    last_name: lastName.value,
+                    phone: mobile.value
                 };
-
                 emit('updateClicked', addedData);
                 issubmit.value = false;
                 isEmptyAddress.value = false;
                 updatecustomerform.value?.reset();
                 updatecustomerform.value?.resetValidation();
                 dialog.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
+                message.value = res.data.message;
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
             })
             .catch((error) => {
                 issubmit.value = false;
                 isEmptyAddress.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -416,15 +417,17 @@ function confirmClick() {
         .then((res) => {
             deleteDialog.value?.close();
             getCustomersData(customerId.value);
-            message.value = res.data.message;
+            showSnackbar.value = true
             isSnackbar.value = true;
+            message.value = res.data.message;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });

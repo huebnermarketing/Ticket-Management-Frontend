@@ -84,10 +84,6 @@
                 </v-form>
             </v-card>
         </v-dialog>
-        <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
-            <v-icon left>{{ icon }}</v-icon>
-            {{ message }}
-        </v-snackbar>
     </div>
 </template>
 <script setup>
@@ -106,20 +102,13 @@ const address = ref('');
 const city = ref('');
 const area = ref('');
 const state = ref('');
-const country = ref('india');
+const country = ref('India');
 const zipcode = ref('');
 const isLoading = ref(false);
 const companyId = ref(0);
 const issubmit = ref(false);
 let addressList = [];
 
-//props for toastification
-const showSnackbar = ref(true);
-const message = ref('');
-const color = ref('');
-const icon = ref('');
-const timer = ref(5000);
-const isSnackbar = ref(false);
 const editSingleAddressForm = ref();
 const singleAddressDetails = ref({})
 

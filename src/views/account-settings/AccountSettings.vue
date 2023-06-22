@@ -33,7 +33,7 @@ const breadcrumbs = ref([
 </script>
 
 <template>
-    <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs" class="my-5"></BaseBreadcrumb>
+    <!-- <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs" class="my-5"></BaseBreadcrumb> -->
     <v-row class="justify-center">
         <!--Account Settings tabs-->
         <v-col cols="12" md="12">

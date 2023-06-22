@@ -1,6 +1,7 @@
 <template>
     <div class="text-center">
         <v-dialog v-model="dialog" persistent class="dialog-mw">
+            <div class="d-none">{{ userProfile }}</div>
             <v-card class="overflow-auto">
                 <v-toolbar dark color="primary">
                     <!-- <v-btn icon dark @click="dialog = false">
@@ -32,27 +33,25 @@
                                             />
                                         </v-avatar>
                                         <label
-                                            for="profileImage"
                                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                                             v-if="!isProfileImg"
-                                            @click="refs['file-input'].click()"
+                                            @click="$refs.uploadprofile.click()"
                                             >Choose file</label
                                         >
                                         <!-- file input for upload and edit profile -->
                                         <input
                                             type="file"
-                                            ref="file-input"
                                             class="d-none"
-                                            id="profileImage"
+                                            ref="uploadprofile"
+                                            id="profileImage3"
                                             accept="image/jpeg,image/jpg,image/png"
                                             @change="uploadImage($event)"
                                         />
                                         <label
-                                            for="profileImage"
                                             class="mb-0 ml-5 text-primary font-weight-bold cursor-pointer text-decoration-underline"
                                             v-if="isProfileImg"
-                                            @click="refs['file-input'].click()"
-                                        >Edit</label
+                                            @click="$refs.uploadprofile.click()"
+                                            >Edit</label
                                         >
                                         <label
                                             color="error"
@@ -75,7 +74,6 @@
                                         v-model="firstName"
                                         variant="outlined"
                                         color="primary"
-                                        placeholder="jhon"
                                         :rules="firstnamerule"
                                     >
                                     </v-text-field>
@@ -87,21 +85,13 @@
                                         v-model="lastName"
                                         variant="outlined"
                                         color="primary"
-                                        placeholder="doe"
                                         :rules="lastnamerule"
                                     ></v-text-field>
                                 </v-col>
                                 <!---------------------------------- Mobile Number --------------------------------->
                                 <v-col cols="12" md="6">
                                     <v-label class="mb-2 font-weight-medium text-capitalize required">Mobile Number</v-label>
-                                    <v-text-field
-                                        v-model="mobile"
-                                        color="primary"
-                                        variant="outlined"
-                                        type="text"
-                                        placeholder="9103388993"
-                                        :rules="mobilerule"
-                                    />
+                                    <v-text-field v-model="mobile" color="primary" variant="outlined" type="text" :rules="mobilerule" />
                                 </v-col>
                                 <!---------------------------------- Email ------------------------------------------->
                                 <v-col cols="12" md="6">
@@ -111,12 +101,11 @@
                                         color="primary"
                                         variant="outlined"
                                         type="email"
-                                        placeholder="john.deo@gmail.com"
                                         autocomplete="off"
                                         :rules="emailrule"
                                     />
                                 </v-col>
-                                 <!---------------------------------- User Role --------------------------------->
+                                <!---------------------------------- User Role --------------------------------->
                                 <v-col cols="12" md="12">
                                     <v-label class="mb-2 font-weight-medium text-capitalize required">Role</v-label>
                                     <v-select
@@ -139,7 +128,6 @@
                                         variant="outlined"
                                         type="password"
                                         v-model="newpwd"
-                                        placeholder="Please enter password"
                                         :rules="passwordrule"
                                     />
                                 </v-col>
@@ -151,7 +139,6 @@
                                         variant="outlined"
                                         type="password"
                                         v-model="confirmpwd"
-                                        placeholder="Please re-enter password"
                                         :rules="confirmpasswordrule"
                                     />
                                 </v-col>
@@ -169,20 +156,24 @@
                 </v-form>
             </v-card>
         </v-dialog>
-        <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar" >
+        <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
         </v-snackbar>
     </div>
 </template>
 <script setup>
-import { ref, defineExpose, defineComponent, onMounted } from 'vue';
-import {formValidationsRules} from '@/mixins/formValidationRules.js'
+import { ref, defineExpose, defineComponent, onMounted, computed } from 'vue';
+import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
+import { useCustomerAddressStore } from '@/stores/customerAddress';
+const store = useCustomerAddressStore();
+const userProfile = ref('');
 
 //mixins
-const {confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule } = formValidationsRules();
+const { confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule } =
+    formValidationsRules();
 
 const dialog = ref(false);
 const userRole = ref([]);
@@ -210,12 +201,10 @@ const createuserform = ref();
 // validations rules
 
 /*emits*/
-const emit = defineEmits(['addUserClicked'])
-
+const emit = defineEmits(['addUserClicked']);
 
 //methods
 function uploadImage(e) {
-    console.log('uploadedd');
     isProfileImg.value = true;
     const fd = new FormData();
     const file = e.target.files[0];
@@ -225,7 +214,9 @@ function uploadImage(e) {
 }
 function resetProfilepic() {
     userProfilePic.value = '';
+    UserProfileFile.value = '';
     isProfileImg.value = false;
+    document.querySelector('#profileImage3').value = '';
 }
 function closeDialog() {
     createuserform.value?.reset();
@@ -239,7 +230,7 @@ function getRoles() {
         })
         .catch((error) => {
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -253,7 +244,6 @@ async function createUser() {
     if (valid) {
         issubmit.value = true;
         const fd = new FormData();
-        console.log('rolee', userRole.value.id);
         fd.append('first_name', firstName.value);
         fd.append('last_name', lastName.value);
         fd.append('phone', mobile.value);
@@ -266,8 +256,8 @@ async function createUser() {
         baseURlApi
             .post('user/create-user', fd)
             .then((res) => {
-                const addedData = res.data.data
-                emit('addUserClicked',addedData)
+                const addedData = res.data.data;
+                emit('addUserClicked', addedData);
                 issubmit.value = false;
                 createuserform.value?.reset();
                 createuserform.value?.resetValidation();
@@ -280,7 +270,7 @@ async function createUser() {
             .catch((error) => {
                 issubmit.value = false;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -292,6 +282,10 @@ function open() {
 onMounted(() => {
     // getRoles();
 });
+userProfile.value = computed(() => {
+    return store.getUserProfile;
+});
+
 defineExpose({
     open,
     getRoles

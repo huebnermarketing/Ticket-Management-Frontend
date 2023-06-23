@@ -29,7 +29,6 @@
                                 <v-row>
                                     <!---------------------------------- customer name --------------------------------->
                                     <v-col cols="12" md="6">
-                                        <!-- {{ isExistingCustomer }} {{selectedCustomer}} -->
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Customer Name</v-label>
                                         <v-combobox
                                             v-model="selectedCustomer"
@@ -55,13 +54,15 @@
                                             persistent-counter
                                         >
                                             <template v-slot:selection>
-                                              
-                                                <span v-if="isExistingCustomer"
-                                                    >{{ selectedCustomer.first_name + ' ' + selectedCustomer.last_name }} -{{
-                                                        selectedCustomer.phone
-                                                    }} 
+                                                <span>
+                                                    {{
+                                                        selectedCustomer.first_name + ' ' + selectedCustomer.last_name
+                                                            ? selectedCustomer.last_name
+                                                            : ''
+                                                    }}
+                                                    -{{ selectedCustomer.phone ? selectedCustomer.phone : '' }}
                                                 </span>
-                                                <span v-if="!isExistingCustomer">{{ selectedCustomer.first_name }} </span>
+                                                <!-- <span v-if="!isExistingCustomer">{{ selectedCustomer.first_name }} </span> -->
                                             </template>
 
                                             <template v-slot:no-data>
@@ -109,7 +110,7 @@
                                             single-line
                                             variant="outlined"
                                             :disabled="!isExistingCustomer"
-                                            :rules="ticketdropdownrule"
+                                            :rules="isExistingCustomer ? ticketdropdownrule : ''"
                                         ></v-select>
                                     </v-col>
                                     <!---------------------------------- company name --------------------------------->
@@ -356,6 +357,7 @@
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Payment status</v-label>
                                         <v-select
                                             v-model="paymentStatus"
+                                            @update:modelValue="changePaymentMode()"
                                             :items="paymentStatusOptions"
                                             item-title="payment_type"
                                             item-value="id"
@@ -594,7 +596,7 @@ const contractOptions = ref([
     }
 ]);
 const assignEr = ref([]);
-const customerComboBox = ref()
+const customerComboBox = ref();
 const assignErOptions = ref([]);
 const ticketStatus = ref([]);
 const ticketStatusOptions = ref();
@@ -635,8 +637,8 @@ const collectAmountRule = [
         return 'This field is required.';
     },
     () => {
-        if (isNaN(collectedAmount.value) == false) return true;
-        return 'This field must be a integer value.';
+        if (parseInt(collectedAmount.value) >= 0) return true;
+        return 'This field must be a positive value.';
     }
 ];
 function getinputs() {
@@ -664,7 +666,13 @@ function onEnter() {
         phone: ''
     };
     if (!selectCustomerList.value.includes(data)) {
-        console.log('trueee');
+        addressLineOne.value = '';
+        area.value = '';
+        city.value = '';
+        zipcode.value = '';
+        state.value = '';
+        countryName.value = '';
+        companyName.value = '';
         selectCustomerList.value.unshift(val);
         console.log('trueee11', selectCustomerList.value);
 
@@ -705,9 +713,9 @@ async function createTicket() {
             customer_name:
                 isExistingCustomer.value == true
                     ? selectedCustomer.value.first_name + selectedCustomer.value.last_name
-                    : selectedCustomer.value,
+                    : selectedCustomer.value.first_name,
             is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
-            customer_id: selectedCustomer.value.customer_id,
+            customer_id: isExistingCustomer.value ? selectedCustomer.value.customer_id : '',
             email: customerEmail.value,
             customer_locations_id: selectAddress.value ? selectAddress.value.id : '',
             company_name: companyName.value,
@@ -747,28 +755,30 @@ async function createTicket() {
 
                 message.value = res.data.message;
                 isSnackbar.value = true;
+                showSnackbar.value = true
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
             })
             .catch((error) => {
                 issubmit.value = false;
-                // isSnackbar.value = true;
-                // message.value = error.response.data.message;
-                // color.value = 'error';
-                // icon.value = 'mdi-close-circle';
+                showSnackbar.value = true
+                isSnackbar.value = true;
+                message.value = error.response.data.message;
+                color.value = 'error';
+                icon.value = 'mdi-close-circle';
             });
     }
 }
 function getFieldText(item) {
-    console.log("itemmm",isExistingCustomer.value)
-    if (isExistingCustomer.value) {
-        console.log('item exx', item);
-        return `${item.first_name + ' ' + item.last_name} -(${item.phone})`;
-    } else {
-                console.log('item nonn  exx', item);
+    console.log('itemmm', isExistingCustomer.value);
 
-        return `${item.first_name}`;
-    }
+    console.log('item exx', item);
+    return (
+        `${item.first_name ? item.first_name : ''}` +
+        ' ' +
+        `${item.last_name ? item.last_name : ''}` +
+        `${item.phone ? '-(' + item.phone + ')' : ''}`
+    );
 }
 function getAssignErText(item) {
     {
@@ -842,12 +852,12 @@ function getInitialData() {
     console.log('clickrdd');
     customerComboBox.value.reset();
     isExistingCustomer.value = false;
-    console.log('clickrd111',isExistingCustomer.value);
+    console.log('clickrd111', isExistingCustomer.value);
     selectedCustomer.value = null;
     searchCustomer.value = '';
 }
-function clearInput(){
-     const data = (searchCustomer.value || '').trim();
+function clearInput() {
+    const data = (searchCustomer.value || '').trim();
 
     if (!selectCustomerList.value.includes(data)) {
         // console.log('trueee');
@@ -855,9 +865,8 @@ function clearInput(){
         // console.log('trueee11', selectCustomerList.value);
         selectedCustomer.value = null;
         isExistingCustomer.value = false;
-        // selectAddress.value = '';
-    }
-    else{
+        selectAddress.value = '';
+    } else {
         isExistingCustomer.value = true;
     }
 }
@@ -868,6 +877,14 @@ function getInitialDataProblemType() {
 function addNewCustomer() {
     console.log('ddd');
 }
+function changePaymentMode(){
+    if(paymentStatus.value.id == 2){
+    paymentMode.value = paymentModeOptions.value[1]
+    }
+    else{
+        paymentMode.value = []
+    }
+    }
 
 /************************* computed  ***************************/
 const remainAmount = computed(() => {
@@ -908,4 +925,6 @@ div.v-tabs-bar {
     border-color: #f5f5f5 !important;
     padding: 18px;
 }
+
 </style>
+

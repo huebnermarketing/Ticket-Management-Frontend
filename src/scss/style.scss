@@ -52,3 +52,7 @@
     min-width: unset !important;
     width: fit-content !important;
 }
+.v-input--disabled .v-input__control {
+    background :#e0e0e0;
+    // background: #000 !important;
+}

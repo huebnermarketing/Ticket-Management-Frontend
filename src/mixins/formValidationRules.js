@@ -213,6 +213,10 @@ export const formValidationsRules = () => {
         (value) => {
             if(isNaN(value) == false) return true;
             return 'This field must be a numeric value.';
+        },
+        (value) => {
+            if (parseInt(value) >= 0) return true;
+            return 'This field must be a positive value.';
         }
     ];
 

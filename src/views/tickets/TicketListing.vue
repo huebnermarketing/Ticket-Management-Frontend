@@ -1,6 +1,6 @@
 
 <template>
-    <v-row no-gutters v-show="router.currentRoute.value.name==='Tickets'">
+    <v-row no-gutters v-show="router.currentRoute.value.name === 'Tickets'">
         <v-col cols="12" md="12">
             <v-row justify="space-between" class="align-center mb-3">
                 <v-col cols="12">
@@ -132,8 +132,12 @@
                     <template #item-priority="{ ticket_priority }">
                         <div class="player-wrapper">
                             <v-chip :color="ticket_priority.id == 1 ? 'error' : 'success'">
-                                <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-error" />
-                                <ArrowNarrowDownIcon v-if="ticket_priority.id == 2" stroke-width="1.5" size="20" class="text-success" />
+                                <!-- <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-error" /> -->
+                                <img src="@/assets/images/svgs/High.svg" alt="icon" v-if="ticket_priority.id == 1" />
+                                <img src="@/assets/images/svgs/Low.svg" alt="icon" v-if="ticket_priority.id == 2" />
+                                <img src="@/assets/images/svgs/Medium.svg" alt="icon" v-if="ticket_priority.id == 3" />
+
+                                <!-- <ArrowNarrowDownIcon v-if="ticket_priority.id == 2" stroke-width="1.5" size="20" class="text-success" /> -->
                             </v-chip>
                         </div>
                     </template>
@@ -291,7 +295,7 @@ function searchUser() {
     if (searchValue.value.length > 0) {
         fd.append('search_text', searchValue.value);
         baseURlApi
-            .post(`customer/search?total_record=${current_page.value}`, fd)
+            .post(`ticket/search?total_record=${current_page.value}`, fd)
             .then((res) => {})
             .catch((error) => {});
     }
@@ -367,7 +371,6 @@ function getTickets() {
             } else {
                 itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data));
             }
-
             items.value = itemsData.slice();
             items.value = JSON.parse(JSON.stringify(items.value));
             const proxy = new Proxy(items.value, {
@@ -402,10 +405,10 @@ function addCustomerData(addedData) {
 
 //open modal
 function openAddTicket() {
-    console.log('rouuu',router)
+    console.log('rouuu', router);
     router.push({
-        name:'AddTickets'
-    })
+        name: 'AddTickets'
+    });
 }
 function openEditDialog(id) {
     editId.value = id;

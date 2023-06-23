@@ -58,7 +58,7 @@
                     <div class="text-start">
                         <v-label class="mb-2 font-weight-medium text-capitalize mr-4">favicon</v-label>
                         <v-avatar size="50" class="border">
-                            <img v-if="!userFavicon" src="@/assets/images/profile/faviconDEfault.png" height="20" alt="image" />
+                            <img v-if="!userFavicon" src="@/assets/images/profile/faviconDefault.png" height="20" alt="image" />
                             <img
                                 v-if="userFavicon"
                                 :src="userFavicon"

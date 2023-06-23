@@ -29,6 +29,7 @@
                                 <v-row>
                                     <!---------------------------------- customer name --------------------------------->
                                     <v-col cols="12" md="6">
+                                        <!-- {{ isExistingCustomer }} {{selectedCustomer}} -->
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Customer Name</v-label>
                                         <v-combobox
                                             v-model="selectedCustomer"
@@ -38,8 +39,9 @@
                                             :hide-no-data="false"
                                             :items="selectCustomerList"
                                             @update:modelValue="getAddress()"
-                                            @click:clear="getTickets()"
+                                            @click:clear="getInitialData()"
                                             @keydown.enter.capture.prevent.stop
+                                            @input="clearInput()"
                                             chips
                                             clearable
                                             return-object
@@ -47,14 +49,21 @@
                                             base-color="none"
                                             density="comfortable"
                                             variant="outlined"
+                                            ref="customerComboBox"
+                                            open-on-clear
+                                            persistent-clear
+                                            persistent-counter
                                         >
-                                            <template v-slot:selection="{ item }">
-                                                <span
+                                            <template v-slot:selection>
+                                              
+                                                <span v-if="isExistingCustomer"
                                                     >{{ selectedCustomer.first_name + ' ' + selectedCustomer.last_name }} -{{
                                                         selectedCustomer.phone
-                                                    }}
+                                                    }} 
                                                 </span>
+                                                <span v-if="!isExistingCustomer">{{ selectedCustomer.first_name }} </span>
                                             </template>
+
                                             <template v-slot:no-data>
                                                 <v-list-item>
                                                     <v-list-item-title>
@@ -189,9 +198,13 @@
                                     <!---------------------------------- Problem type --------------------------------->
                                     <v-col cols="12" md="6">
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Problem type</v-label>
-                                        <v-select
+                                        <v-combobox
                                             v-model="problemType"
+                                            v-model:search="searchProblem"
                                             :items="problemTypeOptions"
+                                            @click:clear="getInitialDataProblemType()"
+                                            @keydown.enter.capture.prevent.stop
+                                            :hide-no-data="false"
                                             item-title="problem_name"
                                             item-value="id"
                                             return-object
@@ -203,7 +216,25 @@
                                             multiple
                                             label="Please select problem type"
                                             :rules="ticketdropdownrule"
-                                        ></v-select>
+                                        >
+                                            <template v-slot:no-data>
+                                                <v-list-item>
+                                                    <v-list-item-title>
+                                                        No results matching "<strong>{{ searchProblem }}</strong
+                                                        >". Press
+                                                        <div class="mt-2">
+                                                            <v-btn
+                                                                flat
+                                                                class="table-icons-common text-left flat bg-primary"
+                                                                @click.prevent.stop="onEnterProblem(e)"
+                                                            >
+                                                                <PlusIcon size="16" class="text-left" /> Add new problem type</v-btn
+                                                            >
+                                                        </div>
+                                                    </v-list-item-title>
+                                                </v-list-item>
+                                            </template>
+                                        </v-combobox>
                                     </v-col>
                                     <!---------------------------------- problem title --------------------------------->
                                     <v-col cols="12" md="6">
@@ -213,7 +244,7 @@
                                             variant="outlined"
                                             color="primary"
                                             :rules="requiredrule"
-                                             maxlength="50"
+                                            maxlength="50"
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- description --------------------------------->
@@ -227,7 +258,7 @@
                                             color="primary"
                                             row-height="25"
                                             shaped
-                                             maxlength="500"
+                                            maxlength="500"
                                         ></v-textarea>
                                     </v-col>
                                     <!---------------------------------- Due Date --------------------------------->
@@ -503,7 +534,7 @@ import { router } from '@/router';
 const { emailPatternrule, requiredrule, mobilerule, ticketdropdownrule, amountRule } = formValidationsRules();
 
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -511,8 +542,8 @@ const timer = ref(5000);
 const isSnackbar = ref(false);
 
 const selectCustomerList = ref([]);
-const selectedCustomer = ref('');
-const searchCustomer = ref(null);
+const selectedCustomer = ref(null);
+const searchCustomer = ref('');
 const select = ref('select');
 const mobile = ref('');
 const customerName = ref('');
@@ -531,6 +562,7 @@ const customerOptions = ref([
 const createticketform = ref();
 const problemType = ref([]);
 const problemTypeOptions = ref([]);
+const searchProblem = ref('');
 const Ticketpriority = ref([]);
 const TicketpriorityOptions = ref([]);
 const addressLineOne = ref('');
@@ -548,6 +580,7 @@ const ticketAmount = ref('');
 const collectedAmount = ref('');
 const remainingAmount = ref(0);
 const isExistingCustomer = ref(true);
+const isExistingProblem = ref(true);
 const addressOptions = ref([]);
 const contract = ref([]);
 const contractOptions = ref([
@@ -561,6 +594,7 @@ const contractOptions = ref([
     }
 ]);
 const assignEr = ref([]);
+const customerComboBox = ref()
 const assignErOptions = ref([]);
 const ticketStatus = ref([]);
 const ticketStatusOptions = ref();
@@ -618,7 +652,7 @@ function closeDialog() {
     router.push('/tickets');
 }
 function onEnter() {
-    const data = (selectedCustomer.value || '').trim();
+    const data = (searchCustomer.value || '').trim();
     const val = {
         id: '',
         first_name: data,
@@ -637,6 +671,25 @@ function onEnter() {
         isExistingCustomer.value = false;
         selectAddress.value = '';
     }
+}
+function onEnterProblem() {
+    const requestBody = {
+        problem_name: searchProblem.value
+    };
+    baseURlApi
+        .post('settings/problem-type/add', requestBody)
+        .then((res) => {
+            searchProblem.value = '';
+            console.log('ress', res.data.data);
+            problemTypeOptions.value.unshift(res.data.data);
+        })
+        .catch((error) => {
+            showSnackbar.value = true;
+            isSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
 }
 
 /*methods*/
@@ -707,9 +760,14 @@ async function createTicket() {
     }
 }
 function getFieldText(item) {
-    {
-        console.log('item', item);
+    console.log("itemmm",isExistingCustomer.value)
+    if (isExistingCustomer.value) {
+        console.log('item exx', item);
         return `${item.first_name + ' ' + item.last_name} -(${item.phone})`;
+    } else {
+                console.log('item nonn  exx', item);
+
+        return `${item.first_name}`;
     }
 }
 function getAssignErText(item) {
@@ -722,12 +780,12 @@ function getCustomers() {
     return selectCustomerList.value;
 }
 function clearOnInput() {
-    selectedCustomer.value = '';
+    selectedCustomer.value = null;
 }
 function getAddress() {
     mobile.value = selectedCustomer.value.phone;
     customerEmail.value = selectedCustomer.value.email;
-    isExistingCustomer.value = true;
+    // isExistingCustomer.value = true
     if (selectedCustomer.value?.id) {
         baseURlApi
             .get(`ticket/get-customer-address/${selectedCustomer.value.customer_id}`)
@@ -747,6 +805,7 @@ function getAddress() {
 }
 
 function getTickets() {
+    selectedCustomer.value = null;
     baseURlApi
         .get('ticket/get-detail')
         .then((res) => {
@@ -754,32 +813,57 @@ function getTickets() {
             problemTypeOptions.value = data.problem_types;
             assignErOptions.value = data.assign_engineer;
             ticketStatusOptions.value = data.ticket_status;
-            data.ticket_status.map((data)=>{
-                if(data.id == 1){
-                 ticketStatus.value = data   
+            data.ticket_status.map((data) => {
+                if (data.id == 1) {
+                    ticketStatus.value = data;
                 }
-            })
-            data.payment_status.map((data)=>{
-                 if(data.id == 1){
-                 paymentStatus.value = data   
+            });
+            data.payment_status.map((data) => {
+                if (data.id == 1) {
+                    paymentStatus.value = data;
                 }
-            })
-            // ticketStatus.value = 
+            });
+            // ticketStatus.value =
             appointmentTypeOptions.value = data.appointment_type;
             paymentStatusOptions.value = data.payment_status;
             paymentModeOptions.value = data.payment_mode;
             TicketpriorityOptions.value = data.ticket_priorities;
             selectCustomerList.value = data.customers;
-            console.log('ress', res.data.data);
         })
         .catch((error) => {
-            isLoading.value = false;
             isSnackbar.value = true;
             showSnackbar.value = true;
             message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
+}
+function getInitialData() {
+    console.log('clickrdd');
+    customerComboBox.value.reset();
+    isExistingCustomer.value = false;
+    console.log('clickrd111',isExistingCustomer.value);
+    selectedCustomer.value = null;
+    searchCustomer.value = '';
+}
+function clearInput(){
+     const data = (searchCustomer.value || '').trim();
+
+    if (!selectCustomerList.value.includes(data)) {
+        // console.log('trueee');
+        // selectCustomerList.value.unshift(val);
+        // console.log('trueee11', selectCustomerList.value);
+        selectedCustomer.value = null;
+        isExistingCustomer.value = false;
+        // selectAddress.value = '';
+    }
+    else{
+        isExistingCustomer.value = true;
+    }
+}
+function getInitialDataProblemType() {
+    problemType.value = '';
+    isExistingCustomer.value = false;
 }
 function addNewCustomer() {
     console.log('ddd');

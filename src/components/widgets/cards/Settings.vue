@@ -32,7 +32,7 @@ const model = ref(false);
                         <h5 class="text-subtitle-1 text-medium-emphasis">Turn on chat during call</h5>
                     </div>  
                     <div class="ml-auto">  
-                        <v-switch v-model="model"  hide-details color="primary" inset ></v-switch>
+                        <v-switch v-model="model"  hide-details color="primary" ></v-switch>
                     </div>    
                 </div>
             </div>

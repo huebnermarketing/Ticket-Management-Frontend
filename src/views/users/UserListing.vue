@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col cols="12" md="12">
+        <v-col cols="12" md="12" class="border-0">
             <v-row justify="space-between" class="align-center mb-3">
                 <v-col cols="12" lg="4" md="6">
                     <v-text-field
@@ -25,7 +25,7 @@
             </v-row>
             <!-- style="height:300px !important; overflow-y: scroll !important" -->
 
-            <div v-if='current_page > 1'>
+            <div v-if="current_page > 1">
                 <transition name="fade">
                     <div class="loading" v-if="isLoading">
                         <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
@@ -78,18 +78,31 @@
                             }}</v-chip>
                         </div>
                     </template>
-                     <template #item-status="{ is_active }">
+                    <template #item-status="{ is_active }">
                         <div class="player-wrapper text-capitalize">
-                            <v-chip :color="is_active == 1 ? 'primary' : 'secondary'">{{
-                                is_active == 1 ? 'Active' : 'Inactive'
-                            }}</v-chip>
+                            <!-- <v-chip :color="is_active == 1 ? 'primary' : 'secondary'">{{ is_active == 1 ? 'Active' : 'Inactive' }}</v-chip> -->
+                            <v-chip
+                                rounded="lg"
+                                v-if="is_active !== 1"
+                                class="font-weight-bold pl-1 pr-2"
+                                color="dark"
+                                size="small"
+                            >
+                                <ClockHour4Icon size="15" class="mr-1" />
+                                Inactive
+                            </v-chip>
+
+                            <v-chip rounded="lg" v-else class="font-weight-bold pl-1 pr-2" color="success" size="small">
+                                <CircleIcon size="15" class="mr-1" />
+                               Active
+                            </v-chip>
                         </div>
                     </template>
-                    <template #item-action="{ id , role }">
+                    <template #item-action="{ id, role }">
                         <div class="d-flex align-center" v-if="id !== user.id && role.id >= user.roles[0].id">
                             <v-tooltip text="Edit">
                                 <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="openEditDialog(id,role.id)" v-bind="props"
+                                    <v-btn class="table-icons-common" icon flat @click="openEditDialog(id, role.id)" v-bind="props"
                                         ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
                                     /></v-btn>
                                 </template>
@@ -150,7 +163,7 @@ const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
 /*Login user detail*/
-const user = JSON.parse(localStorage.getItem('user'))
+const user = JSON.parse(localStorage.getItem('user'));
 
 //dialog props
 const dialogTitle = ref('Are you sure you want to delete this user ?');
@@ -167,25 +180,25 @@ const changePasswordFromUser = ref();
 const deleteDialog = ref();
 const refUserListTable = ref();
 
-const breadcrumbs = ref([
-    {
-        text: 'tickets',
-        disabled: false,
-        href: '/tickets'
-    },
-    {
-        text: 'Ticket Listing Table',
-        disabled: true,
-        href: '#'
-    }
-]);
+// const breadcrumbs = ref([
+//     {
+//         text: 'tickets',
+//         disabled: false,
+//         href: '/tickets'
+//     },
+//     {
+//         text: 'Ticket Listing Table',
+//         disabled: true,
+//         href: '#'
+//     }
+// ]);
 
 const headers = ref([
     { text: 'Name', value: 'first_name', sortable: true },
     { text: 'Mobile', value: 'phone', sortable: true },
     { text: 'Email', value: 'email', sortable: true },
     { text: 'User type', value: 'user_type' },
-    { text: 'Status', value: 'status'},
+    { text: 'Status', value: 'status' },
     { text: 'Action', value: 'action' }
 ]);
 const serverItemsLength = ref(50);
@@ -193,7 +206,7 @@ const current_page = ref(1);
 const sortBy = 'first_name';
 const sortType = 'desc';
 const items = ref([]);
-const searchField = ref('name', 'mobile', 'email');
+const searchField = ref('first_name');
 const searchValue = ref('');
 const total_record = ref();
 const deleteId = ref(0);
@@ -210,22 +223,22 @@ const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
 //get users
-function searchUser() {
-    const fd = new FormData();
-    if (searchValue.value.length > 0) {
-        fd.append('search_key', searchValue.value);
-        baseURlApi
-            .post(`user/search-user?total_record=${current_page.value}`, fd)
-            .then((res) => {})
-            .catch((error) => {
-                showSnackbar.value = true;
-                isSnackbar.value = true;
-                message.value = error.response.data.message;
-                color.value = 'error';
-                icon.value = 'mdi-close-circle';
-            });
-    }
-}
+// function searchUser() {
+//     const fd = new FormData();
+//     if (searchValue.value.length > 0) {
+//         fd.append('search_key', searchValue.value);
+//         baseURlApi
+//             .post(`user/search-user?total_record=${current_page.value}`, fd)
+//             .then((res) => {})
+//             .catch((error) => {
+//                 showSnackbar.value = true;
+//                 isSnackbar.value = true;
+//                 message.value = error.response.data.message;
+//                 color.value = 'error';
+//                 icon.value = 'mdi-close-circle';
+//             });
+//     }
+// }
 function getUsers() {
     isLoading.value = true;
     // const params = { total_record: 50, page: parseInt(current_page.value) };
@@ -298,11 +311,11 @@ function openAddUserDialog() {
     adduser.value?.open();
     adduser.value?.getRoles();
 }
-function openEditDialog(id,roleId) {
+function openEditDialog(id, roleId) {
     editId.value = id;
     edituser.value?.getRoles();
     edituser.value?.open();
-    edituser.value?.getUsersData(id,roleId);
+    edituser.value?.getUsersData(id, roleId);
 }
 function openChangePasswordDialog(id) {
     changePasswordFromUser.value?.open(id);
@@ -317,14 +330,14 @@ function confirmClick() {
             deleteDialog.value?.close();
             getUsers();
             message.value = res.data.message;
-            showSnackbar.value = true
+            showSnackbar.value = true;
             isSnackbar.value = true;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
-            showSnackbar.value = true
+            showSnackbar.value = true;
             isSnackbar.value = true;
             message.value = error.response.data.message;
             color.value = 'error';

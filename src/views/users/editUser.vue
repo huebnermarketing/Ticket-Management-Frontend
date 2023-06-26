@@ -130,9 +130,8 @@
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Active</v-label>
                                         <div class="ml-4">
                                             <v-switch
-                                                class="user-switch"
+                                                class="user-switch mb-1"
                                                 v-model="isActiveUser"
-                                                inset
                                                 :color="isActiveUser ? 'primary' : 'secondary'"
                                                 hide-details
                                             ></v-switch>

@@ -64,7 +64,7 @@
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                     <template #item-id="{ unique_id }">
                         <div class="player-wrapper text-capitalize">
-                            {{ unique_id }}
+                            #{{ unique_id }}
                         </div>
                     </template>
                     <template #item-customer_name="{ customer }">
@@ -131,7 +131,8 @@
                     </template>
                     <template #item-priority="{ ticket_priority }">
                         <div class="player-wrapper">
-                            <v-chip :color="ticket_priority.id == 1 ? 'error' : 'success'">
+                            <!-- :color="ticket_priority.id == 1 ? 'error' :ticket_priority.id == 3 ? 'warning' : 'success'" -->
+                            <v-chip :color="'#fff'">
                                 <!-- <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-error" /> -->
                                 <img src="@/assets/images/svgs/High.svg" alt="icon" v-if="ticket_priority.id == 1" />
                                 <img src="@/assets/images/svgs/Low.svg" alt="icon" v-if="ticket_priority.id == 2" />
@@ -148,7 +149,7 @@
                     </template>
                     <template #item-payment_status="{ payment_status }">
                         <div class="player-wrapper">
-                            <v-chip :color="payment_status.id == 3 ? 'primary' : payment_status.id == 2 ? 'secondary' : 'error'"
+                            <v-chip :color="payment_status.background_color" :text-color="payment_status.text_color"
                                 >{{ payment_status.payment_type }}
                             </v-chip>
                         </div>
@@ -176,7 +177,7 @@
                             </v-tooltip>
                             <v-tooltip text="Delete">
                                 <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="deleteCustomer(id)" v-bind="props"
+                                    <v-btn class="table-icons-common" icon flat @click="deleteTicket(id)" v-bind="props"
                                         ><TrashIcon stroke-width="1.5" size="20" class="text-error"
                                     /></v-btn>
                                 </template>
@@ -225,11 +226,11 @@ const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
 //dialog props
-const dialogTitle = ref('Are you sure you want to delete this customer ?');
-const dialogText = ref('This will delete this customer permanently, you can not undo this action.');
+const dialogTitle = ref('Are you sure you want to delete this ticket ?');
+const dialogText = ref('This will delete this ticket permanently, you can not undo this action.');
 const cancelText = ref('Cancel');
 const confirmText = ref('Delete');
-const title = ref('Delete Customer');
+const title = ref('Delete Ticket');
 const editId = ref(0);
 
 //refs
@@ -424,7 +425,7 @@ function cancelClick() {
 }
 function confirmClick() {
     baseURlApi
-        .delete(`customer/delete/${deleteId.value}`)
+        .delete(`ticket/delete/${deleteId.value}`)
         .then((res) => {
             deleteDialog.value?.close();
             getTickets();
@@ -444,7 +445,7 @@ function confirmClick() {
         });
 }
 //delete user
-function deleteCustomer(id) {
+function deleteTicket(id) {
     deleteId.value = id;
     deleteDialog.value?.open();
 }

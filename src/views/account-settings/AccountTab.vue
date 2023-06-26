@@ -96,6 +96,7 @@
                                         type="email"
                                         autocomplete="off"
                                         :rules="emailrule"
+                                        disabled="true"
                                     />
                                 </v-col>
                                 <!---------------------------------- Address line --------------------------------->

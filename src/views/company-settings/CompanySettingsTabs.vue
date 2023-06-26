@@ -1,5 +1,5 @@
 <template>
-    <v-card elevation="2">
+    <v-card elevation="10">
         <v-tabs v-model="tab"  color="primary"  bg-color="teal-darken-3" stacked centered class="c-main-tabs">
             <v-tab v-for="(item, i) in items" :key="i" :value="item.value">
                 <div class="d-flex">
@@ -25,12 +25,12 @@
             </UiChildCard>
         </v-card>
         <v-card elevation="0" class="mb-6 m-5 overflow-hidden c-inner-card" v-if="tab !== 'contract and ticket'">
-            <UiChildCard :title="tab == 'settings' ? 'Company Profile' : tab">
+            <UiChildCard :title="tab == 'settings' ? 'Company Profile' : tab" v-if="tab !== 'contract and ticket'">
                 <v-window v-model="tab">
                     <v-window-item v-for="(item, i) in items" :key="i" :value="item.value">
-                        <v-card>
+                        <!-- <v-card> -->
                             <component v-bind:is="item.component"></component>
-                        </v-card>
+                        <!-- </v-card> -->
                     </v-window-item>
                 </v-window>
             </UiChildCard>

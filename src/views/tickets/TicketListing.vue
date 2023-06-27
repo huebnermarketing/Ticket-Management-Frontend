@@ -255,17 +255,17 @@ const breadcrumbs = ref([
 const topCardsData = ref([]);
 
 const headers = ref([
-    { text: 'Id', value: 'id', sortable: true },
-    { text: 'Customer Name', value: 'customer_name', sortable: true },
-    { text: 'Problem Title', value: 'problem_title', sortable: true },
-    { text: 'Mobile', value: 'mobile', sortable: true },
-    { text: 'Company Name', value: 'company_name', sortable: true },
-    { text: 'Due Date', value: 'due_date', sortable: true },
-    { text: 'Engineer', value: 'engineer', sortable: true },
-    { text: 'Appointment Type', value: 'appointment_type', sortable: true },
-    { text: 'Priority', value: 'priority', sortable: true },
-    { text: 'Ticket Status', value: 'ticket_status', sortable: true },
-    { text: 'Payment Status', value: 'payment_status', sortable: true },
+    { text: 'Id', value: 'id'},
+    { text: 'Customer Name', value: 'customer_name' },
+    { text: 'Problem Title', value: 'problem_title'},
+    { text: 'Mobile', value: 'mobile'},
+    { text: 'Company Name', value: 'company_name'},
+    { text: 'Due Date', value: 'due_date'},
+    { text: 'Engineer', value: 'engineer'},
+    { text: 'Appointment Type', value: 'appointment_type'},
+    { text: 'Priority', value: 'priority'},
+    { text: 'Ticket Status', value: 'ticket_status'},
+    { text: 'Payment Status', value: 'payment_status'},
     { text: 'Action', value: 'action' }
 ]);
 const serverItemsLength = ref(50);

@@ -39,6 +39,7 @@
                                             :items="selectCustomerList"
                                             @update:modelValue="getAddress()"
                                             @click:clear="getInitialData()"
+                                          
                                             @keydown.enter.capture.prevent.stop
                                             clearable
                                             return-object
@@ -629,6 +630,7 @@ const country = ref(['USA', 'United Kingdom', 'India', 'Srilanka']);
 const tab = ref(null);
 const customerEmail = ref('');
 const page = ref({ title: 'Users' });
+const current_page = ref(1);
 const breadcrumbs = ref([
     {
         text: 'Tickets',
@@ -660,18 +662,18 @@ const collectAmountRule = [
 ];
 function getinputs() {
     console.log('caledd');
-    addressLineOne.value = selectAddress.value.address_line1;
-    area.value = selectAddress.value.area;
-    city.value = selectAddress.value.city;
-    zipcode.value = selectAddress.value.zipcode;
-    state.value = selectAddress.value.state;
-    countryName.value = selectAddress.value.country;
-    companyName.value = selectAddress.value.company_name;
+    addressLineOne.value = selectAddress.value?.address_line1;
+    area.value = selectAddress.value?.area;
+    city.value = selectAddress.value?.city;
+    zipcode.value = selectAddress.value?.zipcode;
+    state.value = selectAddress.value?.state;
+    countryName.value = selectAddress.value?.country;
+    companyName.value = selectAddress.value?.company_name;
 }
 function getCustomersList() {
-
+const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
-        .get('customer/list')
+        .get('customer/list',{ params })
         .then((res) => {
             //  isLoading.value = false;
             //  serverItemsLength.value = res.data.data.total;
@@ -704,7 +706,7 @@ function onEnter() {
             email: '',
             created_at: '',
             updated_at: '',
-            customer_id: '',
+            // customer_id: '',
             phone: ''
         };
     } else {
@@ -715,7 +717,7 @@ function onEnter() {
             email: '',
             created_at: '',
             updated_at: '',
-            customer_id: '',
+            // customer_id: '',
             phone: ''
         };
     }
@@ -774,7 +776,7 @@ async function createTicket() {
             ticket_type: tiketTypeRadio.value,
             customer_name: selectedCustomer.value.first_name + selectedCustomer.value.last_name,
             is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
-            customer_id: isExistingCustomer.value == true ? selectedCustomer.value.customer_id : '',
+            customer_id: isExistingCustomer.value == true ? selectedCustomer.value.id : '',
             email: customerEmail.value,
             customer_locations_id: selectAddress.value ? selectAddress.value.id : '',
             company_name: companyName.value,
@@ -807,8 +809,8 @@ async function createTicket() {
                 // emit('addUserClicked', addedData);
 
                 issubmit.value = false;
-                createticketform.value?.reset();
-                createticketform.value?.resetValidation();
+                // createticketform.value.reset();
+                // createticketform.value.resetValidation();
 
                 message.value = res.data.message;
                 console.log('msggg', res.data.message);
@@ -872,13 +874,24 @@ function getCustomers() {
 function clearOnInput() {
     selectedCustomer.value = null;
 }
+function searchCustomers() {
+    const fd = new FormData();
+    if(searchCustomer.value.length > 0){
+    fd.append('search_text', searchCustomer.value);
+    baseURlApi
+        .post(`customer/search?total_record=${current_page.value}`, fd)
+        .then((res) => {
+        })
+        .catch((error) => {});
+    }
+}
 function getAddress() {
     mobile.value = selectedCustomer.value?.phone;
     customerEmail.value = selectedCustomer.value?.email;
     isExistingCustomer.value = true;
     if (selectedCustomer.value?.id) {
         baseURlApi
-            .get(`ticket/get-customer-address/${selectedCustomer.value.customer_id}`)
+            .get(`ticket/get-customer-address/${selectedCustomer.value.id}`)
             .then((res) => {
                 console.log('valll', res.data.data);
                 addressOptions.value = res.data.data;

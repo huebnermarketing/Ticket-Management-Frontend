@@ -5,7 +5,7 @@
                 <v-col cols="12" lg="4" md="6">
                     <v-text-field
                         density="compact"
-                        @input="searchUser()"
+                        @input="searchCustomer()"
                         v-model="searchValue"
                         label="Search"
                         hide-details
@@ -185,7 +185,7 @@ const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
 //get users
-function searchUser() {
+function searchCustomer() {
     const fd = new FormData();
     if(searchValue.value.length > 0){
     fd.append('search_text', searchValue.value);

@@ -9,12 +9,12 @@
                 <v-card elevation="10" class="t-add-card" rounded="md">
                     <!------------------------------------ Ticket type ----------------------------------->
                     <v-row style="padding: 20px 20px 0 20px">
-                        <v-col cols="12">
+                        <v-col cols="12" class="d-flex">
                             <v-label class="font-weight-medium text-capitalize required">ticket type</v-label>
-                            <v-radio-group v-model="tiketTypeRadio" inline class="d-flex justify-flexstart ticket-type-radio">
-                                <v-radio class="font-weight-medium text-capitalize" label="Adhoc" value="adhoc" color="primary"></v-radio>
+                            <v-radio-group id="" v-model="tiketTypeRadio" inline class="d-flex justify-flexstart ticket-type-radio ml-2">
+                                <v-radio class="font-weight-medium text-capitalize mr-5 radio-lbl" label="Adhoc" value="adhoc" color="primary"></v-radio>
                                 <v-radio
-                                    class="font-weight-medium text-capitalize border-1"
+                                    class="font-weight-medium text-capitalize border-1 mr-5 radio-lbl"
                                     label="Contract"
                                     value="contract"
                                     color="primary"
@@ -393,7 +393,11 @@
                                         ></v-select>
                                     </v-col>
                                     <!---------------------------------- collected amount --------------------------------->
-                                    <v-col cols="12" md="6" v-if="paymentStatus.unique_id !== '10003' && paymentStatus.unique_id !== '10004'">
+                                    <v-col
+                                        cols="12"
+                                        md="6"
+                                        v-if="paymentStatus.unique_id !== '10003' && paymentStatus.unique_id !== '10004'"
+                                    >
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">collected amount</v-label>
                                         <v-text-field
                                             v-model="collectedAmount"
@@ -415,7 +419,11 @@
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- payment mode --------------------------------->
-                                    <v-col cols="12" md="6" v-if="paymentStatus.unique_id !== '10003' && paymentStatus.unique_id !== '10004'">
+                                    <v-col
+                                        cols="12"
+                                        md="6"
+                                        v-if="paymentStatus.unique_id !== '10003' && paymentStatus.unique_id !== '10004'"
+                                    >
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">payment mode</v-label>
                                         <v-select
                                             v-model="paymentMode"
@@ -822,10 +830,13 @@ async function createTicket() {
             appointment_type_id: appointmentType.value.id,
             ticket_amount: parseInt(ticketAmount.value),
             payment_type_id: paymentStatus.value.id,
-            collected_amount: parseInt(collectedAmount.value),
-            remaining_amount: parseInt(remainingAmount.value),
+            collected_amount: collectedAmount.value ? parseInt(collectedAmount.value): 0,
+            remaining_amount: remainingAmount.value ? parseInt(remainingAmount.value) : 0,
             payment_mode: paymentMode.value
         };
+        if(paymentMode.value == 0){
+            delete requestBody.payment_mode
+        }
         baseURlApi
             .post('ticket/create', requestBody)
             .then((res) => {
@@ -853,9 +864,11 @@ async function createTicket() {
                 issubmit.value = false;
                 showSnackbar.value = true;
                 isSnackbar.value = true;
-                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
+                if (error.response.error?.length) {
+                    message.value = 'Missing required fields ' + Object.keys(error.response.error).join(' ');
+                } else message.value = error.response.data.message;
             });
     }
 }
@@ -863,14 +876,13 @@ function getFieldText(item) {
     console.log('itemmm', item);
 
     console.log('item exx', item);
-    
-        return (
-            `${item?.first_name ? item.first_name : ''}` +
-            ' ' +
-            `${item?.last_name ? item.last_name : ''}` +
-            ` ${item?.phone ? '-(' + item.phone + ')' : ''}`
-        );
-    
+
+    return (
+        `${item?.first_name ? item.first_name : ''}` +
+        ' ' +
+        `${item?.last_name ? item.last_name : ''}` +
+        ` ${item?.phone ? '-(' + item.phone + ')' : ''}`
+    );
 }
 function addNewAddress() {
     addressLineOne.value = '';
@@ -1020,6 +1032,10 @@ function restrictKeyUp(event) {
     event.preventDefault();
 }
 function changePaymentMode() {
+    if(paymentStatus.value.unique_id == '10003' || paymentStatus.value.unique_id == '10004'){
+ remainingAmount.value = 0
+    }
+   
     if (paymentStatus.value.id == 2) {
         paymentMode.value = paymentModeOptions.value[1];
     } else {
@@ -1047,6 +1063,7 @@ watch(isExistingCustomer.value, (newval, old) => {
 });
 </script>
 <style scoped>
+
 .v-tab--selected .v-tab__slider {
     opacity: 0 !important;
     display: none !important;
@@ -1069,5 +1086,17 @@ div.v-tabs-bar {
     border-color: #f5f5f5 !important;
     padding: 18px;
 }
+.v-radio{
+    border-radius: 5px;
+    padding: 2px;
+    border: 1px solid #e0e0e0;
+}
+.v-radio .v-label .v-label--clickable{
+    margin-right: 20px !important;
+}
+.ticket-type-radio{
+    margin-left: 20px !important;
+}
+
 </style>
 

@@ -1,7 +1,6 @@
 <template>
     <div class="text-center">
         <div class="d-none">{{ userProfile }}</div>
-
         <v-form @submit.prevent="updateProfile" ref="companyProfileForm">
             <div class="loading" v-if="isLoading">
                 <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>

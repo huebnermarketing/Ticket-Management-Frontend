@@ -12,7 +12,12 @@
                         <v-col cols="12" class="d-flex">
                             <v-label class="font-weight-medium text-capitalize required">ticket type</v-label>
                             <v-radio-group id="" v-model="tiketTypeRadio" inline class="d-flex justify-flexstart ticket-type-radio ml-2">
-                                <v-radio class="font-weight-medium text-capitalize mr-5 radio-lbl" label="Adhoc" value="adhoc" color="primary"></v-radio>
+                                <v-radio
+                                    class="font-weight-medium text-capitalize mr-5 radio-lbl"
+                                    label="Adhoc"
+                                    value="adhoc"
+                                    color="primary"
+                                ></v-radio>
                                 <v-radio
                                     class="font-weight-medium text-capitalize border-1 mr-5 radio-lbl"
                                     label="Contract"
@@ -225,6 +230,7 @@
                                     <v-col cols="12" md="6">
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Problem type</v-label>
                                         <v-combobox
+                                            class="prolem-typ"
                                             v-model="problemType"
                                             v-model:search="searchProblem"
                                             :items="problemTypeOptions"
@@ -312,7 +318,7 @@
                                             return-object
                                             single-line
                                             variant="outlined"
-                                            label="Please select assign engineer"
+                                            label="Please select engineer"
                                             :rules="ticketdropdownrule"
                                         ></v-select>
                                         <template v-slot:selection="{ item }">
@@ -330,7 +336,7 @@
                                             return-object
                                             single-line
                                             variant="outlined"
-                                            label="Please select a ticket priority "
+                                            label="Please select ticket priority "
                                             :rules="ticketdropdownrule"
                                         ></v-select>
                                     </v-col>
@@ -593,6 +599,9 @@ const customerOptions = ref([
         value: '2'
     }
 ]);
+const showPicker = ref(false);
+const selectedDate = ref(null);
+
 const createticketform = ref();
 const problemType = ref([]);
 const problemTypeOptions = ref([]);
@@ -807,7 +816,7 @@ async function createTicket() {
         issubmit.value = true;
         const requestBody = {
             ticket_type: tiketTypeRadio.value,
-            customer_name: selectedCustomer.value.first_name + selectedCustomer.value.last_name,
+            customer_name: selectedCustomer.value.first_name + ' ' + selectedCustomer.value.last_name,
             is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
             customer_id: isExistingCustomer.value == true ? selectedCustomer.value.id : '',
             email: customerEmail.value,
@@ -824,18 +833,18 @@ async function createTicket() {
             problem_title: problemTitle.value,
             due_date: dueDate.value,
             description: description.value,
-            ticket_status_id: 1,
+            ticket_status_id: ticketStatus.value.id,
             priority_id: Ticketpriority.value.id,
             assigned_user_id: assignEr.value.id,
             appointment_type_id: appointmentType.value.id,
             ticket_amount: parseInt(ticketAmount.value),
             payment_type_id: paymentStatus.value.id,
-            collected_amount: collectedAmount.value ? parseInt(collectedAmount.value): 0,
+            collected_amount: collectedAmount.value ? parseInt(collectedAmount.value) : 0,
             remaining_amount: remainingAmount.value ? parseInt(remainingAmount.value) : 0,
             payment_mode: paymentMode.value
         };
-        if(paymentMode.value == 0){
-            delete requestBody.payment_mode
+        if (paymentMode.value.length == 0) {
+            delete requestBody.payment_mode;
         }
         baseURlApi
             .post('ticket/create', requestBody)
@@ -849,12 +858,9 @@ async function createTicket() {
                 // createticketform.value.resetValidation();
 
                 message.value = res.data.message;
-                console.log('msggg', res.data.message);
                 isSnackbar.value = true;
                 showSnackbar.value = true;
-                console.log('msggg111', 'mdi-check-circle');
                 icon.value = 'mdi-check-circle';
-                console.log('msggg111111', icon.value);
                 color.value = 'success';
                 router.push({
                     name: 'Tickets'
@@ -1032,10 +1038,10 @@ function restrictKeyUp(event) {
     event.preventDefault();
 }
 function changePaymentMode() {
-    if(paymentStatus.value.unique_id == '10003' || paymentStatus.value.unique_id == '10004'){
- remainingAmount.value = 0
+    if (paymentStatus.value.unique_id == '10003' || paymentStatus.value.unique_id == '10004') {
+        remainingAmount.value = 0;
     }
-   
+
     if (paymentStatus.value.id == 2) {
         paymentMode.value = paymentModeOptions.value[1];
     } else {
@@ -1046,6 +1052,11 @@ function changePaymentMode() {
 /************************* computed  ***************************/
 const remainAmount = computed(() => {
     return (remainingAmount.value = parseInt(ticketAmount.value) - parseInt(collectedAmount.value));
+});
+
+const fromDateDisp = computed(() => {
+    return fromDateVal.value;
+    // format/do something with date
 });
 
 onMounted(() => {
@@ -1063,7 +1074,13 @@ watch(isExistingCustomer.value, (newval, old) => {
 });
 </script>
 <style scoped>
-
+.v-input--density-default, .v-field--variant-solo, .v-field--variant-filled {
+    --v-input-control-height: 45px;
+    --v-input-padding-top: 9px;
+}
+.v-input--density-default .v-field--variant-outlined, .v-input--density-default .v-field--single-line{
+    --v-field-padding-bottom: 0 !important;
+}
 .v-tab--selected .v-tab__slider {
     opacity: 0 !important;
     display: none !important;
@@ -1086,17 +1103,16 @@ div.v-tabs-bar {
     border-color: #f5f5f5 !important;
     padding: 18px;
 }
-.v-radio{
+.v-radio {
     border-radius: 5px;
     padding: 2px;
     border: 1px solid #e0e0e0;
 }
-.v-radio .v-label .v-label--clickable{
+.v-radio .v-label .v-label--clickable {
     margin-right: 20px !important;
 }
-.ticket-type-radio{
+.ticket-type-radio {
     margin-left: 20px !important;
 }
-
 </style>
 

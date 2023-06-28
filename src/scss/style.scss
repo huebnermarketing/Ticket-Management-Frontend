@@ -61,6 +61,12 @@
     margin-right: 14px !important;
     padding: 5px !important;
 }
+// .v-input--density-default .v-field--variant-outlined, .v-input--density-default .v-field--single-line{
+//     --v-field-padding-bottom: 0 !important;
+// }
+.v-input--density-default .v-field--variant-outlined, .v-input--density-default .v-field--single-line{
+    --v-field-padding-bottom: 0 !important; 
+}
 // .v-field__input{
 //     padding: 23px;
 // }

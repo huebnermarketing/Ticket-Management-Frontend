@@ -31,7 +31,7 @@
                 </transition>
             </div>
             <div id="infinite-list">
-                <v-form @submit.prevent="" ref="problemEditForm">
+                <v-form @submit.prevent="" ref="problemEditForm"  class="w-50">
                     <EasyDataTable
                         sticky
                         :must-sort="true"

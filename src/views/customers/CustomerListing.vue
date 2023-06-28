@@ -185,17 +185,17 @@ const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
 //get users
-function searchCustomer() {
-    const fd = new FormData();
-    if(searchValue.value.length > 0){
-    fd.append('search_text', searchValue.value);
-    baseURlApi
-        .post(`customer/search?total_record=${current_page.value}`, fd)
-        .then((res) => {
-        })
-        .catch((error) => {});
+    function searchCustomer() {
+        const fd = new FormData();
+        if(searchValue.value.length > 0){
+        fd.append('search_text', searchValue.value);
+        baseURlApi
+            .post(`customer/search?total_record=${current_page.value}`, fd)
+            .then((res) => {
+            })
+            .catch((error) => {});
+        }
     }
-}
 function getCustomers() {
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };

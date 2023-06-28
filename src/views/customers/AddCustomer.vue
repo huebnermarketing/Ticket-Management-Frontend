@@ -282,9 +282,9 @@ async function createCustomer() {
             alternate_mobile: altPhone,
             addresses: addaddress.value
         };
-        if (lastName.value == '') {
-            delete requestBody.last_name;
-        }
+        // if (lastName.value == '') {
+        //     delete requestBody.last_name;
+        // }
         if (altPhone[0] == null || altPhone[0] == '') {
             delete requestBody.alternate_mobile;
         }

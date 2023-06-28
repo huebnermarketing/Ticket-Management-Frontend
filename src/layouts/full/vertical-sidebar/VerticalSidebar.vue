@@ -50,9 +50,10 @@ companyName.value = computed(() => {
         </v-locale-provider>
         <v-locale-provider v-else>
             <div class="pa-5 d-flex">
-                <v-avatar size="35" class="border mr-3">
+                <v-avatar size="35" class="border mr-3" v-if="!userProfile == null  || !userData.profile_photo == null ">
+                     <!-- v-if="userProfile || userData.profile_photo" -->
                             <img
-                                v-if="userProfile || userData.profile_photo"
+                               
                                 :src="userProfile.value ? userProfile.value:userData.profile_photo"
                                 width="35"
                                 alt="Julia"
@@ -60,7 +61,7 @@ companyName.value = computed(() => {
                                 style="object-fit: cover !important"
                             />
                         </v-avatar>
-                    <h6 class="text-h6 font-weight-bold font-serif">{{companyName ? companyName.value :userData.company_name }}</h6>
+                    <h6 class="text-h6 font-weight-bold font-serif" v-else>{{companyName ? companyName.value :userData.company_name }}</h6>
 
                 <!-- <Logo /> -->
             </div>

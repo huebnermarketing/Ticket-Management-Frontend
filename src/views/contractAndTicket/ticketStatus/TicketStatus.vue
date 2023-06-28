@@ -4,7 +4,7 @@
             <!---------------------------------- Add new tiket status --------------------------------->
             <v-form @submit.prevent="addProblems()" ref="ticketStatusForm" style="padding: 16px 12px">
                 <v-row justify="space-between" class="align-center mb-3">
-                    <v-col cols="12" md="6" lg="6">
+                    <v-col cols="12" md="6" lg="5">
                         <div class="d-flex">
                             <v-label class="font-weight-medium text-capitalize required mb-4 mr-2">Add new ticket status</v-label>
                             <v-text-field
@@ -24,7 +24,7 @@
                             -->
                         </div>
                     </v-col>
-                    <v-col cols="12" md="6" lg="6" class="d-flex">
+                    <v-col cols="12" md="6" lg="7" class="d-flex">
                         <div class="d-flex mb-2">
                             <v-label class="font-weight-medium text-capitalize required mb-4 mr-2">text color</v-label>
                             <label
@@ -77,7 +77,7 @@
                 </transition>
             </div>
             <div id="infinite-list">
-                <v-form @submit.prevent="" ref="contractEditForm">
+                <v-form @submit.prevent="" ref="contractEditForm"  class="w-75">
                     <EasyDataTable
                         sticky
                         :must-sort="true"

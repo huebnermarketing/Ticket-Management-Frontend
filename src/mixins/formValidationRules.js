@@ -72,8 +72,10 @@ export const formValidationsRules = () => {
     ];
     const emailPatternrule = [
         (value) => {
+            if(value){
             if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)) return true;
             return 'Email must be in valid email address format';
+            }
         }
     ];
     const rule = [
@@ -112,6 +114,13 @@ export const formValidationsRules = () => {
     const dropdownrule = [
         (value) => {
             if (value) return true;
+            return 'Please select an item.';
+        }
+    ];
+    const ticketdropdownrule = [
+        (value) => {
+            console.log("drop",value.length)
+            if(value ? Object.keys(value).length > 0 : '') return true
             return 'Please select an item.';
         }
     ];
@@ -195,5 +204,26 @@ export const formValidationsRules = () => {
         //     return 'Zip Code must be a numeric value.';
         // }
     ];
-    return { emailPatternrule,alternativemobilerule, requiredrule, cityrule, staterule, zipcoderule, countyrule, arearule, addresslinerule, companynamerule, confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule };
+
+    const amountRule = [
+        (value) => {
+            if (value) return true;
+            return 'This field is required.';
+        },
+        (value) => {
+            if(isNaN(value) == false) return true;
+            return 'This field must be a numeric value.';
+        },
+        (value) => {
+            if (parseInt(value) >= 0) return true;
+            return 'This field must be a positive value.';
+        }
+    ];
+
+    const limitFileSize = [
+        value => {
+            return !value || !value.length || value[0].size < 2000000 || 'File size should be less than 2 MB!'
+          },
+    ]
+    return { amountRule,ticketdropdownrule,limitFileSize,emailPatternrule,alternativemobilerule, requiredrule, cityrule, staterule, zipcoderule, countyrule, arearule, addresslinerule, companynamerule, confirmpwd, newpwd, firstnamerule, lastnamerule, mobilerule, emailrule, passwordrule, rule, confirmpasswordrule, dropdownrule };
 };

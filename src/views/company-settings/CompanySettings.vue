@@ -8,7 +8,7 @@
 </template>
 <script setup>
 import { ref } from 'vue';
-import CompanySettingsTabs from '@/views/pages/company-settings/CompanySettingsTabs.vue'
+import CompanySettingsTabs from '@/views/company-settings/CompanySettingsTabs.vue'
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import UiTableCard from '@/components/shared/UiTableCard.vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';

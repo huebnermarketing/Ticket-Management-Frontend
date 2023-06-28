@@ -114,8 +114,15 @@
                                                         <path
                                                             d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z"
                                                             stroke-width="1"
-                                                            :fill="i == radios || data.is_primary? 'rgb(93,135,255)' : 'rgb(255,255,255)'"
-                                                        ></path>
+                                                            :fill="
+                                                                i == radios && data.is_primary == 1
+                                                                    ? 'rgb(93,135,255)'
+                                                                    : data.is_primary == 1
+                                                                    ? 'rgb(93,135,255)'
+                                                                    : 'rgb(255,255,255)'
+                                                            "
+                                                        >
+                                                        </path>
                                                     </svg>
                                                 </div>
                                             </template>
@@ -223,7 +230,7 @@ const deleteDialog = ref();
 const deleteId = ref(0);
 
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -251,10 +258,8 @@ function closeDialog() {
 function addaddressData(data) {
     store.getnewAddress;
     addaddress.value = addaddress.value.concat(data);
-    console.log("addd",addaddress.value,'ffff',addaddress.value)
     if (addaddress.value.length == 1) {
         addaddress.value[0].is_primary = 1;
-        console.log("enyert",addaddress.value,'ffff',addaddress.value)    
     }
     if (addaddress.value.length > 0) isEmptyAddress.value = false;
 }
@@ -269,7 +274,6 @@ async function createCustomer() {
         var altPhone = altMobile.value.map((item) => {
             return item['altMobileNo'];
         });
-        console.log("alttt phone",altPhone)
         const requestBody = {
             first_name: firstName.value,
             last_name: lastName.value,
@@ -295,16 +299,18 @@ async function createCustomer() {
                 createcustomerform.value?.resetValidation();
                 addaddress.value = [];
                 dialog.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
+                message.value = res.data.message;
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
             })
             .catch((error) => {
                 issubmit.value = false;
                 isEmptyAddress.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -337,7 +343,6 @@ function openAddAddressDialog() {
     addNewaddress.value?.open();
 }
 function filterData(data) {
-    console.log('existing1', data);
     const existing = addaddress.value.find((e) => e.id === data.id);
 
     if (existing) {
@@ -347,7 +352,6 @@ function filterData(data) {
 function openEditDialog(id, data) {
     singleAddressDetail.value = data;
     singleAddressDetail.value.id = id;
-    console.log('singlee', singleAddressDetail.value);
     editsingleaddress.value?.open(singleAddressDetail.value);
 }
 
@@ -359,6 +363,7 @@ function confirmClick() {
     addaddress.value.splice(deleteId.value, 1);
     deleteDialog.value?.close();
     deleteDialog.value?.close();
+    showSnackbar.value = true
     isSnackbar.value = true;
     message.value = 'Address deleted successfully';
     color.value = 'error';

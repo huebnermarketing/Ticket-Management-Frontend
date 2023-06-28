@@ -8,7 +8,6 @@
                         <div class="d-flex">
                             <v-label class="font-weight-medium text-capitalize required mb-4 mr-2">Add new contract type</v-label>
                             <v-text-field
-                                required
                                 name="contracttype"
                                 v-model="contractType"
                                 variant="outlined"
@@ -33,102 +32,106 @@
                 </transition>
             </div>
             <div id="infinite-list">
-                 <v-form @submit.prevent="updateContract()" ref="contractEditForm">
-                <EasyDataTable
-                    sticky
-                    :must-sort="true"
-                    :rows-per-page="1000"
-                    :server-items-length="serverItemsLength"
-                    :headers="headers"
-                    :fixed-header="true"
-                    :hide-footer="true"
-                    :items="items"
-                    :search-value="searchValue"
-                    :theme-color="themeColor"
-                    :search="searchField"
-                    table-class-name="customize-table"
-                    :loading="isLoading"
-                >
-                
-                    <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
-                    <template #item-contract_service_type="{ contract_name, id }">
-                        <div class="player-wrapper text-capitalize" v-if="id !== editID">
-                            {{ contract_name }}
-                        </div>
-                        <v-text-field
-                            v-if="isEditable && id == editID"
-                            name="contracttype1"
-                            v-model="editContractType"
-                            variant="outlined"
-                            color="primary"
-                            class="mt-2"
-                            :rules="requiredrule"
-                        >
-                        </v-text-field>
-                    </template>
-                    <template #item-action="{ id }">
-                        <div class="d-flex align-center">
-                            <v-tooltip text="Edit">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        v-if="id !== editID"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        @click="editContract(id)"
-                                        v-bind="props"
-                                        ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Update">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        type="submit"
-                                        v-if="isEditable && id == editID && !isEdit"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        @click="updateContract(id)"
-                                        v-bind="props"
-                                        ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                    <v-btn
-                                        v-if="isEditable && id == editID && isEdit"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        disabled
-                                        v-bind="props"
-                                        ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Cancel">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        v-if="isEditable && id == editID && !isEdit"
-                                        class="table-icons-common"
-                                        icon
-                                        flat
-                                        @click="cancelUpdate(id)"
-                                        v-bind="props"
-                                        ><XIcon stroke-width="1.5" size="20" class="text-error"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Delete">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn v-if="id !== editID" class="table-icons-common" icon flat @click="deleteContract(id)" v-bind="props"
-                                        ><TrashIcon stroke-width="1.5" size="20" class="text-error"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                        </div>
-                    </template>
-                    
-                </EasyDataTable>
-                 </v-form>
+                <v-form @submit.prevent="" ref="contractEditForm">
+                    <EasyDataTable
+                        sticky
+                        :must-sort="true"
+                        :rows-per-page="1000"
+                        :server-items-length="serverItemsLength"
+                        :headers="headers"
+                        :fixed-header="true"
+                        :hide-footer="true"
+                        :items="items"
+                        :search-value="searchValue"
+                        :theme-color="themeColor"
+                        :search="searchField"
+                        table-class-name="customize-table"
+                        :loading="isLoading"
+                    >
+                        <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
+                        <template #item-contract_service_type="{ contract_name, id }">
+                            <div class="player-wrapper text-capitalize" v-if="id !== editID">
+                                {{ contract_name }}
+                            </div>
+                            <v-text-field
+                                v-if="isEditable && id == editID"
+                                name="contracttype1"
+                                v-model="editContractType"
+                                variant="outlined"
+                                color="primary"
+                                class="mt-2"
+                                :rules="requiredrule"
+                            >
+                            </v-text-field>
+                        </template>
+                        <template #item-action="{ id }">
+                            <div class="d-flex align-center">
+                                <v-tooltip text="Edit">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="id !== editID"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="editContract(id)"
+                                            v-bind="props"
+                                            ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Update">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            type="submit"
+                                            v-if="isEditable && id == editID && !isEdit"
+                                            class="table-icons-common"
+                                            icon
+                                            @click="updateContract(id)"
+                                            flat
+                                            v-bind="props"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                        <v-btn
+                                            v-if="isEditable && id == editID && isEdit"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            disabled
+                                            v-bind="props"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Cancel">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="isEditable && id == editID && !isEdit"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="cancelUpdate(id)"
+                                            v-bind="props"
+                                            ><XIcon stroke-width="1.5" size="20" class="text-error"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Delete">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-if="id !== editID"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="deleteContract(id)"
+                                            v-bind="props"
+                                            ><TrashIcon stroke-width="1.5" size="20" class="text-error"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                            </div>
+                        </template>
+                    </EasyDataTable>
+                </v-form>
             </div>
             <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
                 <v-icon left>{{ icon }}</v-icon>
@@ -172,7 +175,7 @@ const title = ref('Delete Contract Service Type');
 
 //refs
 const deleteDialog = ref();
-const contractEditForm = ref()
+const contractEditForm = ref();
 
 const headers = ref([
     { text: 'Contract Service Type', value: 'contract_service_type' },
@@ -184,7 +187,7 @@ const deleteId = ref(0);
 const isLoading = ref(false);
 const resizableDiv = ref();
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -201,34 +204,36 @@ const editContractType = ref('');
 
 //update
 async function updateContract(id) {
-     const { valid } = await contractEditForm.value?.validate();
+    const { valid } = await contractEditForm.value?.validate();
     if (valid) {
         isEdit.value = true;
-    const requestBody = {
-        contract_name: editContractType.value
-    };
-    baseURlApi
-        .post(`settings/contract-type/update/${id}`, requestBody)
-        .then((res) => {
-            isEdit.value = false;
-            isEditable.value = false;
-            message.value = res.data.message;
-            isSnackbar.value = true;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
-            getContracts();
-            editID.value = 0;
-            dialog.value = false;
-        })
-        .catch((error) => {
-            editID.value = 0;
-            isEdit.value = false;
-            isEditable.value = false;
-            isSnackbar.value = true;
-            message.value = error.message;
-            color.value = 'error';
-            icon.value = 'mdi-close-circle';
-        });
+        const requestBody = {
+            contract_name: editContractType.value
+        };
+        baseURlApi
+            .post(`settings/contract-type/update/${id}`, requestBody)
+            .then((res) => {
+                isEdit.value = false;
+                isEditable.value = false;
+                message.value = res.data.message;
+                showSnackbar.value = true;
+                isSnackbar.value = true;
+                icon.value = 'mdi-check-circle';
+                color.value = 'success';
+                getContracts();
+                editID.value = 0;
+                dialog.value = false;
+            })
+            .catch((error) => {
+                editID.value = 0;
+                isEdit.value = false;
+                isEditable.value = false;
+                showSnackbar.value = true;
+                isSnackbar.value = true;
+                message.value = error.response.data.message;
+                color.value = 'error';
+                icon.value = 'mdi-close-circle';
+            });
     }
 }
 
@@ -243,8 +248,9 @@ function editContract(id) {
             editContractType.value = res.data.data.contract_name;
         })
         .catch((error) => {
+            showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -253,7 +259,7 @@ function editContract(id) {
 //listing
 function getContracts() {
     isLoading.value = true;
-    isSnackbar.value = false;
+    // isSnackbar.value = false;
     baseURlApi
         .get('settings/contract-type/list')
         .then((res) => {
@@ -266,23 +272,24 @@ function getContracts() {
         })
         .catch((error) => {
             isLoading.value = false;
+            showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
 }
 
 //cancel update
-function cancelUpdate(id){
+function cancelUpdate(id) {
     isEditable.value = false;
     editID.value = 0;
-    getContracts()
+    // getContracts();
 }
 
 //add contract
 async function addContract() {
-    isSnackbar.value = false;
+    // isSnackbar.value = false;
     const { valid } = await contractForm.value?.validate();
     if (valid) {
         issubmit.value = true;
@@ -292,20 +299,22 @@ async function addContract() {
         baseURlApi
             .post('settings/contract-type/add', requestBody)
             .then((res) => {
-                issubmit.value = false;
-                message.value = res.data.message;
-                isSnackbar.value = true;
-                icon.value = 'mdi-check-circle';
-                color.value = 'success';
                 contractForm.value?.reset();
                 contractForm.value?.resetValidation();
+                issubmit.value = false;
+                showSnackbar.value = true;
+                isSnackbar.value = true;
+                message.value = res.data.message;
+                icon.value = 'mdi-check-circle';
+                color.value = 'success';
                 getContracts();
                 dialog.value = false;
             })
             .catch((error) => {
                 issubmit.value = false;
+                showSnackbar.value = true;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -324,15 +333,17 @@ function confirmClick() {
         .then((res) => {
             deleteDialog.value?.close();
             getContracts();
-            message.value = res.data.message;
+            showSnackbar.value = true;
             isSnackbar.value = true;
+            message.value = res.data.message;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });

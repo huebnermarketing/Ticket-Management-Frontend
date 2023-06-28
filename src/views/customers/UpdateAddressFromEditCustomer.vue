@@ -170,20 +170,18 @@ async function updateAddress() {
             .catch((error) => {
                 issubmit.value = false;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
     }
 }
 function getAddressData(id) {
-    console.log('calleddd', id);
     // isLoading.value = true;
     addrId.value = id;
     baseURlApi
         .get(`customer/address/get/${id}`)
         .then((res) => {
-            console.log('calleddd1111', res);
             // isLoading.value = false;
             const data = res.data.data;
             (address.value = data.address_line1),

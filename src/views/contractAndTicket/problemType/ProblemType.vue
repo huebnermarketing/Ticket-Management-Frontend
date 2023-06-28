@@ -31,7 +31,7 @@
                 </transition>
             </div>
             <div id="infinite-list">
-                <v-form @submit.prevent="updateContract()" ref="problemEditForm">
+                <v-form @submit.prevent="" ref="problemEditForm">
                     <EasyDataTable
                         sticky
                         :must-sort="true"
@@ -84,9 +84,10 @@
                                             class="table-icons-common"
                                             icon
                                             flat
+                                            type="submit"
                                             @click="updateProblem(id)"
                                             v-bind="props"
-                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                         <v-btn
                                             v-if="isEditable && id == editID && isEdit"
@@ -95,7 +96,7 @@
                                             flat
                                             disabled
                                             v-bind="props"
-                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                     </template>
                                 </v-tooltip>
@@ -185,7 +186,7 @@ const deleteId = ref(0);
 const isLoading = ref(false);
 const resizableDiv = ref();
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -213,8 +214,9 @@ async function updateProblem(id) {
             .then((res) => {
                 isEdit.value = false;
                 isEditable.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
+                message.value = res.data.message;
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
                 getProblems();
@@ -225,8 +227,9 @@ async function updateProblem(id) {
                 editID.value = 0;
                 isEdit.value = false;
                 isEditable.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -244,8 +247,9 @@ function editProblem(id) {
             editproblemType.value = res.data.data.problem_name;
         })
         .catch((error) => {
+            showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -254,7 +258,6 @@ function editProblem(id) {
 //listing
 function getProblems() {
     isLoading.value = true;
-    isSnackbar.value = false;
     baseURlApi
         .get('settings/problem-type/list')
         .then((res) => {
@@ -267,8 +270,9 @@ function getProblems() {
         })
         .catch((error) => {
             isLoading.value = false;
+            showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -278,12 +282,11 @@ function getProblems() {
 function cancelUpdate(id) {
     isEditable.value = false;
     editID.value = 0;
-    getProblems();
+    // getProblems();
 }
 
 //add problems
 async function addProblems() {
-    isSnackbar.value = false;
     const { valid } = await problemForm.value?.validate();
     if (valid) {
         issubmit.value = true;
@@ -294,8 +297,9 @@ async function addProblems() {
             .post('settings/problem-type/add', requestBody)
             .then((res) => {
                 issubmit.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true
                 isSnackbar.value = true;
+                message.value = res.data.message;
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
                 problemForm.value?.reset();
@@ -305,8 +309,9 @@ async function addProblems() {
             })
             .catch((error) => {
                 issubmit.value = false;
+                showSnackbar.value = true
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -325,15 +330,17 @@ function confirmClick() {
         .then((res) => {
             deleteDialog.value?.close();
             getProblems();
-            message.value = res.data.message;
+            showSnackbar.value = true
             isSnackbar.value = true;
+            message.value = res.data.message;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });

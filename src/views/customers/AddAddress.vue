@@ -91,10 +91,6 @@
                 </v-form>
             </v-card>
         </v-dialog>
-        <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
-            <v-icon left>{{ icon }}</v-icon>
-            {{ message }}
-        </v-snackbar>
     </div>
 </template>
 <script setup>
@@ -126,7 +122,6 @@ const message = ref('');
 const color = ref('');
 const icon = ref('');
 const timer = ref(5000);
-const isSnackbar = ref(false);
 const createAddressForm = ref();
 
 // validations rules
@@ -135,33 +130,16 @@ const createAddressForm = ref();
 const emit = defineEmits(['addAddressClicked']);
 
 //methods
-function uploadImage(e) {
-    console.log('uploadedd');
-    isProfileImg.value = true;
-    const fd = new FormData();
-    const file = e.target.files[0];
-    UserProfileFile.value = file;
-    userProfilePic.value = URL.createObjectURL(e.target.files[0]);
-    fd.append('file', file);
-}
-function resetProfilepic() {
-    userProfilePic.value = '';
-    isProfileImg.value = false;
-}
 function closeDialog() {
     createAddressForm.value?.reset();
+    country.value = "India"
     dialog.value = false;
 }
 
-function limitFileSize() {
-    let size = parseFloat(this.file1 ? this.file1.size : '') / (1024 * 1024).toFixed(2);
-    size > 10 ? (this.fileSize = true) : (this.fileSize = false);
-}
+
 async function addAddress() {
     
     const { valid } = await createAddressForm.value?.validate();
-           console.log("ddd 111232",typeof addressList)
-
     if (valid) {
         const data = []
         data.push ({
@@ -179,7 +157,7 @@ async function addAddress() {
         issubmit.value = false;
         createAddressForm.value?.reset();
         createAddressForm.value?.resetValidation();
-        country.value = 'india'
+        country.value = 'India'
         dialog.value = false;
     }
 }

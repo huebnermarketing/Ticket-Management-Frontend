@@ -5,7 +5,7 @@
                 <v-col cols="12" lg="4" md="6">
                     <v-text-field
                         density="compact"
-                        @input="searchUser()"
+                        @input="searchCustomer()"
                         v-model="searchValue"
                         label="Search"
                         hide-details
@@ -35,7 +35,7 @@
             <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto">
                 <!-- :search-value="searchValue" -->
                 <EasyDataTable
-                    :rows-per-page="-1"
+                    :rows-per-page="10000"
                     sticky
                     fixed
                     :server-items-length="serverItemsLength"
@@ -47,10 +47,11 @@
                     :theme-color="themeColor"
                     :search="searchField"
                     table-class-name="customize-table"
-                    ref="refUserListTable"
+                    ref="refCustomerListTable"
                     :loading="isLoading"
                     :sort-by="sortBy"
                     :sort-type="sortType"
+                    must-sort
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                     <template #item-first_name="{ first_name, last_name }">
@@ -140,7 +141,7 @@ const addcustomer = ref();
 const editcustomer = ref();
 const changePasswordFromUser = ref();
 const deleteDialog = ref();
-const refUserListTable = ref();
+const refCustomerListTable = ref();
 
 const breadcrumbs = ref([
     {
@@ -175,7 +176,7 @@ const isLoading = ref(false);
 const resizableDiv = ref();
 const isFromAdd = ref(false);
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -184,14 +185,13 @@ const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
 //get users
-function searchUser() {
+function searchCustomer() {
     const fd = new FormData();
     if(searchValue.value.length > 0){
     fd.append('search_text', searchValue.value);
     baseURlApi
         .post(`customer/search?total_record=${current_page.value}`, fd)
         .then((res) => {
-            console.log('res', res);
         })
         .catch((error) => {});
     }
@@ -224,8 +224,12 @@ function getCustomers() {
                 for (let i in uniqueObject) {
                     itemsData.push(uniqueObject[i]);
                 }
+                console.log("one")
             } else {
+                console.log("res.daa",res.data.data)
                 itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data));
+                                console.log("two")
+
             }
 
             items.value = itemsData.slice();
@@ -236,22 +240,24 @@ function getCustomers() {
                 }
             });
             items.value = [...proxy];
-            items.value = [...JSON.parse(JSON.stringify(items.value))];
+            items.value = [...JSON.parse(JSON.stringify(items.value))][0] !== null ? [...JSON.parse(JSON.stringify(items.value))] : [];
+            console.log("ite",items.value)
         })
         .catch((error) => {
             isLoading.value = false;
             isSnackbar.value = true;
-            message.value = error.message;
+            showSnackbar.value = true
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
 }
 function filterData(addedData) {
-    console.log("existttt")
+     // const existing = items.value.find((e) => e.id === editedData.id);
+    // if (existing) Object.assign(existing, editedData);
     const existing = items.value.find((e) => e.id === addedData.id
 );
     if (existing) Object.assign(existing, addedData);
-    console.log("existttt",items.value,addedData)
 }
 function addCustomerData(addedData) {
     isFromAdd.value = true;
@@ -282,15 +288,17 @@ function confirmClick() {
         .then((res) => {
             deleteDialog.value?.close();
             getCustomers();
-            message.value = res.data.message;
+            showSnackbar.value = true
             isSnackbar.value = true;
+            message.value = res.data.message;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -305,7 +313,6 @@ onMounted(() => {
     listElm.addEventListener('scroll', (e) => {
         if (items.value.length < serverItemsLength.value) {
             if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
-                console.log("scrolled")
                 current_page.value = current_page.value + 1;
                 isFromAdd.value = false;
                 getCustomers();

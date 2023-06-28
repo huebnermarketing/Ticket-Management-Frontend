@@ -32,7 +32,7 @@
                         <v-btn size="large" color="lightprimary" disabled block class="mt-5 text-primary" flat v-if="isClicked"
                             >Reset Password</v-btn
                         >
-                        <v-btn size="large" type="submit" color="lightprimary" block class="mt-5 text-primary" flat v-if="!isClicked"
+                        <v-btn size="large" type="submit" color="primary" block class="mt-5 text-primary" flat v-if="!isClicked"
                             >Reset Password</v-btn
                         >
                     </div>
@@ -43,8 +43,10 @@
                 <v-icon left>{{ icon }}</v-icon>
                 {{ message }}
             </v-snackbar>
-        </v-row>
+        </v-row>    
     </div>
+ <Footer />         
+
 </template>
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -52,6 +54,7 @@ import Logo from '@/layouts/full/logo/Logo.vue';
 import { baseURlApi } from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute, useRouter } from 'vue-router';
+import Footer from '@/components/landingpage/layout/Footer.vue';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
 const route = useRoute();
 const router = useRouter();
@@ -62,7 +65,7 @@ const { confirmpwd, newpwd, confirmpasswordrule, passwordrule } = formValidation
 
 const auth_token = localStorage.getItem('auth-token');
 const token = route.query.token;
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('mdi-check-circle');
@@ -84,7 +87,6 @@ async function resetPassword() {
     if (valid) {
         isClicked.value = true;
         isSnackbar.value = false;
-        showSnackbar.value = true;
         baseURlApi
             .post('auth/reset-password?permission=user-auth', requestBody)
             .then((res) => {
@@ -92,6 +94,7 @@ async function resetPassword() {
                 resetpwd.value?.resetValidation();
                 isClicked.value = false;
                 message.value = res.data.message;
+                showSnackbar.value = true;
                 isSnackbar.value = true;
                 icon.value = 'mdi-check-circle';
                 color.value = 'success';
@@ -99,6 +102,7 @@ async function resetPassword() {
             })
             .catch((error) => {
                 isClicked.value = false;
+                showSnackbar.value = true;
                 isSnackbar.value = true;
                 message.value = error.response.data.message;
                 color.value = 'error';

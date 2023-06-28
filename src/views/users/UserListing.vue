@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col cols="12" md="12">
+        <v-col cols="12" md="12" class="border-0">
             <v-row justify="space-between" class="align-center mb-3">
                 <v-col cols="12" lg="4" md="6">
                     <v-text-field
@@ -33,10 +33,11 @@
                 </transition>
             </div>
             <!-- <div id="infinite-list" style="max-height: calc(100vh - 484px); overflow-y: auto"> -->
-                 <div id="infinite-list">
+            <div id="infinite-list">
                 <!-- :search-value="searchValue" -->
+                <!-- //:server-items-length="serverItemsLength" // -->
                 <EasyDataTable
-                    :rows-per-page="1000"
+                    :rows-per-page="10000"
                     sticky
                     fixed
                     :server-items-length="serverItemsLength"
@@ -44,14 +45,15 @@
                     :fixed-headers="true"
                     :hide-footer="true"
                     :items="items"
-                    :search-value="searchValue"
                     :theme-color="themeColor"
-                    :search="searchField"
                     table-class-name="customize-table"
                     ref="refUserListTable"
                     :loading="isLoading"
                     :sort-by="sortBy"
                     :sort-type="sortType"
+                    :search="searchField"
+                    :search-value="searchValue"
+                    must-sort
                 >
                     <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                     <template #item-first_name="{ first_name, last_name }">
@@ -76,11 +78,31 @@
                             }}</v-chip>
                         </div>
                     </template>
-                    <template #item-action="{ id }">
-                        <div class="d-flex align-center">
+                    <template #item-status="{ is_active }">
+                        <div class="player-wrapper text-capitalize">
+                            <!-- <v-chip :color="is_active == 1 ? 'primary' : 'secondary'">{{ is_active == 1 ? 'Active' : 'Inactive' }}</v-chip> -->
+                            <v-chip
+                                rounded="lg"
+                                v-if="is_active !== 1"
+                                class="font-weight-bold pl-1 pr-2"
+                                color="dark"
+                                size="small"
+                            >
+                                <ClockHour4Icon size="15" class="mr-1" />
+                                Inactive
+                            </v-chip>
+
+                            <v-chip rounded="lg" v-else class="font-weight-bold pl-1 pr-2" color="success" size="small">
+                                <CircleIcon size="15" class="mr-1" />
+                               Active
+                            </v-chip>
+                        </div>
+                    </template>
+                    <template #item-action="{ id, role }">
+                        <div class="d-flex align-center" v-if="id !== user.id && role.id >= user.roles[0].id">
                             <v-tooltip text="Edit">
                                 <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
+                                    <v-btn class="table-icons-common" icon flat @click="openEditDialog(id, role.id)" v-bind="props"
                                         ><PencilIcon stroke-width="1.5" size="20" class="text-primary"
                                     /></v-btn>
                                 </template>
@@ -95,7 +117,7 @@
                             <v-tooltip text="Change password">
                                 <template v-slot:activator="{ props }">
                                     <v-btn class="table-icons-common" icon flat @click="openChangePasswordDialog(id)" v-bind="props"
-                                        ><SendIcon stroke-width="1.5" size="20" class="text-primary"
+                                        ><LockIcon stroke-width="1.5" size="20" class="text-primary"
                                     /></v-btn>
                                 </template>
                             </v-tooltip>
@@ -125,7 +147,7 @@
     </v-row>
 </template>
 <script setup>
-import { onMounted, ref} from 'vue';
+import { onMounted, ref } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import addUser from '@/views/users/addUser.vue';
 import editUser from '@/views/users/editUser.vue';
@@ -139,6 +161,9 @@ const themeColor = ref('rgb(var(--v-theme-secondary))');
 
 const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
+
+/*Login user detail*/
+const user = JSON.parse(localStorage.getItem('user'));
 
 //dialog props
 const dialogTitle = ref('Are you sure you want to delete this user ?');
@@ -155,24 +180,25 @@ const changePasswordFromUser = ref();
 const deleteDialog = ref();
 const refUserListTable = ref();
 
-const breadcrumbs = ref([
-    {
-        text: 'tickets',
-        disabled: false,
-        href: '/tickets'
-    },
-    {
-        text: 'Ticket Listing Table',
-        disabled: true,
-        href: '#'
-    }
-]);
+// const breadcrumbs = ref([
+//     {
+//         text: 'tickets',
+//         disabled: false,
+//         href: '/tickets'
+//     },
+//     {
+//         text: 'Ticket Listing Table',
+//         disabled: true,
+//         href: '#'
+//     }
+// ]);
 
 const headers = ref([
     { text: 'Name', value: 'first_name', sortable: true },
     { text: 'Mobile', value: 'phone', sortable: true },
     { text: 'Email', value: 'email', sortable: true },
     { text: 'User type', value: 'user_type' },
+    { text: 'Status', value: 'status' },
     { text: 'Action', value: 'action' }
 ]);
 const serverItemsLength = ref(50);
@@ -180,7 +206,7 @@ const current_page = ref(1);
 const sortBy = 'first_name';
 const sortType = 'desc';
 const items = ref([]);
-const searchField = ref('name', 'mobile', 'email');
+const searchField = ref('first_name');
 const searchValue = ref('');
 const total_record = ref();
 const deleteId = ref(0);
@@ -188,41 +214,40 @@ const isLoading = ref(false);
 const resizableDiv = ref();
 const isFromAdd = ref(false);
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
 
-const serverOptions = {
-    page: 1,
-    sort_value: sortBy.value,
-    order_by: sortType.value
-};
 const tableHeight = ref(0);
 //get users
-function searchUser() {
-    const fd = new FormData();
-    if(searchValue.value.length > 0){
-    fd.append('search_key', searchValue.value);
-    baseURlApi
-        .post(`user/search-user?total_record=${current_page.value}`, fd)
-        .then((res) => {
-            console.log('res', res);
-        })
-        .catch((error) => {});
-    }
-}
+// function searchUser() {
+//     const fd = new FormData();
+//     if (searchValue.value.length > 0) {
+//         fd.append('search_key', searchValue.value);
+//         baseURlApi
+//             .post(`user/search-user?total_record=${current_page.value}`, fd)
+//             .then((res) => {})
+//             .catch((error) => {
+//                 showSnackbar.value = true;
+//                 isSnackbar.value = true;
+//                 message.value = error.response.data.message;
+//                 color.value = 'error';
+//                 icon.value = 'mdi-close-circle';
+//             });
+//     }
+// }
 function getUsers() {
     isLoading.value = true;
-    const params = { total_record: 50, page: parseInt(current_page.value) };
+    // const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
         .get('/user/get-users')
         .then((res) => {
             isLoading.value = false;
             serverItemsLength.value = res.data.data.total;
-            items.value = res.data.data
+            items.value = res.data.data.data;
             // let itemsData = [];
             // console.log(res.data.data.data
             // )
@@ -261,15 +286,16 @@ function getUsers() {
         })
         .catch((error) => {
             isLoading.value = false;
+            showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
 }
 
 function filterData(editedData) {
-     getUsers();
+    getUsers();
     // const existing = items.value.find((e) => e.id === editedData.id);
     // if (existing) Object.assign(existing, editedData);
 }
@@ -285,11 +311,11 @@ function openAddUserDialog() {
     adduser.value?.open();
     adduser.value?.getRoles();
 }
-function openEditDialog(id) {
+function openEditDialog(id, roleId) {
     editId.value = id;
     edituser.value?.getRoles();
     edituser.value?.open();
-    edituser.value?.getUsersData(id);
+    edituser.value?.getUsersData(id, roleId);
 }
 function openChangePasswordDialog(id) {
     changePasswordFromUser.value?.open(id);
@@ -304,14 +330,16 @@ function confirmClick() {
             deleteDialog.value?.close();
             getUsers();
             message.value = res.data.message;
+            showSnackbar.value = true;
             isSnackbar.value = true;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });

@@ -9,7 +9,7 @@ const show3 = ref(true);
         <v-col cols="12" md="6">
             <div class="mb-6">
                 <v-label class="font-weight-medium mb-2">User Name</v-label>
-                <v-text-field color="primary" variant="outlined" type="text" placeholder="John" hide-details />
+                <v-text-field color="primary" variant="outlined" type="text"  hide-details />
             </div>
             <div>
                 <v-label class="font-weight-medium mb-2">Password</v-label>
@@ -17,7 +17,6 @@ const show3 = ref(true);
                     color="primary"
                     variant="outlined"
                     :type="show2 ? 'text' : 'password'"
-                    placeholder="john.deo"
                     hide-details
                     class="text-subtitle-1"
                     :append-inner-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
@@ -29,7 +28,7 @@ const show3 = ref(true);
         <v-col cols="12" md="6">
             <div class="mb-6">
                 <v-label class="font-weight-medium mb-2">Email</v-label>
-                <v-text-field color="primary" variant="outlined" type="email" placeholder="john.deo" suffix="@example.com" hide-details />
+                <v-text-field color="primary" variant="outlined" type="email" suffix="@example.com" hide-details />
             </div>
             <div>
                 <v-label class="font-weight-medium mb-2">Confirm</v-label>
@@ -37,7 +36,6 @@ const show3 = ref(true);
                     color="primary"
                     variant="outlined"
                     :type="show3 ? 'text' : 'password'"
-                    placeholder="john.deo"
                     hide-details
                     class="text-subtitle-1"
                     :append-inner-icon="show3 ? 'mdi-eye' : 'mdi-eye-off'"

@@ -16,11 +16,56 @@
                                 :rules="requiredrule"
                             >
                             </v-text-field>
-                            <v-btn btn color="primary" type="submit" class="ml-2 mt-1" v-if="!issubmit"> Save </v-btn>
-                            <v-btn btn color="primary" disabled class="ml-2 mt-1" v-if="issubmit"> Save </v-btn>
                         </div>
                     </v-col>
-                    <v-col cols="12" md="3"> </v-col>
+                </v-row>
+                <v-row justify="space-between" class="align-center mb-3">
+                    <v-col cols="12" md="6" lg="6">
+                        <div class="d-flex">
+                            <v-label class="font-weight-medium text-capitalize required mb-4 mr-2">text color</v-label>
+                            <!-- <div
+                                class="color-display mr-4"
+                                :style="{ 'background-color': `${textColor}` }"
+                                @click="istextColor = !istextColor"
+                            ></div> -->
+                         <input
+                                required
+                                class="color-display mr-4"               
+                                name="ticketStatus"
+                                v-model="textColor"
+                                type="color"
+                            />
+                           
+                                <!-- <v-color-picker
+                                    v-model="textColor"
+                                    v-if="istextColor"   
+                                    @blur="focusChange()"
+                                    hide-inputs
+                                    :hide-canvas = istextColor 
+                                    elevation="15"
+                                  
+                                ></v-color-picker> -->
+                           
+                        </div>
+                    </v-col>
+                    <v-col cols="12" md="6" lg="6">
+                        <div class="d-flex">
+                            <v-label class="font-weight-medium text-capitalize required mb-4 mr-2">background color</v-label>
+                            <div
+                                class="color-display mr-4"
+                                :style="{ 'background-color': `${backgroundColor}` }"
+                                @click="isbgColor = !isbgColor"
+                            ></div>
+
+                            <v-color-picker v-model="backgroundColor" v-if="isbgColor" hide-inputs elevation="15"></v-color-picker>
+                        </div>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <v-btn btn color="primary" type="submit" class="ml-2 mt-1" v-if="!issubmit"> Save </v-btn>
+                        <v-btn btn color="primary" disabled class="ml-2 mt-1" v-if="issubmit"> Save </v-btn>
+                    </v-col>
                 </v-row>
             </v-form>
             <div v-if="current_page >= 1">
@@ -31,7 +76,7 @@
                 </transition>
             </div>
             <div id="infinite-list">
-                <v-form @submit.prevent="updateContract()" ref="contractEditForm">
+                <v-form @submit.prevent="" ref="contractEditForm">
                     <EasyDataTable
                         sticky
                         :must-sort="true"
@@ -84,9 +129,10 @@
                                             class="table-icons-common"
                                             icon
                                             flat
+                                            type="submit"
                                             @click="updateTicketStatus(id)"
                                             v-bind="props"
-                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                         <v-btn
                                             v-if="isEditable && id == editID && isEdit"
@@ -95,7 +141,7 @@
                                             flat
                                             disabled
                                             v-bind="props"
-                                            ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                            ><CheckIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                     </template>
                                 </v-tooltip>
@@ -114,7 +160,13 @@
                                 </v-tooltip>
                                 <v-tooltip text="Delete">
                                     <template v-slot:activator="{ props }">
-                                        <v-btn  v-if="id !== editID" class="table-icons-common" icon flat @click="deleteContract(id)" v-bind="props"
+                                        <v-btn
+                                            v-if="id !== editID"
+                                            class="table-icons-common"
+                                            icon
+                                            flat
+                                            @click="deleteContract(id)"
+                                            v-bind="props"
                                             ><TrashIcon stroke-width="1.5" size="20" class="text-error"
                                         /></v-btn>
                                     </template>
@@ -167,11 +219,12 @@ const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
 //dialog props
+const dialog = ref(false);
 const dialogTitle = ref('Are you sure you want to delete this Ticket Status ?');
 const dialogText = ref('This will delete this Ticket Status permanently, you can not undo this action.');
 const cancelText = ref('Cancel');
 const confirmText = ref('Delete');
-const title = ref('Delete Problem Type');
+const title = ref('Delete Ticket Status');
 
 //refs
 const deleteDialog = ref();
@@ -187,7 +240,7 @@ const deleteId = ref(0);
 const isLoading = ref(false);
 const resizableDiv = ref();
 //props for toastification
-const showSnackbar = ref(true);
+const showSnackbar = ref(false);
 const message = ref('');
 const color = ref('');
 const icon = ref('');
@@ -198,6 +251,10 @@ const ticketStatusForm = ref();
 const issubmit = ref(false);
 const editID = ref(0);
 const isEdit = ref(false);
+const textColor = ref('#fff');
+const istextColor = ref(false);
+const isbgColor = ref(false);
+const backgroundColor = ref('#000');
 
 const ticketStatus = ref('');
 const editTicketStatus = ref('');
@@ -227,8 +284,9 @@ async function updateTicketStatus(id) {
                 editID.value = 0;
                 isEdit.value = false;
                 isEditable.value = false;
+                showSnackbar.value = true;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -245,8 +303,9 @@ function editProblem(id) {
             editTicketStatus.value = res.data.data.status_name;
         })
         .catch((error) => {
+            showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -255,7 +314,7 @@ function editProblem(id) {
 //listing
 function getTicketStatus() {
     isLoading.value = true;
-    isSnackbar.value = false;
+    // isSnackbar.value = false;
     baseURlApi
         .get('settings/ticket-status/list')
         .then((res) => {
@@ -268,23 +327,27 @@ function getTicketStatus() {
         })
         .catch((error) => {
             isLoading.value = false;
+            showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
 }
 
+function focusChange(){
+    console.log("focusde")
+}
 //cancel update
 function cancelUpdate(id) {
     isEditable.value = false;
     editID.value = 0;
-    getTicketStatus();
+    // getTicketStatus();
 }
 
 //add ticket status
 async function addProblems() {
-    isSnackbar.value = false;
+    // isSnackbar.value = false;
     const { valid } = await ticketStatusForm.value?.validate();
     if (valid) {
         issubmit.value = true;
@@ -295,9 +358,10 @@ async function addProblems() {
             .post('settings/ticket-status/add', requestBody)
             .then((res) => {
                 issubmit.value = false;
-                message.value = res.data.message;
+                showSnackbar.value = true;
                 isSnackbar.value = true;
                 icon.value = 'mdi-check-circle';
+                message.value = res.data.message;
                 color.value = 'success';
                 ticketStatusForm.value?.reset();
                 ticketStatusForm.value?.resetValidation();
@@ -306,8 +370,9 @@ async function addProblems() {
             })
             .catch((error) => {
                 issubmit.value = false;
+                showSnackbar.value = true;
                 isSnackbar.value = true;
-                message.value = error.message;
+                message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
             });
@@ -326,15 +391,17 @@ function confirmClick() {
         .then((res) => {
             deleteDialog.value?.close();
             getTicketStatus();
-            message.value = res.data.message;
+            showSnackbar.value = true;
             isSnackbar.value = true;
             icon.value = 'mdi-check-circle';
+            message.value = res.data.message;
             color.value = 'success';
         })
         .catch((error) => {
             deleteDialog.value?.close();
+            showSnackbar.value = true;
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
@@ -375,5 +442,21 @@ onMounted(() => {
 .fade-enter,
 .fade-leave-to {
     opacity: 0;
+}
+.color-display {
+    width: 70px;
+    height: 50px;
+    border-radius: 12px;
+    border-color:#e0e0e0;
+    /* border: 1px solid black; */
+}
+
+@media only screen and (max-width: 500px) {
+    .color-display {
+        margin: 0 !important;
+        text-align: center;
+        width: 100% !important;
+        height: 60px !important;
+    }
 }
 </style>

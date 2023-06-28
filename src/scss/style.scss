@@ -52,3 +52,11 @@
     min-width: unset !important;
     width: fit-content !important;
 }
+.v-input--disabled .v-input__control {
+    background :#e0e0e0;
+    border-radius: 6px;
+    // background: #000 !important;
+}
+// .v-field__input{
+//     padding: 23px;
+// }

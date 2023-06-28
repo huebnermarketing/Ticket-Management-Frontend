@@ -4,10 +4,25 @@
     <!-- ---------------------------------------------- -->
     <v-menu :close-on-content-click="true">
         <template v-slot:activator="{ props }">
+            <div class="d-none">{{userProfile}}</div>
             <v-btn class="custom-hover-primary" variant="text" v-bind="props" icon>
                 <v-avatar size="35" class="border">
-                    <img v-if="userData.profile_photo" :src="userData.profile_photo" width="35" alt="Julia" height="35" style="object-fit: cover !important" />
-                    <img v-if="!userData.profile_photo" src="@/assets/images/profile/user.png" width="35" alt="Julia" height="35" style="object-fit: cover !important" />
+                    <img
+                        v-if="userProfile || userData.profile_photo"
+                        :src="userProfile.value ? userProfile.value:userData.profile_photo"
+                        width="35"
+                        alt="Julia"
+                        height="35"
+                        style="object-fit: cover !important"
+                    />
+                    <img
+                        v-if="!userData.profile_photo && userProfile.value == ''"
+                        src="@/assets/images/profile/user.png"
+                        width="35"
+                        alt="Julia"
+                        height="35"
+                        style="object-fit: cover !important"
+                    />
                 </v-avatar>
             </v-btn>
         </template>
@@ -40,21 +55,30 @@
                         </div>
                     </div>
                 </div>
-                <v-divider></v-divider>
+                <!-- <v-divider></v-divider> -->
+                <hr class="v-divider v-theme--BLUE_THEME" aria-orientation="horizontal" role="separator" />
             </div>
             <!-- <perfect-scrollbar style="height: calc(100vh - 240px); max-height: 240px"> -->
-            <perfect-scrollbar>
-                <v-list class="py-0 theme-list" lines="two">
-                    <v-list-item v-for="item in profileDD" :key="item.title" class="py-2 px-4 custom-text-primary" :to="item.href">
+            <perfect-scrollbar class="list-main">
+                <v-list class="py-0 p-0 theme-list" lines="two">
+                    <v-list-item
+                        v-for="(item, i) in profileDD"
+                        :key="item.title"
+                        class="custom-text-primary p-0 list-items"
+                        :to="item.href"
+                    >
                         <template v-slot:prepend>
-                            <v-avatar size="48" class="mr-3" rounded="md">
+                            <!-- <v-avatar size="48" class="mr-3" rounded="md">
+                                <SettingsIcon size="18" stroke-width="1.5" />
+                            </v-avatar> -->
+                            <v-avatar size="48" color="lightprimary" class="mr-3" rounded="md" v-if="i == 1">
+                                <UserIcon size="18" stroke-width="1.5" />
+                            </v-avatar>
+                            <v-avatar size="48" color="lightprimary" class="mr-3" rounded="md" v-if="i == 0">
                                 <SettingsIcon size="18" stroke-width="1.5" />
                             </v-avatar>
-                            <!-- <v-avatar size="48" color="lightprimary" class="mr-3" rounded="md"  v-if="i == 1">
-                                <UserIcon size="18" stroke-width="1.5" />
-                            </v-avatar> -->
                         </template>
-                        <div>
+                        <div class="mb-2">
                             <h6 class="text-subtitle-1 font-weight-bold custom-title">{{ item.title }}</h6>
                         </div>
                         <p class="text-subtitle-1 font-weight-regular textSecondary">{{ item.subtitle }}</p>
@@ -82,13 +106,15 @@
     </v-snackbar>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { ref, computed,onMounted } from 'vue';
 import { MailIcon, SettingsIcon, UserIcon } from 'vue-tabler-icons';
 import proUser1 from '@/assets/images/svgs/icon-account.svg';
 import proUser2 from '@/assets/images/svgs/icon-inbox.svg';
 import { baseURlApi } from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute, useRouter } from 'vue-router';
+import { useCustomerAddressStore } from '@/stores/customerAddress';
+const store = useCustomerAddressStore();
 const { logout } = useAuthStore();
 
 const route = useRoute();
@@ -101,17 +127,20 @@ const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
 const userData = JSON.parse(localStorage.getItem('user'));
+const userProfile = ref('');
 const profileDD = [
     {
         // avatar: JSON.parse(localStorage.getItem('user')).profile_photo,
         title: 'Company Setting',
         href: '/pages/company-settings',
+        subtitle: 'Manage organizational level settings',
         icon: SettingsIcon
     },
     {
         // avatar: JSON.parse(localStorage.getItem('user')).profile_photo,
         title: 'User Profile',
         href: '/apps/user/profile',
+        subtitle: ' Account Settings',
         icon: UserIcon
     }
 ];
@@ -127,13 +156,16 @@ function loggedout() {
         })
         .catch((error) => {
             isSnackbar.value = true;
-            message.value = error.message;
+            message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
         });
 }
+ userProfile.value = computed(() => {
+    return store.getUserProfile;
+});
 // onMounted(()=>{
-//     JSON.parse(localStorage.getItem('user')).profile_photo
+//    console.log('updatedd', store.getUserProfile)
 // })
 </script>
 <style scoped>
@@ -144,5 +176,11 @@ function loggedout() {
     text-align: right !important;
     font-size: 16px !important;
     text-transform: capitalize !important;
+}
+.list-main {
+    padding: 16px 32px !important;
+}
+.list-items {
+    padding-left: 0 !important;
 }
 </style>

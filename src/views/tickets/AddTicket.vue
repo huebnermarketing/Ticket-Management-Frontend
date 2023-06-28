@@ -34,75 +34,146 @@
                                 <v-row>
                                     <!---------------------------------- customer name --------------------------------->
                                     <v-col cols="12" md="6">
-                                        <!-- {{ searchCustomer }} -->
-                                        <!-- v-model:search="searchCustomer" -->
-                                        <!-- @update:modelValue="getAddress()"
-                                            @click:clear="getInitialData(), clearInput()"
-                                            @keydown.enter.capture.prevent.stop -->
-                                        <!-- v-model="selectedCustomer" v-model:search="searchCustomer" 
-                                       
-                                        item-value="id" :hide-no-data="false" :items="selectCustomerList" -->
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Customer Name</v-label>
-                                        <v-combobox
-                                            :items="selectCustomerList"
-                                            :item-title="getFieldText"
-                                            clearable
-                                            v-model="selectedCustomer"
-                                            v-model:search="searchCustomer"
-                                            @keydown.enter.capture.prevent.stop
-                                            @click:clear="getInitialData(), clearInput()"
-                                            @update:modelValue="getAddress()"
-                                            bg-color="none"
-                                            item-value="id"
-                                            :hide-no-data="false"
-                                            base-color="none"
-                                            density="comfortable"
-                                            variant="outlined"
-                                            ref="customerComboBox"
-                                            open-on-clear
-                                            return-object
-                                            auto-complete="off"
-                                        >
-                                            <template v-slot:selection="{ item }">
-                                                <!-- {{getText(item)}} -->
-                                                <span>
-                                                    <!-- ertyuy -->
-                                                    ppppp
-                                                    <!-- {{ item.value.first_name + ' ' + item.value.last_name }} -->
-                                                    <!-- -{{ selectedCustomer.phone ? selectedCustomer.phone : '' }} -->
-                                                </span>
-                                            </template>
-                                            <!-- <template v-slot:item="{ item }">
-                                              {{  item.first_name ? item.first_name : '' + ' ' + item.last_name ? item.last_name :
-                                                '' + item.phone ? '-(' + item.phone + ')' : '' }}
-                                            </template> -->
-                                            <!-- <span v-if="!isExistingCustomer">{{ selectedCustomer.first_name }} </span> -->
+                                        <v-menu open-on-focus>
+                                            <template v-slot:activator="{ props }">
+                                                <v-text-field
+                                                    @click:clear="
+                                                        () => {
+                                                            customerSearchModel = '';
+                                                            selectedCustomerModel = {};
+                                                            isExistingCustomer = false;
+                                                            selectAddress = '';
+                                                            addressLineOne = '';
+                                                            area = '';
+                                                            city = '';
+                                                            zipcode = '';
+                                                            state = '';
 
-                                            <template v-slot:no-data>
-                                                <v-list-item>
+                                                            countryName = 'India';
+                                                            companyName = '';
+                                                            mobile = '';
+                                                            getInitialData();
+                                                            clearInput();
+                                                        }
+                                                    "
+                                                    clearable
+                                                    hide-details
+                                                    placeholder="Type minimum 3 characters to search for existing customers"
+                                                    browser-autocomplete="name"
+                                                    name="name"
+                                                    v-bind="props"
+                                                    @keyup="searchNewCustomers"
+                                                    v-model="customerSearchModel"
+                                                ></v-text-field>
+                                            </template>
+                                            <v-list class="pa-0">
+                                                <v-row v-if="!filteredCustomers.length && customerSearchModel.length" class="ma-0">
+                                                    <v-col cols="12">No customers found matching "{{ customerSearchModel }}"</v-col>
+                                                    <v-col>
+                                                        <v-btn
+                                                            color="primary"
+                                                            @click.capture.prevent.stop="addTempCustomer(customerSearchModel)"
+                                                        >
+                                                            + Add New Customer</v-btn
+                                                        >
+                                                    </v-col>
+                                                </v-row>
+                                                <v-list-item
+                                                    v-for="(item, index) in filteredCustomers"
+                                                    :key="index"
+                                                    @click.stop="
+                                                        () => {
+                                                            selectedCustomerModel = item;
+                                                            customerSearchModel = (
+                                                                selectedCustomerModel.first_name +
+                                                                '' +
+                                                                ' ' +
+                                                                (selectedCustomerModel.last_name || '')
+                                                            ).trim();
+                                                            getAddress(item);
+                                                            isExistingCustomer = true;
+                                                        }
+                                                    "
+                                                >
                                                     <v-list-item-title>
-                                                        No results matching "<strong>{{ searchCustomer }}</strong
-                                                        >"
-                                                        <div class="mt-2">
-                                                            <v-btn
-                                                                flat
-                                                                class="table-icons-common text-left flat bg-primary"
-                                                                @click.prevent.stop="onEnter(e)"
-                                                            >
-                                                                <PlusIcon size="16" class="text-left" /> Add new customer</v-btn
-                                                            >
-                                                        </div>
+                                                        {{ item.first_name }} {{ item.last_name }}
+                                                        <template v-if="item.phone"> - ({{ item.phone }})</template>
                                                     </v-list-item-title>
                                                 </v-list-item>
-                                            </template>
+                                            </v-list>
+                                        </v-menu>
+                                        <template v-if="false">
+                                            <!-- {{ searchCustomer }} -->
+                                            <!-- v-model:search="searchCustomer" -->
+                                            <!-- @update:modelValue="getAddress()"
+                                                @click:clear="getInitialData(), clearInput()"
+                                                @keydown.enter.capture.prevent.stop -->
+                                            <!-- v-model="selectedCustomer" v-model:search="searchCustomer" 
+                                        
+                                            item-value="id" :hide-no-data="false" :items="selectCustomerList" -->
+                                            <v-label class="mb-2 font-weight-medium text-capitalize required">Customer Name</v-label>
+                                            <v-combobox
+                                                :items="selectCustomerList"
+                                                :item-title="getFieldText"
+                                                clearable
+                                                v-model="selectedCustomer"
+                                                v-model:search="searchCustomer"
+                                                @keydown.enter.capture.prevent.stop
+                                                @click:clear="getInitialData(), clearInput()"
+                                                @update:modelValue="getAddress()"
+                                                bg-color="none"
+                                                item-value="id"
+                                                :hide-no-data="false"
+                                                base-color="none"
+                                                density="comfortable"
+                                                variant="outlined"
+                                                ref="customerComboBox"
+                                                open-on-clear
+                                                return-object
+                                                auto-complete="off"
+                                            >
+                                                <template v-slot:selection="{ item }">
+                                                    <!-- {{getText(item)}} -->
+                                                    <span>
+                                                        <!-- ertyuy -->
+                                                        ppppp
+                                                        <!-- {{ item.value.first_name + ' ' + item.value.last_name }} -->
+                                                        <!-- -{{ selectedCustomer.phone ? selectedCustomer.phone : '' }} -->
+                                                    </span>
+                                                </template>
+                                                <!-- <template v-slot:item="{ item }">
+                                                {{  item.first_name ? item.first_name : '' + ' ' + item.last_name ? item.last_name :
+                                                    '' + item.phone ? '-(' + item.phone + ')' : '' }}
+                                                </template> -->
+                                                <!-- <span v-if="!isExistingCustomer">{{ selectedCustomer.first_name }} </span> -->
 
-                                            <!-- <template v-slot:append-item>
-                                            <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
-                                                ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
-                                            /></v-btn>
-                                        </template> -->
-                                        </v-combobox>
-                                        <!-- <v-text-field v-model="customerName" variant="outlined" color="primary"></v-text-field> -->
+                                                <template v-slot:no-data>
+                                                    <v-list-item>
+                                                        <v-list-item-title>
+                                                            No results matching "<strong>{{ searchCustomer }}</strong
+                                                            >"
+                                                            <div class="mt-2">
+                                                                <v-btn
+                                                                    flat
+                                                                    class="table-icons-common text-left flat bg-primary"
+                                                                    @click.prevent.stop="onEnter(e)"
+                                                                >
+                                                                    <PlusIcon size="16" class="text-left" /> Add new customer</v-btn
+                                                                >
+                                                            </div>
+                                                        </v-list-item-title>
+                                                    </v-list-item>
+                                                </template>
+
+                                                <!-- <template v-slot:append-item>
+                                                <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
+                                                    ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
+                                                /></v-btn>
+                                            </template> -->
+                                            </v-combobox>
+                                            <!-- <v-text-field v-model="customerName" variant="outlined" color="primary"></v-text-field> -->
+                                        </template>
                                     </v-col>
                                     <!---------------------------------- Mobile Number --------------------------------->
                                     <v-col cols="12" md="6">
@@ -816,9 +887,11 @@ async function createTicket() {
         issubmit.value = true;
         const requestBody = {
             ticket_type: tiketTypeRadio.value,
-            customer_name: selectedCustomer.value.first_name + ' ' + selectedCustomer.value.last_name,
+            // customer_name: selectedCustomer.value.first_name + ' ' + selectedCustomer.value.last_name,
+            // customer_name: selectedCustomer.value.first_name + selectedCustomer.value.last_name,
+            customer_name: [selectedCustomerModel.value.first_name, selectedCustomerModel.value.last_name].join(' '),
             is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
-            customer_id: isExistingCustomer.value == true ? selectedCustomer.value.id : '',
+            customer_id: isExistingCustomer.value == true ? selectedCustomerModel.value.id : '',
             email: customerEmail.value,
             customer_locations_id: selectAddress.value ? selectAddress.value.id : '',
             company_name: companyName.value,
@@ -933,15 +1006,30 @@ function searchCustomers() {
             .catch((error) => {});
     }
 }
-function getAddress() {
-    mobile.value = selectedCustomer.value?.phone;
-    customerEmail.value = selectedCustomer.value?.email;
-    if (selectedCustomer.value) {
+function searchNewCustomers() {
+    clearTimeout(searchTimer.value);
+    searchTimer.value = setTimeout(() => {
+        if (customerSearchModel.value.trim().length < 3) return;
+        const fd = new FormData();
+        fd.append('search_text', customerSearchModel.value);
+        baseURlApi
+            .post(`customer/search?total_record=50`, fd)
+            .then((res) => {
+                selectCustomerList.value = res.data.data.data;
+            })
+            .catch((error) => {});
+    }, 400);
+}
+function getAddress(customer) {
+    customer = customer || selectedCustomer.value || {};
+    mobile.value = customer.phone;
+    customerEmail.value = customer.email;
+    if (Object.keys(customer).length) {
         isExistingCustomer.value = true;
     }
-    if (selectedCustomer.value?.id) {
+    if (customer.id) {
         baseURlApi
-            .get(`ticket/get-customer-address/${selectedCustomer.value.id}`)
+            .get(`ticket/get-customer-address/${customer.id}`)
             .then((res) => {
                 console.log('valll', res.data.data);
                 addressOptions.value = res.data.data;
@@ -1058,6 +1146,64 @@ const fromDateDisp = computed(() => {
     return fromDateVal.value;
     // format/do something with date
 });
+const filteredCustomers = computed(() => {
+    if (customerSearchModel.value?.length < 3) {
+        return [];
+    }
+    const _model = (customerSearchModel.value || '').toLowerCase().trim();
+    // return selectCustomerList.value.filter(e=>{
+    //     debugger
+    //     return (
+    //         (e.first_name || '') +
+    //         (e.last_name || '') +
+    //         (e.phone || '')
+    //     ).toLowerCase().trim().includes(_model)
+    // })
+    // return selectCustomerList.value.filter(e=>{
+    //     return ((e.first_name || '').toLowerCase().includes(_model)
+    //     || (e.last_name || '').toLowerCase().includes(_model)
+    //     || (e.phone+'').includes(_model))
+    // })
+    return selectCustomerList.value.filter((e) => {
+        return _model
+            .split(' ')
+            .some(
+                (m) =>
+                    (e.first_name || '').toLowerCase().includes(m) ||
+                    (e.last_name || '').toLowerCase().includes(m) ||
+                    (e.phone + '').includes(m)
+            );
+    });
+});
+const customerSearchModel = ref('');
+const selectedCustomerModel = ref({});
+const searchTimer = ref({});
+
+function addTempCustomer(custName) {
+    const [first, last] = custName
+        .split(' ')
+        .map((e) => e.trim())
+        .filter(Boolean);
+    const newCustomer = {
+        first_name: first || '',
+        last_name: last || '',
+        phone: '',
+        id: selectCustomerList.value.length + 1
+    };
+    selectCustomerList.value.unshift(newCustomer);
+    isExistingCustomer.value = false;
+    selectAddress.value = '';
+    addressLineOne.value = '';
+    area.value = '';
+    city.value = '';
+    zipcode.value = '';
+    state.value = '';
+
+    countryName.value = 'India';
+    companyName.value = '';
+    mobile.value = '';
+    // selectCustomerList.value.unshift(val);
+}
 
 onMounted(() => {
     getTickets();
@@ -1074,11 +1220,14 @@ watch(isExistingCustomer.value, (newval, old) => {
 });
 </script>
 <style scoped>
-.v-input--density-default, .v-field--variant-solo, .v-field--variant-filled {
+.v-input--density-default,
+.v-field--variant-solo,
+.v-field--variant-filled {
     --v-input-control-height: 45px;
     --v-input-padding-top: 9px;
 }
-.v-input--density-default .v-field--variant-outlined, .v-input--density-default .v-field--single-line{
+.v-input--density-default .v-field--variant-outlined,
+.v-input--density-default .v-field--single-line {
     --v-field-padding-bottom: 0 !important;
 }
 .v-tab--selected .v-tab__slider {
@@ -1115,4 +1264,3 @@ div.v-tabs-bar {
     margin-left: 20px !important;
 }
 </style>
-

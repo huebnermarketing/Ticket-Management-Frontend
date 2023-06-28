@@ -1,8 +1,8 @@
 <template>
     <v-row no-gutters>
-        <v-col cols="12" md="12">
+        <v-col cols="12" md="12" lg="12">
             <!---------------------------------- Add new tiket status --------------------------------->
-            <v-form @submit.prevent="addProblems()" ref="ticketStatusForm">
+            <v-form @submit.prevent="addProblems()" ref="ticketStatusForm" style="padding: 16px 12px">
                 <v-row justify="space-between" class="align-center mb-3">
                     <v-col cols="12" md="6" lg="6">
                         <div class="d-flex">
@@ -16,58 +16,59 @@
                                 :rules="requiredrule"
                             >
                             </v-text-field>
+                            <!-- <chrome-picker
+                                @input="getColorValue()"
+                                v-model="ticketStatus.hex"
+                                 :value="colors.hex : (colors.hex = hexValue)"
+                            />
+                            -->
                         </div>
                     </v-col>
-                </v-row>
-                <v-row justify="space-between" class="align-center mb-3">
-                    <v-col cols="12" md="6" lg="6">
-                        <div class="d-flex">
+                    <v-col cols="12" md="6" lg="6" class="d-flex">
+                        <div class="d-flex mb-2">
                             <v-label class="font-weight-medium text-capitalize required mb-4 mr-2">text color</v-label>
-                            <!-- <div
-                                class="color-display mr-4"
+                            <label
+                                for="txtColor"
+                                class="color-display player-wrapper mr-4"
                                 :style="{ 'background-color': `${textColor}` }"
-                                @click="istextColor = !istextColor"
-                            ></div> -->
-                         <input
+                            ></label>
+
+                            <input
                                 required
-                                class="color-display mr-4"               
+                                class="hide-color"
+                                id="txtColor"
                                 name="ticketStatus"
                                 v-model="textColor"
                                 type="color"
+                                :rules="requiredrule"
                             />
-                           
-                                <!-- <v-color-picker
-                                    v-model="textColor"
-                                    v-if="istextColor"   
-                                    @blur="focusChange()"
-                                    hide-inputs
-                                    :hide-canvas = istextColor 
-                                    elevation="15"
-                                  
-                                ></v-color-picker> -->
-                           
                         </div>
-                    </v-col>
-                    <v-col cols="12" md="6" lg="6">
-                        <div class="d-flex">
+                        <div class="d-flex mb-2 justify-start ml-5">
                             <v-label class="font-weight-medium text-capitalize required mb-4 mr-2">background color</v-label>
-                            <div
-                                class="color-display mr-4"
-                                :style="{ 'background-color': `${backgroundColor}` }"
-                                @click="isbgColor = !isbgColor"
-                            ></div>
-
-                            <v-color-picker v-model="backgroundColor" v-if="isbgColor" hide-inputs elevation="15"></v-color-picker>
+                            <label for="bgColor" class="color-display mr-4" :style="{ 'background-color': `${backgroundColor}` }"></label>
+                            <input
+                                required
+                                class="hide-color"
+                                id="bgColor"
+                                name="ticketStatus"
+                                v-model="backgroundColor"
+                                type="color"
+                                :rules="requiredrule"
+                            />
                         </div>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-btn btn color="primary" type="submit" class="ml-2 mt-1" v-if="!issubmit"> Save </v-btn>
-                        <v-btn btn color="primary" disabled class="ml-2 mt-1" v-if="issubmit"> Save </v-btn>
+                        <v-btn btn color="primary" type="submit" class="mt-1" v-if="!issubmit"> Save </v-btn>
+                        <v-btn btn color="primary" disabled class="mt-1" v-if="issubmit"> Save </v-btn>
                     </v-col>
                 </v-row>
             </v-form>
+        </v-col>
+        <v-divider class="mb-5"></v-divider>
+
+        <v-col cols="12" md="12">
             <div v-if="current_page >= 1">
                 <transition name="fade">
                     <div class="loading" v-if="isLoading">
@@ -92,6 +93,7 @@
                         table-class-name="customize-table"
                         :loading="isLoading"
                     >
+                        <!------------------------------------- ticekt status -------------------------------------->
                         <template #item-ticket_status="{ status_name, id }">
                             <div class="player-wrapper text-capitalize" v-if="id !== editID">
                                 {{ status_name }}
@@ -106,6 +108,57 @@
                                 :rules="requiredrule"
                             >
                             </v-text-field>
+                        </template>
+                        <!------------------------------------- text color -------------------------------------->
+
+                        <template #item-text_color="{ text_color, id }">
+                            <div
+                                v-if="id !== editID"
+                                class="color-display-tb-row mr-4 player-wrapper"
+                                :style="{ 'background-color': `${text_color}` }"
+                            ></div>
+                            <div class="d-flex lbl-txt-color" v-if="isEditable && id == editID">
+                                <label
+                                    for="txtColor1"
+                                    class="color-display-tb-row input-txt-color"
+                                    :style="{ 'background-color': `${editTextColor}` }"
+                                ></label>
+
+                                <input
+                                    required
+                                    class="hide-color"
+                                    id="txtColor1"
+                                    name="ticketStatus"
+                                    v-model="editTextColor"
+                                    type="color"
+                                    :rules="requiredrule"
+                                />
+                            </div>
+                        </template>
+                        <!------------------------------------- background color -------------------------------------->
+
+                        <template #item-background_color="{ background_color, id }">
+                            <div
+                                v-if="id !== editID"
+                                class="color-display-tb-row mr-4 player-wrapper"
+                                :style="{ 'background-color': `${background_color}` }"
+                            ></div>
+                            <div v-if="isEditable && id == editID" class="d-flex lbl-txt-color">
+                                <label
+                                    for="bgColor1"
+                                    class="color-display-tb-row mr-4 player-wrapper input-txt-color"
+                                    :style="{ 'background-color': `${editBgColor}` }"
+                                ></label>
+                                <input
+                                    required
+                                    class="hide-color"
+                                    id="bgColor1"
+                                    name="ticketStatus"
+                                    v-model="editBgColor"
+                                    type="color"
+                                    :rules="requiredrule"
+                                />
+                            </div>
                         </template>
                         <template #item-action="{ id, is_lock }">
                             <div class="d-flex align-center" v-if="is_lock == 0">
@@ -203,7 +256,7 @@
     </v-row>
 </template>
 <script setup>
-import { onMounted, ref, watch, defineExpose } from 'vue';
+import { onMounted, ref, watch, defineExpose, defineComponent } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
 
@@ -213,7 +266,10 @@ import dialogBox from '@/components/TicketComponents/dialog.vue';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import 'vue3-easy-data-table/dist/style.css';
+
 const themeColor = ref('rgb(var(--v-theme-secondary))');
+
+
 
 const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
@@ -232,8 +288,11 @@ const contractEditForm = ref();
 
 const headers = ref([
     { text: 'Ticket Status', value: 'ticket_status' },
+    { text: 'Text Color', value: 'text_color' },
+    { text: 'Background Color', value: 'background_color' },
     { text: 'Action', value: 'action' }
 ]);
+
 
 const items = ref([]);
 const deleteId = ref(0);
@@ -251,13 +310,15 @@ const ticketStatusForm = ref();
 const issubmit = ref(false);
 const editID = ref(0);
 const isEdit = ref(false);
-const textColor = ref('#fff');
+const textColor = ref('#ffffff');
 const istextColor = ref(false);
 const isbgColor = ref(false);
-const backgroundColor = ref('#000');
+const backgroundColor = ref('#000000');
 
 const ticketStatus = ref('');
 const editTicketStatus = ref('');
+const editTextColor = ref('');
+const editBgColor = ref('');
 
 //update
 async function updateTicketStatus(id) {
@@ -265,7 +326,9 @@ async function updateTicketStatus(id) {
     if (valid) {
         isEdit.value = true;
         const requestBody = {
-            status_name: editTicketStatus.value
+            status_name: editTicketStatus.value,
+            background_color: editBgColor.value,
+            text_color: editTextColor.value
         };
         baseURlApi
             .post(`settings/ticket-status/update/${id}`, requestBody)
@@ -301,6 +364,8 @@ function editProblem(id) {
             editID.value = id;
             isEditable.value = true;
             editTicketStatus.value = res.data.data.status_name;
+            editTextColor.value = res.data.data.text_color;
+            editBgColor.value = res.data.data.background_color;
         })
         .catch((error) => {
             showSnackbar.value = true;
@@ -335,8 +400,8 @@ function getTicketStatus() {
         });
 }
 
-function focusChange(){
-    console.log("focusde")
+function focusChange() {
+    console.log('focusde');
 }
 //cancel update
 function cancelUpdate(id) {
@@ -352,7 +417,9 @@ async function addProblems() {
     if (valid) {
         issubmit.value = true;
         const requestBody = {
-            status_name: ticketStatus.value
+            status_name: ticketStatus.value,
+            background_color: backgroundColor.value,
+            text_color: textColor.value
         };
         baseURlApi
             .post('settings/ticket-status/add', requestBody)
@@ -447,16 +514,38 @@ onMounted(() => {
     width: 70px;
     height: 50px;
     border-radius: 12px;
-    border-color:#e0e0e0;
-    /* border: 1px solid black; */
+    border: 1px solid #e0e0e0;
+    margin-bottom: 12px;
 }
+.color-display-tb-row {
+    width: 50px;
+    height: 35px;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 12px;
+}
+.lbl-txt-color {
+    border: 1px solid #e0e0e0;
+    margin-bottom: 13px;
+    border-radius: 5px;
+}
+.input-txt-color {
+    margin: 5px;
+}
+.hide-color{
+    visibility: hidden;
+    opacity: 0;
+    width: 0;
+    height: 0;
 
+}
 @media only screen and (max-width: 500px) {
     .color-display {
         margin: 0 !important;
         text-align: center;
         width: 100% !important;
         height: 60px !important;
+        margin-bottom: 12px;
     }
 }
 </style>

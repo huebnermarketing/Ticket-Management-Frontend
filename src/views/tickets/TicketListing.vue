@@ -8,7 +8,7 @@
 
                     <TopCards :topCardsData="topCardsData" />
                 </v-col>
-                <v-col cols="12" lg="4" md="6">
+                <!-- <v-col cols="12" lg="4" md="6">
                     <v-text-field
                         density="compact"
                         @input="searchUser()"
@@ -17,8 +17,8 @@
                         hide-details
                         variant="outlined"
                     ></v-text-field>
-                </v-col>
-                <v-col cols="12" md="3">
+                </v-col> -->
+                <v-col cols="12" md="12">
                     <div class="d-flex gap-2 justify-end">
                         <v-btn btn color="primary" @click="openAddTicket()">
                             <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add Ticket
@@ -134,9 +134,9 @@
                             <!-- :color="ticket_priority.id == 1 ? 'error' :ticket_priority.id == 3 ? 'warning' : 'success'" -->
                             <v-chip :color="'#fff'">
                                 <!-- <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-error" /> -->
-                                <img src="@/assets/images/svgs/High.svg" alt="icon" v-if="ticket_priority.id == 1" />
-                                <img src="@/assets/images/svgs/Low.svg" alt="icon" v-if="ticket_priority.id == 2" />
-                                <img src="@/assets/images/svgs/Medium.svg" alt="icon" v-if="ticket_priority.id == 3" />
+                                <img src="@/assets/images/svgs/High.svg" alt="icon" v-if="ticket_priority.unique_id == 10001" />
+                                <img src="@/assets/images/svgs/Low.svg" alt="icon" v-if="ticket_priority.unique_id == 10002" />
+                                <img src="@/assets/images/svgs/Medium.svg" alt="icon" v-if="ticket_priority.unique_id == 10003" />
 
                                 <!-- <ArrowNarrowDownIcon v-if="ticket_priority.id == 2" stroke-width="1.5" size="20" class="text-success" /> -->
                             </v-chip>

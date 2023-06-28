@@ -14,7 +14,7 @@
                             <v-radio-group v-model="tiketTypeRadio" inline class="d-flex justify-flexstart ticket-type-radio">
                                 <v-radio class="font-weight-medium text-capitalize" label="Adhoc" value="adhoc" color="primary"></v-radio>
                                 <v-radio
-                                    class="font-weight-medium text-capitalize"
+                                    class="font-weight-medium text-capitalize border-1"
                                     label="Contract"
                                     value="contract"
                                     color="primary"
@@ -29,37 +29,41 @@
                                 <v-row>
                                     <!---------------------------------- customer name --------------------------------->
                                     <v-col cols="12" md="6">
+                                        <!-- {{ searchCustomer }} -->
+                                        <!-- v-model:search="searchCustomer" -->
+                                        <!-- @update:modelValue="getAddress()"
+                                            @click:clear="getInitialData(), clearInput()"
+                                            @keydown.enter.capture.prevent.stop -->
+                                        <!-- v-model="selectedCustomer" v-model:search="searchCustomer" 
+                                       
+                                        item-value="id" :hide-no-data="false" :items="selectCustomerList" -->
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Customer Name</v-label>
                                         <v-combobox
+                                            :items="selectCustomerList"
+                                            :item-title="getFieldText"
+                                            clearable
                                             v-model="selectedCustomer"
                                             v-model:search="searchCustomer"
-                                            :item-title="getFieldText"
+                                            @keydown.enter.capture.prevent.stop
+                                            @click:clear="getInitialData(), clearInput()"
+                                            @update:modelValue="getAddress()"
+                                            bg-color="none"
                                             item-value="id"
                                             :hide-no-data="false"
-                                            :items="selectCustomerList"
-                                            @update:modelValue="getAddress()"
-                                            @click:clear="getInitialData()"
-                                          
-                                            @keydown.enter.capture.prevent.stop
-                                            clearable
-                                            return-object
-                                            bg-color="none"
                                             base-color="none"
                                             density="comfortable"
                                             variant="outlined"
                                             ref="customerComboBox"
                                             open-on-clear
+                                            return-object
+                                            auto-complete="off"
                                         >
                                             <template v-slot:selection="{ item }">
                                                 <!-- {{getText(item)}} -->
                                                 <span>
-                                                    {{ item.value.first_name + ' ' + item.value.last_name }}
-                                                    <!-- {{
-
-                                                        selectedCustomer.first_name + ' ' + selectedCustomer.last_name
-                                                            ? selectedCustomer.last_name
-                                                            : '' 
-                                                    }}  -->
+                                                    <!-- ertyuy -->
+                                                    ppppp
+                                                    <!-- {{ item.value.first_name + ' ' + item.value.last_name }} -->
                                                     <!-- -{{ selectedCustomer.phone ? selectedCustomer.phone : '' }} -->
                                                 </span>
                                             </template>
@@ -123,12 +127,14 @@
                                             persistent-counter
                                         >
                                             <template v-slot:prepend-item>
-                                                <v-btn color="primary" flat @click="addNewAddress()" v-bind="props"
-                                                    ><PlusIcon stroke-width="1.5" size="20" class="text-white text-end" /><span
-                                                        class="text-end"
-                                                        >Add new address</span
-                                                    ></v-btn
-                                                >
+                                                <div style="text-align: right; padding: 4px 10px 10px">
+                                                    <v-btn color="primary" class="m-0 p-0" flat @click="addNewAddress()" v-bind="props"
+                                                        ><PlusIcon stroke-width="1.5" size="20" class="text-white text-end" /><span
+                                                            class="text-end"
+                                                            >Add new address</span
+                                                        ></v-btn
+                                                    >
+                                                </div>
                                             </template>
                                         </v-combobox>
                                     </v-col>
@@ -387,7 +393,7 @@
                                         ></v-select>
                                     </v-col>
                                     <!---------------------------------- collected amount --------------------------------->
-                                    <v-col cols="12" md="6">
+                                    <v-col cols="12" md="6" v-if="paymentStatus.unique_id !== '10003' && paymentStatus.unique_id !== '10004'">
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">collected amount</v-label>
                                         <v-text-field
                                             v-model="collectedAmount"
@@ -409,7 +415,7 @@
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- payment mode --------------------------------->
-                                    <v-col cols="12" md="6" v-if="paymentStatus.payment_type !== 'Unpaid'">
+                                    <v-col cols="12" md="6" v-if="paymentStatus.unique_id !== '10003' && paymentStatus.unique_id !== '10004'">
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">payment mode</v-label>
                                         <v-select
                                             v-model="paymentMode"
@@ -660,6 +666,15 @@ const collectAmountRule = [
         return 'This field must be a positive value.';
     }
 ];
+function renderItemTitle(item) {
+    const fname = item?.raw?.first_name;
+    const lname = item?.raw?.last_name;
+    const phone = item?.raw?.phone;
+    const name = [fname, lname].filter(Boolean).join(' ');
+    if (phone) return name + ' - (' + phone + ')';
+    // return name
+    return item.title;
+}
 function getinputs() {
     console.log('caledd');
     addressLineOne.value = selectAddress.value?.address_line1;
@@ -671,14 +686,14 @@ function getinputs() {
     companyName.value = selectAddress.value?.company_name;
 }
 function getCustomersList() {
-const params = { total_record: 50, page: parseInt(current_page.value) };
+    const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
-        .get('customer/list',{ params })
+        .get('customer/list', { params })
         .then((res) => {
             //  isLoading.value = false;
             //  serverItemsLength.value = res.data.data.total;
-             selectCustomerList.value = res.data.data.data
-             console.log("selecteddd list", res.data.data.data)
+            selectCustomerList.value = res.data.data.data;
+            console.log('selecteddd list', res.data.data.data);
         })
         .catch((error) => {
             // isLoading.value = false;
@@ -765,6 +780,16 @@ function onEnterProblem() {
 }
 
 /*methods*/
+function onBlur() {
+    if (searchCustomer.value?.length) {
+        const newItem = {
+            first_name: selectedCustomer.value,
+            id: selectCustomerList.value.length + 1
+        };
+        // selectCustomerList.value.unshift(newItem)
+        selectedCustomer.value = newItem;
+    }
+}
 async function createTicket() {
     const { valid } = await createticketform.value?.validate();
     const problem_type = problemType.value.map((data) => {
@@ -838,12 +863,14 @@ function getFieldText(item) {
     console.log('itemmm', item);
 
     console.log('item exx', item);
-    return (
-        `${item.first_name ? item.first_name : ''}` +
-        ' ' +
-        `${item.last_name ? item.last_name : ''}` +
-        `${item.phone ? '-(' + item.phone + ')' : ''}`
-    );
+    
+        return (
+            `${item?.first_name ? item.first_name : ''}` +
+            ' ' +
+            `${item?.last_name ? item.last_name : ''}` +
+            ` ${item?.phone ? '-(' + item.phone + ')' : ''}`
+        );
+    
 }
 function addNewAddress() {
     addressLineOne.value = '';
@@ -875,20 +902,25 @@ function clearOnInput() {
     selectedCustomer.value = null;
 }
 function searchCustomers() {
+    console.log('sssss', selectedCustomer.value);
     const fd = new FormData();
-    if(searchCustomer.value.length > 0){
-    fd.append('search_text', searchCustomer.value);
-    baseURlApi
-        .post(`customer/search?total_record=${current_page.value}`, fd)
-        .then((res) => {
-        })
-        .catch((error) => {});
+    if (selectedCustomer.value.length > 0) {
+        fd.append('search_text', selectedCustomer.value);
+        baseURlApi
+            .post(`customer/search?total_record=${current_page.value}`, fd)
+            .then((res) => {
+                console.log('seacghg', res.data.data.data);
+                customerOptions.value = res.data.data.data;
+            })
+            .catch((error) => {});
     }
 }
 function getAddress() {
     mobile.value = selectedCustomer.value?.phone;
     customerEmail.value = selectedCustomer.value?.email;
-    isExistingCustomer.value = true;
+    if (selectedCustomer.value) {
+        isExistingCustomer.value = true;
+    }
     if (selectedCustomer.value?.id) {
         baseURlApi
             .get(`ticket/get-customer-address/${selectedCustomer.value.id}`)
@@ -930,12 +962,12 @@ function getTickets() {
             assignErOptions.value = data.assign_engineer;
             ticketStatusOptions.value = data.ticket_status;
             data.ticket_status.map((data) => {
-                if (data.id == 1) {
+                if (data.unique_id == '10001') {
                     ticketStatus.value = data;
                 }
             });
             data.payment_status.map((data) => {
-                if (data.id == 1) {
+                if (data.unique_id == '10003') {
                     paymentStatus.value = data;
                 }
             });
@@ -943,7 +975,7 @@ function getTickets() {
             paymentStatusOptions.value = data.payment_status;
             paymentModeOptions.value = data.payment_mode;
             TicketpriorityOptions.value = data.ticket_priorities;
-            getCustomersList()
+            getCustomersList();
             // selectCustomerList.value = data.customers;
         })
         .catch((error) => {
@@ -955,29 +987,31 @@ function getTickets() {
         });
 }
 function getInitialData() {
-    console.log('clickrdd');
-    customerComboBox.value.reset();
     isExistingCustomer.value = false;
+    console.log('clickrdd', isExistingCustomer.value);
     selectedCustomer.value = null;
     searchCustomer.value = '';
     selectAddress.value = '';
+    customerComboBox.value.reset();
 }
 function clearInput() {
-    console.log('clearrr');
-    const data = (searchCustomer.value || '').trim();
+    isExistingCustomer.value = false;
+    // getAddress()
+    console.log('clearrr', isExistingCustomer.value);
+    // const data = (searchCustomer.value || '').trim();
 
-    if (!selectCustomerList.value.includes(data)) {
-        console.log('clearrr111');
-        selectedCustomer.value = null;
-        isExistingCustomer.value = false;
-        selectAddress.value = '';
-    } else {
-        isExistingCustomer.value = true;
-    }
+    // if (!selectCustomerList.value.includes(data)) {
+    //     console.log('clearrr111');
+    //     selectedCustomer.value = null;
+    //     isExistingCustomer.value = false;
+    //     selectAddress.value = '';
+    // } else {
+    //     isExistingCustomer.value = true;
+    // }
 }
 function getInitialDataProblemType() {
     problemType.value = '';
-    isExistingCustomer.value = false;
+    // isExistingCustomer.value = false;
 }
 function addNewCustomer() {
     console.log('ddd');
@@ -1002,11 +1036,14 @@ onMounted(() => {
     getTickets();
 });
 
-watch(selectedCustomer.value, (val) => {
-    if (val.length > 5) {
-        this.$nextTick(() => selectedCustomer.value.pop());
-        console.lof('watchh', selectedCustomer.value);
-    }
+// watch(selectedCustomer.value, (val) => {
+//     if (val.length > 5) {
+//         this.$nextTick(() => selectedCustomer.value.pop());
+//         console.lof('watchh', selectedCustomer.value);
+//     }
+// });
+watch(isExistingCustomer.value, (newval, old) => {
+    console.lof('watchh1111', newval, old);
 });
 </script>
 <style scoped>

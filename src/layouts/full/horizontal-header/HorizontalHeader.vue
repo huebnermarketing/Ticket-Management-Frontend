@@ -1,19 +1,10 @@
 <script setup>
 import { ref, watch, computed } from 'vue';
 import { useCustomizerStore } from '../../../stores/customizer';
-import { useEcomStore } from '@/stores/apps/eCommerce';
-// Icon Imports
 import { GridDotsIcon, LanguageIcon, SearchIcon, Menu2Icon, BellRingingIcon, ShoppingCartIcon } from 'vue-tabler-icons';
 import Logo from '../logo/Logo.vue';
 import RtlLogo from '../logo/RtlLogo.vue';
-
-// dropdown imports
-// import LanguageDD from '../vertical-header/LanguageDD.vue';
-// import NotificationDD from '../vertical-header/NotificationDD.vue';
 import ProfileDD from '../vertical-header/ProfileDD.vue';
-// import Navigations from '../vertical-header/Navigations.vue';
-// import Searchbar from '../vertical-header/Searchbar.vue';
-// import RightMobileSidebar from '../vertical-header/RightMobileSidebar.vue';
 
 const customizer = useCustomizerStore();
 const showSearch = ref(false);
@@ -26,12 +17,6 @@ function searchbox() {
 watch(priority, (newPriority) => {
     // yes, console.log() is a side effect
     priority.value = newPriority;
-});
-
-// count items
-const store = useEcomStore();
-const getCart = computed(() => {
-    return store.cart;
 });
 </script>
 
@@ -93,15 +78,6 @@ const getCart = computed(() => {
             <!-- ---------------------------------------------- -->
 
             <NotificationDD />
-
-            <!-- ---------------------------------------------- -->
-            <!-- ShoppingCart -->
-            <!-- ---------------------------------------------- -->
-            <v-btn icon variant="text" color="primary" to="/ecommerce/checkout">
-                <v-badge color="error" :content="getCart?.length">
-                    <ShoppingCartIcon stroke-width="1.5" size="22" />
-                </v-badge>
-            </v-btn>
 
             <!-- right sidebar -->
             <v-btn class="hidden-lg-and-up ml-3" icon rounded="sm" @click.stop="appsdrawer = !appsdrawer" variant="flat">

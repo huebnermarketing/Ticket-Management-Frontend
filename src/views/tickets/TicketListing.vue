@@ -1,211 +1,212 @@
 
 <template>
-    <v-row no-gutters v-show="router.currentRoute.value.name === 'Tickets'">
-        <v-col cols="12" md="12">
-            <v-row justify="space-between" class="align-center mb-3">
-                <v-col cols="12">
-                    <!-- <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb> -->
+    <v-container v-scroll="onScroll" fluid class="pa-0">
+        <v-row no-gutters v-show="router.currentRoute.value.name === 'Tickets'">
+            <v-col cols="12" md="12">
+                <v-row justify="space-between" class="align-center mb-3">
+                    <v-col cols="12">
+                        <!-- <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb> -->
 
-                    <TopCards :topCardsData="topCardsData" />
-                </v-col>
-                <!-- <v-col cols="12" lg="4" md="6">
-                    <v-text-field
-                        density="compact"
-                        @input="searchUser()"
-                        v-model="searchValue"
-                        label="Search"
-                        hide-details
-                        variant="outlined"
-                    ></v-text-field>
-                </v-col> -->
-                <v-col cols="12" md="12">
-                    <div class="d-flex gap-2 justify-end">
-                        <v-btn btn color="primary" @click="openAddTicket()">
-                            <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add Ticket
-                        </v-btn>
-                        <!-- <v-btn btn color="primary">
-                            <FilterIcon stroke-width="1.5" size="20" class="text-white" />
-                        </v-btn> -->
-                    </div>
-                </v-col>
-            </v-row>
-            <!-- style="height:300px !important; overflow-y: scroll !important" -->
+                        <TopCards :topCardsData="topCardsData" />
+                    </v-col>
+                    <!-- <v-col cols="12" lg="4" md="6">
+                        <v-text-field
+                            density="compact"
+                            @input="searchUser()"
+                            v-model="searchValue"
+                            label="Search"
+                            hide-details
+                            variant="outlined"
+                        ></v-text-field>
+                    </v-col> -->
+                    <v-col cols="12" md="12">
+                        <div class="d-flex gap-2 justify-end">
+                            <v-btn btn color="primary" @click="openAddTicket()">
+                                <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add Ticket
+                            </v-btn>
+                            <!-- <v-btn btn color="primary">
+                                <FilterIcon stroke-width="1.5" size="20" class="text-white" />
+                            </v-btn> -->
+                        </div>
+                    </v-col>
+                </v-row>
+                <!-- style="height:300px !important; overflow-y: scroll !important" -->
 
-            <div v-if="current_page > 1">
-                <transition name="fade">
-                    <div class="loading" v-if="isLoading">
-                        <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
-                    </div>
-                </transition>
-            </div>
-            <div id="infinite-list" style="max-height: calc(100vh - 380px); overflow-y: auto">
-                <!-- :search-value="searchValue" -->
-                <EasyDataTable
-                    :rows-per-page="10000000"
-                    sticky
-                    fixed
-                    id="ticketlist"
-                    responsive
-                    :server-items-length="serverItemsLength"
-                    :headers="headers"
-                    :fixed-headers="true"
-                    :hide-footer="true"
-                    :items="items"
-                    :search-value="searchValue"
-                    :theme-color="themeColor"
-                    :search="searchField"
-                    table-class-name="customize-table"
-                    ref="refCustomerListTable"
-                    :loading="isLoading"
-                    :sort-by="sortBy"
-                    :sort-type="sortType"
-                    must-sort
-                >
-                    <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
-                    <template #item-id="{ unique_id }">
-                        <div class="player-wrapper text-capitalize">
-                            #{{ unique_id }}
+                <!-- <div v-if="current_page > 1">
+                    <transition name="fade">
+                        <div class="loading" v-if="isLoading">
+                            <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
                         </div>
-                    </template>
-                    <template #item-customer_name="{ customer }">
-                        <div class="player-wrapper text-capitalize">
-                            {{ customer.first_name + ' ' + customer.last_name }}
-                        </div>
-                    </template>
-                    <template #item-problem_title="{ problem_title }">
-                        <div class="player-wrapper text-capitalize">
-                            {{ problem_title }}
-                        </div>
-                    </template>
-                    <template #item-mobile="{ customer }">
-                        <div class="d-none">
-                            {{
-                                customer.phones.map((data) => {
-                                    if (data.is_primary == 1) {
-                                        mobile = data.phone;
-                                    }
-                                })
-                            }}
-                        </div>
-                        <div class="player-wrapper">
-                            {{ mobile }}
-                        </div>
-                    </template>
-                    <template #item-company_name="{ customer_location }">
-                        <div class="player-wrapper">
-                            {{ customer_location.company_name }}
-                        </div>
-                    </template>
-                    <template #item-due_date="{ due_date }">
-                        <div class="player-wrapper">
-                            {{ due_date }}
-                        </div>
-                    </template>
-                    <template #item-engineer="{ assigned_engineer }">
-                        <div class="player-wrapper">
-                            <v-avatar size="35" class="border">
-                                <img
-                                    v-if="assigned_engineer.profile_photo"
-                                    :src="assigned_engineer.profile_photo"
-                                    width="35"
-                                    alt="Julia"
-                                    height="35"
-                                    style="object-fit: cover !important"
-                                />
-                                <img
-                                    v-if="!assigned_engineer.profile_photo"
-                                    src="@/assets/images/profile/user.png"
-                                    width="35"
-                                    alt="Julia"
-                                    height="35"
-                                    style="object-fit: cover !important"
-                                />
-                            </v-avatar>
-                            <span class="ml-2">{{ assigned_engineer.first_name + ' ' + assigned_engineer.last_name }}</span>
-                        </div>
-                    </template>
-                    <template #item-appointment_type="{ appointment_type }">
-                        <div class="player-wrapper">
-                            {{ appointment_type.appointment_name }}
-                        </div>
-                    </template>
-                    <template #item-priority="{ ticket_priority }">
-                        <div class="player-wrapper">
-                            <!-- :color="ticket_priority.id == 1 ? 'error' :ticket_priority.id == 3 ? 'warning' : 'success'" -->
-                            <v-chip :color="'#fff'">
-                                <!-- <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-error" /> -->
-                                <img src="@/assets/images/svgs/High.svg" alt="icon" v-if="ticket_priority.unique_id == 10001" />
-                                <img src="@/assets/images/svgs/Low.svg" alt="icon" v-if="ticket_priority.unique_id == 10002" />
-                                <img src="@/assets/images/svgs/Medium.svg" alt="icon" v-if="ticket_priority.unique_id == 10003" />
+                    </transition>
+                </div> -->
+                <div id="infinite-list">
+                    <!-- :search-value="searchValue" -->
+                    <EasyDataTable
+                        sticky
+                        fixed
+                        id="ticketlist"
+                        responsive
+                        :server-items-length="serverItemsLength"
+                        :headers="headers"
+                        :fixed-headers="true"
+                        :hide-footer="true"
+                        :items="items"
+                        :search-value="searchValue"
+                        :theme-color="themeColor"
+                        :search="searchField"
+                        table-class-name="customize-table"
+                        ref="refCustomerListTable"
+                        :loading="isLoading && current_page === 1"
+                        :sort-by="sortBy"
+                        :sort-type="sortType"
+                        must-sort
+                    >
+                        <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
+                        <template #item-id="{ unique_id }">
+                            <div class="player-wrapper text-capitalize">
+                                #{{ unique_id }}
+                            </div>
+                        </template>
+                        <template #item-customer_name="{ customer }">
+                            <div class="player-wrapper text-capitalize">
+                                {{ customer.first_name + ' ' + customer.last_name }}
+                            </div>
+                        </template>
+                        <template #item-problem_title="{ problem_title }">
+                            <div class="player-wrapper text-capitalize">
+                                {{ problem_title }}
+                            </div>
+                        </template>
+                        <template #item-mobile="{ customer }">
+                            <div class="d-none">
+                                {{
+                                    customer.phones.map((data) => {
+                                        if (data.is_primary == 1) {
+                                            mobile = data.phone;
+                                        }
+                                    })
+                                }}
+                            </div>
+                            <div class="player-wrapper">
+                                {{ mobile }}
+                            </div>
+                        </template>
+                        <template #item-company_name="{ customer_location }">
+                            <div class="player-wrapper">
+                                {{ customer_location.company_name }}
+                            </div>
+                        </template>
+                        <template #item-due_date="{ due_date }">
+                            <div class="player-wrapper">
+                                {{ due_date }}
+                            </div>
+                        </template>
+                        <template #item-engineer="{ assigned_engineer }">
+                            <div class="player-wrapper">
+                                <v-avatar size="35" class="border">
+                                    <img
+                                        v-if="assigned_engineer.profile_photo"
+                                        :src="assigned_engineer.profile_photo"
+                                        width="35"
+                                        alt="Julia"
+                                        height="35"
+                                        style="object-fit: cover !important"
+                                    />
+                                    <img
+                                        v-if="!assigned_engineer.profile_photo"
+                                        src="@/assets/images/profile/user.png"
+                                        width="35"
+                                        alt="Julia"
+                                        height="35"
+                                        style="object-fit: cover !important"
+                                    />
+                                </v-avatar>
+                                <span class="ml-2">{{ assigned_engineer.first_name + ' ' + assigned_engineer.last_name }}</span>
+                            </div>
+                        </template>
+                        <template #item-appointment_type="{ appointment_type }">
+                            <div class="player-wrapper">
+                                {{ appointment_type.appointment_name }}
+                            </div>
+                        </template>
+                        <template #item-priority="{ ticket_priority }">
+                            <div class="player-wrapper">
+                                <!-- :color="ticket_priority.id == 1 ? 'error' :ticket_priority.id == 3 ? 'warning' : 'success'" -->
+                                <v-chip :color="'#fff'">
+                                    <!-- <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-error" /> -->
+                                    <img src="@/assets/images/svgs/High.svg" alt="icon" v-if="ticket_priority.unique_id == 10001" />
+                                    <img src="@/assets/images/svgs/Low.svg" alt="icon" v-if="ticket_priority.unique_id == 10002" />
+                                    <img src="@/assets/images/svgs/Medium.svg" alt="icon" v-if="ticket_priority.unique_id == 10003" />
 
-                                <!-- <ArrowNarrowDownIcon v-if="ticket_priority.id == 2" stroke-width="1.5" size="20" class="text-success" /> -->
-                            </v-chip>
-                        </div>
-                    </template>
-                    <template #item-ticket_status="{ ticket_status }">
-                        <div class="player-wrapper">
-                            <v-chip :color="'primary'">{{ ticket_status.status_name }} </v-chip>
-                        </div>
-                    </template>
-                    <template #item-payment_status="{ payment_status }">
-                        <div class="player-wrapper">
-                            <v-chip :color="payment_status.background_color" :text-color="payment_status.text_color"
-                                >{{ payment_status.payment_type }}
-                            </v-chip>
-                        </div>
-                    </template>
-                    <!-- <template #item-company_name="{ company_name }">
-                        <div class="player-wrapper">
-                            {{ company_name }}
-                        </div>
-                    </template> -->
-                    <template #item-action="{ id }">
-                        <div class="d-flex align-center">
-                            <v-tooltip text="View">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="openAddTicket()" v-bind="props"
-                                        ><EyeIcon stroke-width="1.5" size="20" class="text-primary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Edit">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
-                                        ><PencilIcon stroke-width="1.5" size="20" class="text-secondary"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="Delete">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="deleteTicket(id)" v-bind="props"
-                                        ><TrashIcon stroke-width="1.5" size="20" class="text-error"
-                                    /></v-btn>
-                                </template>
-                            </v-tooltip>
-                        </div>
-                    </template>
-                </EasyDataTable>
-            </div>
-        </v-col>
-        <dialogBox
-            ref="deleteDialog"
-            @confirClk="confirmClick()"
-            @cancelClk="cancelClick()"
-            :dialogText="dialogText"
-            :confirmText="confirmText"
-            :dialogTitle="dialogTitle"
-            :cancelText="cancelText"
-            :title="title"
-        />
+                                    <!-- <ArrowNarrowDownIcon v-if="ticket_priority.id == 2" stroke-width="1.5" size="20" class="text-success" /> -->
+                                </v-chip>
+                            </div>
+                        </template>
+                        <template #item-ticket_status="{ ticket_status }">
+                            <div class="player-wrapper">
+                                <v-chip :color="'primary'">{{ ticket_status.status_name }} </v-chip>
+                            </div>
+                        </template>
+                        <template #item-payment_status="{ payment_status }">
+                            <div class="player-wrapper">
+                                <v-chip :color="payment_status.background_color" :text-color="payment_status.text_color"
+                                    >{{ payment_status.payment_type }}
+                                </v-chip>
+                            </div>
+                        </template>
+                        <!-- <template #item-company_name="{ company_name }">
+                            <div class="player-wrapper">
+                                {{ company_name }}
+                            </div>
+                        </template> -->
+                        <template #item-action="{ id }">
+                            <div class="d-flex align-center">
+                                <v-tooltip text="View">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
+                                            ><EyeIcon stroke-width="1.5" size="20" class="text-primary"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Edit">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
+                                            ><PencilIcon stroke-width="1.5" size="20" class="text-secondary"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="Delete">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn class="table-icons-common" icon flat @click="deleteTicket(id)" v-bind="props"
+                                            ><TrashIcon stroke-width="1.5" size="20" class="text-error"
+                                        /></v-btn>
+                                    </template>
+                                </v-tooltip>
+                            </div>
+                        </template>
+                    </EasyDataTable>
+                </div>
+            </v-col>
+            <dialogBox
+                ref="deleteDialog"
+                @confirClk="confirmClick()"
+                @cancelClk="cancelClick()"
+                :dialogText="dialogText"
+                :confirmText="confirmText"
+                :dialogTitle="dialogTitle"
+                :cancelText="cancelText"
+                :title="title"
+            />
 
-        <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
-            <v-icon left>{{ icon }}</v-icon>
-            {{ message }}
-        </v-snackbar>
-        <addCustomer ref="addcustomer" @addCustomerClicked="addCustomerData" />
-        <editCustomer ref="editcustomer" @updateClicked="filterData" />
-    </v-row>
-    <router-view />
+            <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
+                <v-icon left>{{ icon }}</v-icon>
+                {{ message }}
+            </v-snackbar>
+            <addCustomer ref="addcustomer" @addCustomerClicked="addCustomerData" />
+            <editCustomer ref="editcustomer" @updateClicked="filterData" />
+        </v-row>
+        <router-view />
+    </v-container>
 </template>
 <script setup>
 import { onMounted, ref, watch, defineExpose, onUpdated } from 'vue';
@@ -252,7 +253,50 @@ const breadcrumbs = ref([
         href: '#'
     }
 ]);
-const topCardsData = ref([]);
+const topCardsData = ref([
+    {
+        title: 'Unresolved',
+        key: 'unresolved',
+        number: ticketDashboard.value.unresolved,
+        bgcolor: 'lightprimary',
+        textcolor: 'primary'
+    },
+    {
+        title: 'Overdue',
+        key: 'overdue',
+        number: ticketDashboard.value.overdue,
+        bgcolor: 'lightwarning',
+        textcolor: 'warning'
+    },
+    {
+        title: 'Due Today',
+        key: 'due_today',
+        number: ticketDashboard.value.due_today,
+        bgcolor: 'lightprimary',
+        textcolor: 'primary'
+    },
+    {
+        title: 'Due This Week',
+        key: 'due_this_week',
+        number: ticketDashboard.value.due_this_week,
+        bgcolor: 'lightwarning',
+        textcolor: 'warning'
+    },
+    {
+        title: 'Partially Paid',
+        key: 'partially_paid',
+        number: ticketDashboard.value.partially_paid,
+        bgcolor: 'lightprimary',
+        textcolor: 'primary'
+    },
+    {
+        title: 'Unpaid',
+        key: 'unpaid',
+        number: ticketDashboard.value.unpaid,
+        bgcolor: 'lightwarning',
+        textcolor: 'warning'
+    }
+]);
 
 const headers = ref([
     { text: 'Id', value: 'id'},
@@ -289,7 +333,7 @@ const timer = ref(5000);
 const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
-
+const totalItems = ref(0)
 //get users
 function searchUser() {
     const fd = new FormData();
@@ -301,86 +345,76 @@ function searchUser() {
             .catch((error) => {});
     }
 }
+function updateTopCardValues() {
+    topCardsData.value.forEach((e) => {
+        e.number = ticketDashboard.value[e.key]
+    })
+}
+function onScroll(e) {
+    // if (e.scrollTop + e.clientHeight >= e.scrollHeight) {
+    //     current_page.value = current_page.value + 1;
+    //     isFromAdd.value = false;
+    //     getTickets();
+    // }
+    const el = e.target?.scrollingElement
+    if (!el) return
+    if (current_page.value > 1 && items.value.length >= totalItems.value) return
+    const scrollPercent =
+        (100 * el.scrollTop) / (el.scrollHeight - el.clientHeight)
+    if (scrollPercent > 50) {
+        getTickets()
+    }
+}
 function getTickets() {
+    if (current_page.value > 1 && (items.value.length >= totalItems.value) || isLoading.value) return
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
         .get('ticket/list', { params })
         .then((res) => {
             isLoading.value = false;
-            ticketDashboard.value = res.data.data.ticketDashboard;
-            topCardsData.value.push(
-                {
-                    title: 'Unresolved',
-                    number: ticketDashboard.value.unresolved,
-                    bgcolor: 'lightprimary',
-                    textcolor: 'primary'
-                },
-                {
-                    title: 'Overdue',
-                    number: ticketDashboard.value.overdue,
-                    bgcolor: 'lightwarning',
-                    textcolor: 'warning'
-                },
-                {
-                    title: 'Due Today',
-                    number: ticketDashboard.value.due_today,
-                    bgcolor: 'lightprimary',
-                    textcolor: 'primary'
-                },
-                {
-                    title: 'Due This Week',
-                    number: ticketDashboard.value.due_this_week,
-                    bgcolor: 'lightwarning',
-                    textcolor: 'warning'
-                },
-                {
-                    title: 'Partially Paid',
-                    number: ticketDashboard.value.partially_paid,
-                    bgcolor: 'lightprimary',
-                    textcolor: 'primary'
-                },
-                {
-                    title: 'Unpaid',
-                    number: ticketDashboard.value.unpaid,
-                    bgcolor: 'lightwarning',
-                    textcolor: 'warning'
-                }
-            );
             console.log('dataa11', res.data.data.allTicket.data);
             serverItemsLength.value = res.data.data.allTicket.total;
-            let itemsData = [];
-            if (isFromAdd.value) {
-                let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data);
+            totalItems.value = res.data.data.allTicket.total
+            
+            ticketDashboard.value = res.data.data.ticketDashboard;
+            updateTopCardValues()
+            if (0){
+                let itemsData = [];
+                if (isFromAdd.value) {
+                    let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data);
 
-                // Declare an empty object
-                let uniqueObject = {};
+                    // Declare an empty object
+                    let uniqueObject = {};
 
-                // Loop for the array elements
-                for (let i in newArray) {
-                    // Extract the title
-                    let objid = newArray[i]['id'];
+                    // Loop for the array elements
+                    for (let i in newArray) {
+                        // Extract the title
+                        let objid = newArray[i]['id'];
 
-                    // Use the title as the index
-                    uniqueObject[objid] = newArray[i];
+                        // Use the title as the index
+                        uniqueObject[objid] = newArray[i];
+                    }
+
+                    // Loop to push unique object into array
+                    for (let i in uniqueObject) {
+                        itemsData.push(uniqueObject[i]);
+                    }
+                } else {
+                    itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data));
                 }
-
-                // Loop to push unique object into array
-                for (let i in uniqueObject) {
-                    itemsData.push(uniqueObject[i]);
-                }
-            } else {
-                itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data));
+                items.value = itemsData.slice();
+                items.value = JSON.parse(JSON.stringify(items.value));
+                const proxy = new Proxy(items.value, {
+                    get(target, prop, receiver) {
+                        return target[prop];
+                    }
+                });
+                items.value = [...proxy];
+                items.value = [...JSON.parse(JSON.stringify(items.value))];
             }
-            items.value = itemsData.slice();
-            items.value = JSON.parse(JSON.stringify(items.value));
-            const proxy = new Proxy(items.value, {
-                get(target, prop, receiver) {
-                    return target[prop];
-                }
-            });
-            items.value = [...proxy];
-            items.value = [...JSON.parse(JSON.stringify(items.value))];
+            items.value.push(...res.data.data.allTicket.data)
+            current_page.value++
         })
         .catch((error) => {
             isLoading.value = false;
@@ -465,17 +499,8 @@ function deleteTicket(id) {
     deleteDialog.value?.open();
 }
 onMounted(() => {
-    console.log("list mounted called")
-    const listElm = document.querySelector('#infinite-list');
-    listElm.addEventListener('scroll', (e) => {
-        if (items.value.length < serverItemsLength.value) {
-            if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
-                current_page.value = current_page.value + 1;
-                isFromAdd.value = false;
-                getTickets();
-            }
-        }
-    });
+    // const listElm = document.querySelector('#infinite-list');
+    // listElm.addEventListener('scroll', );
     getTickets();
       
 });

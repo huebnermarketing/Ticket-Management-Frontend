@@ -5,7 +5,7 @@
                 <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
             </v-col>
             <v-col cols="10" style="margin: 0 auto">
-                <h5 class="text-h5 mb-6 mt-3">Create New Ticket</h5>
+                <h5 class="text-h5 mb-6 mt-3">Edit Ticket</h5>
                 <v-card elevation="10" class="t-add-card" rounded="md">
                     <!------------------------------------ Ticket type ----------------------------------->
                     <v-row style="padding: 20px 20px 0 20px">
@@ -368,8 +368,7 @@
                                         <v-text-field
                                             v-model="collectedAmount"
                                             variant="outlined"
-                                            color="primary"
-                                            :rules="collectAmountRule"
+                                            color="primary"                                      
                                             @input="remainAmount"
                                             disabled="true"
                                         ></v-text-field>
@@ -932,12 +931,6 @@ function searchCustomers() {
     }
 }
 function getAddress(customerId) {
-    // customer = customer || selectedCustomer.value || {};
-    // mobile.value = customer.phone;
-    // customerEmail.value = customer.email;
-    // if (Object.keys(customer).length) {
-    //     isExistingCustomer.value = true;
-    // }
     if (customerId) {
         baseURlApi
             .get(`ticket/get-customer-address/${customerId}`)
@@ -969,11 +962,6 @@ function getTickets() {
                     ticketStatus.value = data;
                 }
             });
-            // data.payment_status.map((data) => {
-            //     if (data.unique_id == '10003') {
-            //         paymentStatus.value = data;
-            //     }
-            // });
             appointmentTypeOptions.value = data.appointment_type;
             paymentStatusOptions.value = data.payment_status;
             paymentModeOptions.value = data.payment_mode;

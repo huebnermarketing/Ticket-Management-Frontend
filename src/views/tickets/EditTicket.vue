@@ -527,7 +527,6 @@
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import BasicHeaderForm from '@/components/forms/form-layouts/BasicHeaderForm.vue';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';

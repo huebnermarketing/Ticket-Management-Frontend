@@ -31,6 +31,12 @@ const MainRoutes = {
                     exact:true,
                     component: () => import('@/views/tickets/AddTicket.vue'),
                 },
+                {
+                    name: 'EditTickets',
+                    path: '/tickets/edit-ticket',
+                    exact:true,
+                    component: () => import('@/views/tickets/EditTicket.vue'),
+                },
             ]
         },
 //---------------------------------- Contracts ---------------------------------------------//

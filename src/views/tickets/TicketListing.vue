@@ -163,7 +163,7 @@
                             <div class="d-flex align-center">
                                 <v-tooltip text="View">
                                     <template v-slot:activator="{ props }">
-                                        <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
+                                        <v-btn class="table-icons-common" icon flat @click.stop v-bind="props"
                                             ><EyeIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                     </template>

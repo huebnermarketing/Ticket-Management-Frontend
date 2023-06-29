@@ -412,10 +412,10 @@ function openAddTicket() {
     });
 }
 function openEditDialog(id) {
+     localStorage.setItem("ticketId",id)
      console.log("openn")
       router.push({
         name: 'EditTickets',
-        params: { id: parseInt(id) }
     });
     // editcustomer.value?.addaddressData()
 }

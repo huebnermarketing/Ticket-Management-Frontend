@@ -38,78 +38,30 @@
                                         <v-menu open-on-focus>
                                             <template v-slot:activator="{ props }">
                                                 <v-text-field
-                                                    @click:clear="
-                                                        () => {
-                                                            customerSearchModel = '';
-                                                            selectedCustomerModel = {};
-                                                            isExistingCustomer = false;
-                                                            selectAddress = '';
-                                                            addressLineOne = '';
-                                                            area = '';
-                                                            city = '';
-                                                            zipcode = '';
-                                                            state = '';
-
-                                                            countryName = 'India';
-                                                            companyName = '';
-                                                            mobile = '';
-                                                            getInitialData();
-                                                            clearInput();
-                                                            customerEmail.value = '';
-                                                        }
-                                                    "
                                                     clearable
                                                     hide-details
                                                     placeholder="Type minimum 3 characters to search for existing customers"
                                                     browser-autocomplete="name"
                                                     name="name"
                                                     v-bind="props"
-                                                    @keyup="searchNewCustomers"
                                                     v-model="customerSearchModel"
                                                     ref="customInput"
+                                                    disabled="true"
                                                 ></v-text-field>
                                             </template>
-                                            <v-list class="pa-0">
-                                                <v-row v-if="!filteredCustomers.length && customerSearchModel.length" class="ma-0">
-                                                    <v-col cols="12">No customers found matching "{{ customerSearchModel }}"</v-col>
-                                                    <v-col>
-                                                        <v-btn
-                                                            color="primary"
-                                                            @click.capture.prevent.stop="addTempCustomer(customerSearchModel)"
-                                                        >
-                                                            + Add New Customer</v-btn
-                                                        >
-                                                    </v-col>
-                                                </v-row>
-                                                <v-list-item
-                                                    v-for="(item, index) in filteredCustomers"
-                                                    :key="index"
-                                                    @click.stop="
-                                                        () => {
-                                                            selectedCustomerModel = item;
-                                                            customerSearchModel = (
-                                                                selectedCustomerModel.first_name +
-                                                                '' +
-                                                                ' ' +
-                                                                (selectedCustomerModel.last_name || '')
-                                                            ).trim();
-                                                            getAddress(item);
-                                                            isExistingCustomer = true;
-                                                        }
-                                                    "
-                                                >
-                                                    <v-list-item-title>
-                                                        {{ item.first_name }} {{ item.last_name }}
-                                                        <template v-if="item.phone"> - ({{ item.phone }})</template>
-                                                    </v-list-item-title>
-                                                </v-list-item>
-                                            </v-list>
                                         </v-menu>
                                     </v-col>
                                     <!---------------------------------- Mobile Number --------------------------------->
                                     <v-col cols="12" md="6">
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Mobile Number</v-label>
-                                        <v-text-field v-model="mobile" color="primary" variant="outlined" type="text" :rules="mobilerule" />
+                                        <v-text-field
+                                            v-model="mobile"
+                                            color="primary"
+                                            variant="outlined"
+                                            type="text"
+                                            :rules="mobilerule"
+                                            disabled="true"
+                                        />
                                     </v-col>
                                     <!---------------------------------- Address --------------------------------->
                                     <v-col cols="12" md="6">
@@ -360,6 +312,7 @@
                                             variant="outlined"
                                             label="Please select ticket status"
                                             :rules="ticketdropdownrule"
+                                            disabled="true"
                                         ></v-select>
                                     </v-col>
                                     <!---------------------------------- Appointment type --------------------------------->
@@ -418,6 +371,7 @@
                                             color="primary"
                                             :rules="collectAmountRule"
                                             @input="remainAmount"
+                                            disabled="true"
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- Remaining amount --------------------------------->
@@ -578,8 +532,8 @@ import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import { router } from '@/router';
-import { useRoute } from 'vue-router'
-const route = useRoute()
+import { useRoute } from 'vue-router';
+const route = useRoute();
 const { emailPatternrule, requiredrule, mobilerule, ticketdropdownrule, amountRule } = formValidationsRules();
 
 //props for toastification
@@ -667,7 +621,7 @@ const page = ref({ title: 'Users' });
 const current_page = ref(1);
 const emptyProblemType = ref(false);
 /******************************************************** edit ticket **********************************************/
-const ticketId = ref(0)
+const ticketId = ref(0);
 
 /********************************************************* emits ********************************************************/
 const emit = defineEmits(['ticketAdded']);
@@ -703,6 +657,50 @@ const collectAmountRule = [
 ];
 
 /********************************************** methods  ********************************************************/
+function getTicketData() {
+    baseURlApi
+        .get(`ticket/view/${ticketId.value}`)
+        .then((res) => {
+            console.log('ress', res.data.data.ticket_detail);
+            const data = res.data.data.ticket_detail;
+            tiketTypeRadio.value = data.ticket_type;
+            customerSearchModel.value = data.customer.first_name + ' ' + data.customer.last_name;
+            selectedCustomerModel.value = data.customer;
+            const mobileDetails = data.customer.phones.find((element) => element.is_primary === 1)
+            mobile.value = mobileDetails.phone;
+            customerEmail.value = data.customer.email;
+            selectAddress.value = data.customer_location;
+            addressLineOne.value = data.customer_location.address_line1;
+            area.value = data.customer_location.area;
+            city.value = data.customer_location.city;
+            zipcode.value = data.customer_location.zipcode;
+            state.value = data.customer_location.state;
+            countryName.value = data.customer_location.country;
+            companyName.value = data.customer_location.company_name;
+            getAddress(data.customer_id);
+            problemType.value = data.problem_types;
+            problemTitle.value = data.problem_title;
+            description.value = data.description;
+            dueDate.value = data.due_date;
+            assignEr.value = data.assigned_engineer;
+            Ticketpriority.value = data.ticket_priority;
+            ticketStatus.value = data.ticket_status;
+            appointmentType.value = data.appointment_type;
+            ticketAmount.value = data.amount.toString();
+            collectedAmount.value = data.collected_amount;
+            paymentStatus.value = data.payment_status;
+            remainingAmount.value = data.remaining_amount;
+            paymentMode.value = data.payment_mode;
+        })
+        .catch((error) => {
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            console.log('err', error.response.data.message);
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
 function renderItemTitle(item) {
     const fname = item?.raw?.first_name;
     const lname = item?.raw?.last_name;
@@ -726,8 +724,6 @@ function getCustomersList() {
     baseURlApi
         .get('customer/list', { params })
         .then((res) => {
-            //  isLoading.value = false;
-            //  serverItemsLength.value = res.data.data.total;
             selectCustomerList.value = res.data.data.data;
         })
         .catch((error) => {
@@ -771,16 +767,6 @@ function onEnter() {
             phone: ''
         };
     }
-
-    // var someString = data;
-    // var index = someString.indexOf(' ');
-    // if (index) {
-    //     // Gets the first index where a space occours
-    //     var id = someString.slice(0, index); // Gets the first part
-    //     var text = someString.slice(index + 1);
-
-    // } // Gets the text part
-
     if (!selectCustomerList.value.includes(data)) {
         addressLineOne.value = '';
         area.value = '';
@@ -830,7 +816,6 @@ function onBlur() {
             first_name: selectedCustomer.value,
             id: selectCustomerList.value.length + 1
         };
-        // selectCustomerList.value.unshift(newItem)
         selectedCustomer.value = newItem;
     }
 }
@@ -840,22 +825,13 @@ async function editTicket() {
         return data.id;
     });
     if (isExistingCustomer.value == false) {
-        // if(newCutomerValue.value.includes(" ")){
-        // const data = newCutomerValue.value ;
-        // var index = data.indexOf(' ');
         selectedCustomerModel.value.first_name = newCutomerValue.value.first_name; // Gets the first part
         selectedCustomerModel.value.last_name = newCutomerValue.value.last_name.replace(' ', '');
-        // }
-        // else{
-        //     selectedCustomerModel.value.first_name = newCutomerValue.value
-        // }
     }
     if (valid) {
         issubmit.value = true;
         const requestBody = {
             ticket_type: tiketTypeRadio.value,
-            // customer_name: selectedCustomer.value.first_name + ' ' + selectedCustomer.value.last_name,
-            // customer_name: selectedCustomer.value.first_name + selectedCustomer.value.last_name,
             customer_name: [selectedCustomerModel.value.first_name, selectedCustomerModel.value.last_name].join(' ').trim(),
             is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
             customer_id: isExistingCustomer.value == true ? selectedCustomerModel.value.id : '',
@@ -889,13 +865,7 @@ async function editTicket() {
         baseURlApi
             .post(`ticket/update/${ticketId.value}`, requestBody)
             .then((res) => {
-                // const addedData = res.data.data;
-                // emit('addUserClicked', addedData);
-
                 issubmit.value = false;
-                // editTicketform.value.reset();
-                // editTicketform.value.resetValidation();
-
                 message.value = res.data.message;
                 isSnackbar.value = true;
                 showSnackbar.value = true;
@@ -903,9 +873,6 @@ async function editTicket() {
                 color.value = 'success';
                 emit('ticketAdded');
                 router.push('/tickets');
-                // router.push({
-                //     name: 'Tickets'
-                // });
             })
             .catch((error) => {
                 issubmit.value = false;
@@ -935,7 +902,6 @@ function addNewAddress() {
     state.value = '';
     countryName.value = 'India';
     companyName.value = '';
-    // selectCustomerList.value.unshift(val);
     isExistingCustomer.value = false;
     selectAddress.value = '';
 }
@@ -965,50 +931,23 @@ function searchCustomers() {
             .catch((error) => {});
     }
 }
-function searchNewCustomers() {
-    clearTimeout(searchTimer.value);
-    searchTimer.value = setTimeout(() => {
-        if (customerSearchModel.value.trim().length < 3) return;
-        const fd = new FormData();
-        fd.append('search_text', customerSearchModel.value);
+function getAddress(customerId) {
+    // customer = customer || selectedCustomer.value || {};
+    // mobile.value = customer.phone;
+    // customerEmail.value = customer.email;
+    // if (Object.keys(customer).length) {
+    //     isExistingCustomer.value = true;
+    // }
+    if (customerId) {
         baseURlApi
-            .post(`customer/search?total_record=50`, fd)
-            .then((res) => {
-                selectCustomerList.value = res.data.data.data;
-            })
-            .catch((error) => {});
-    }, 400);
-}
-function getAddress(customer) {
-    customer = customer || selectedCustomer.value || {};
-    mobile.value = customer.phone;
-    customerEmail.value = customer.email;
-    if (Object.keys(customer).length) {
-        isExistingCustomer.value = true;
-    }
-    if (customer.id) {
-        baseURlApi
-            .get(`ticket/get-customer-address/${customer.id}`)
+            .get(`ticket/get-customer-address/${customerId}`)
             .then((res) => {
                 addressOptions.value = res.data.data;
-
-                // addressOptions.value.push({
-                //     address_line1: 'Add new address',
-                //     color: 'primary'
-                // });
-                selectAddress.value = addressOptions.value.filter((data) => data.is_primary == 1)[0];
-                addressLineOne.value = selectAddress.value.address_line1;
-                area.value = selectAddress.value.area;
-                city.value = selectAddress.value.city;
-                zipcode.value = selectAddress.value.zipcode;
-                state.value = selectAddress.value.state;
-                countryName.value = selectAddress.value.country;
-                companyName.value = selectAddress.value.company_name;
             })
             .catch((error) => {
                 isSnackbar.value = true;
                 showSnackbar.value = true;
-                console.log("err", error.response.data.message)
+                console.log('err', error.response.data.message);
                 message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
@@ -1030,17 +969,16 @@ function getTickets() {
                     ticketStatus.value = data;
                 }
             });
-            data.payment_status.map((data) => {
-                if (data.unique_id == '10003') {
-                    paymentStatus.value = data;
-                }
-            });
+            // data.payment_status.map((data) => {
+            //     if (data.unique_id == '10003') {
+            //         paymentStatus.value = data;
+            //     }
+            // });
             appointmentTypeOptions.value = data.appointment_type;
             paymentStatusOptions.value = data.payment_status;
             paymentModeOptions.value = data.payment_mode;
             TicketpriorityOptions.value = data.ticket_priorities;
             getCustomersList();
-            // selectCustomerList.value = data.customers;
         })
         .catch((error) => {
             isSnackbar.value = true;
@@ -1050,23 +988,8 @@ function getTickets() {
             icon.value = 'mdi-close-circle';
         });
 }
-function getInitialData() {
-    isExistingCustomer.value = false;
-    selectedCustomer.value = null;
-    searchCustomer.value = '';
-    selectAddress.value = '';
-    customerEmail.value = '';
-    customInput.value.reset();
-
-    // customerComboBox.value.reset();
-}
-function clearInput() {
-    isExistingCustomer.value = false;
-    // getAddress()
-}
 function getInitialDataProblemType() {
     problemType.value = '';
-    // isExistingCustomer.value = false;
 }
 
 function restrictKeyUp(event) {
@@ -1091,26 +1014,12 @@ const remainAmount = computed(() => {
 
 const fromDateDisp = computed(() => {
     return fromDateVal.value;
-    // format/do something with date
 });
 const filteredCustomers = computed(() => {
     if (customerSearchModel.value?.length < 3) {
         return [];
     }
     const _model = (customerSearchModel.value || '').toLowerCase().trim();
-    // return selectCustomerList.value.filter(e=>{
-    //     debugger
-    //     return (
-    //         (e.first_name || '') +
-    //         (e.last_name || '') +
-    //         (e.phone || '')
-    //     ).toLowerCase().trim().includes(_model)
-    // })
-    // return selectCustomerList.value.filter(e=>{
-    //     return ((e.first_name || '').toLowerCase().includes(_model)
-    //     || (e.last_name || '').toLowerCase().includes(_model)
-    //     || (e.phone+'').includes(_model))
-    // })
     return selectCustomerList.value.filter((e) => {
         return _model
             .split(' ')
@@ -1147,17 +1056,6 @@ function addTempCustomer(custName) {
             id: selectCustomerList.value.length + 1
         };
     }
-
-    // const [first, last] = custName
-    //     .split(' ')
-    //     .map((e) => e.trim())
-    //     .filter(Boolean);
-    // const newCustomer = {
-    //     first_name: first || '',
-    //     last_name: last || '',
-    //     phone: '',
-    //     id: selectCustomerList.value.length + 1
-    // };
     newCutomerValue.value = newCustomer;
     selectCustomerList.value.unshift(newCustomer);
     isExistingCustomer.value = false;
@@ -1167,27 +1065,18 @@ function addTempCustomer(custName) {
     city.value = '';
     zipcode.value = '';
     state.value = '';
-
     countryName.value = 'India';
     companyName.value = '';
     mobile.value = '';
     customerEmail.value = '';
-
-    // selectCustomerList.value.unshift(val);
 }
 
 onMounted(() => {
-    ticketId.value = parseInt(route.params.id)
-    console.log("rrr",ticketId.value)
+    ticketId.value = parseInt(localStorage.getItem('ticketId'));
+    getTicketData();
+    console.log('rrr', ticketId.value);
     getTickets();
 });
-
-// watch(selectedCustomer.value, (val) => {
-//     if (val.length > 5) {
-//         this.$nextTick(() => selectedCustomer.value.pop());
-//         console.lof('watchh', selectedCustomer.value);
-//     }
-// });
 </script>
 <style scoped>
 .v-input--density-default,

@@ -221,8 +221,9 @@ import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import 'vue3-easy-data-table/dist/style.css';
 import { router } from '@/router';
+import { useRoute } from 'vue-router';
 const themeColor = ref('rgb(var(--v-theme-secondary))');
-
+const route = useRoute()
 const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
@@ -480,30 +481,24 @@ function confirmClick() {
             icon.value = 'mdi-close-circle';
         });
 }
-onUpdated(() => {
-     const listElm = document.querySelector('#infinite-list');
-    listElm.addEventListener('scroll', (e) => {
-        if (items.value.length < serverItemsLength.value) {
-            if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
-                current_page.value = current_page.value + 1;
-                isFromAdd.value = false;
-                getTickets();
-            }
-        }
-    });
-    getTickets();
-})
+
 //delete user
 function deleteTicket(id) {
     deleteId.value = id;
     deleteDialog.value?.open();
 }
 onMounted(() => {
-    // const listElm = document.querySelector('#infinite-list');
-    // listElm.addEventListener('scroll', );
     getTickets();
       
 });
+// TODO: split routes & remove block below
+watch(() => route.name, (e) => {
+    if (e === 'Tickets') {
+        current_page.value = 1
+        items.value = []
+        getTickets()
+    }
+})
 </script>
 
 <style>

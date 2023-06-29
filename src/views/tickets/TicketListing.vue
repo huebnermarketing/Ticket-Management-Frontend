@@ -41,7 +41,7 @@
             <div id="infinite-list" style="max-height: calc(100vh - 380px); overflow-y: auto">
                 <!-- :search-value="searchValue" -->
                 <EasyDataTable
-                    :rows-per-page="10000"
+                    :rows-per-page="10000000"
                     sticky
                     fixed
                     id="ticketlist"
@@ -163,7 +163,7 @@
                         <div class="d-flex align-center">
                             <v-tooltip text="View">
                                 <template v-slot:activator="{ props }">
-                                    <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
+                                    <v-btn class="table-icons-common" icon flat @click="openAddTicket()" v-bind="props"
                                         ><EyeIcon stroke-width="1.5" size="20" class="text-primary"
                                     /></v-btn>
                                 </template>
@@ -208,7 +208,7 @@
     <router-view />
 </template>
 <script setup>
-import { onMounted, ref, watch, defineExpose } from 'vue';
+import { onMounted, ref, watch, defineExpose, onUpdated } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import TopCards from '@/components/cards/TopCards.vue';
@@ -406,15 +406,17 @@ function addCustomerData(addedData) {
 
 //open modal
 function openAddTicket() {
-    console.log('rouuu', router);
+   
     router.push({
         name: 'AddTickets'
     });
 }
 function openEditDialog(id) {
-    editId.value = id;
-    editcustomer.value?.open();
-    editcustomer.value?.getCustomersData(id);
+     console.log("openn")
+      router.push({
+        name: 'EditTickets',
+        params: { id: parseInt(id) }
+    });
     // editcustomer.value?.addaddressData()
 }
 function openChangePasswordDialog(id) {
@@ -444,12 +446,26 @@ function confirmClick() {
             icon.value = 'mdi-close-circle';
         });
 }
+onUpdated(() => {
+     const listElm = document.querySelector('#infinite-list');
+    listElm.addEventListener('scroll', (e) => {
+        if (items.value.length < serverItemsLength.value) {
+            if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
+                current_page.value = current_page.value + 1;
+                isFromAdd.value = false;
+                getTickets();
+            }
+        }
+    });
+    getTickets();
+})
 //delete user
 function deleteTicket(id) {
     deleteId.value = id;
     deleteDialog.value?.open();
 }
 onMounted(() => {
+    console.log("list mounted called")
     const listElm = document.querySelector('#infinite-list');
     listElm.addEventListener('scroll', (e) => {
         if (items.value.length < serverItemsLength.value) {
@@ -461,6 +477,7 @@ onMounted(() => {
         }
     });
     getTickets();
+      
 });
 </script>
 

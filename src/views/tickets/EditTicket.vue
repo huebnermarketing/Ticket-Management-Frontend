@@ -30,7 +30,7 @@
                     <!------------------------------------ Addhoc form ----------------------------------->
                     <v-row v-if="tiketTypeRadio == 'adhoc'" style="padding: 20px">
                         <v-col cols="12">
-                            <v-form @submit.prevent="createTicket" ref="createticketform">
+                            <v-form @submit.prevent="editTicket" ref="editTicketform">
                                 <v-row>
                                     <!---------------------------------- customer name --------------------------------->
                                     <v-col cols="12" md="6">
@@ -105,77 +105,6 @@
                                                 </v-list-item>
                                             </v-list>
                                         </v-menu>
-                                        <template v-if="false">
-                                            <!-- {{ searchCustomer }} -->
-                                            <!-- v-model:search="searchCustomer" -->
-                                            <!-- @update:modelValue="getAddress()"
-                                                @click:clear="getInitialData(), clearInput()"
-                                                @keydown.enter.capture.prevent.stop -->
-                                            <!-- v-model="selectedCustomer" v-model:search="searchCustomer" 
-                                        
-                                            item-value="id" :hide-no-data="false" :items="selectCustomerList" -->
-                                            <v-label class="mb-2 font-weight-medium text-capitalize required">Customer Name</v-label>
-                                            <v-combobox
-                                                :items="selectCustomerList"
-                                                :item-title="getFieldText"
-                                                clearable
-                                                v-model="selectedCustomer"
-                                                v-model:search="searchCustomer"
-                                                @keydown.enter.capture.prevent.stop
-                                                @click:clear="getInitialData(), clearInput()"
-                                                @update:modelValue="getAddress()"
-                                                bg-color="none"
-                                                item-value="id"
-                                                :hide-no-data="false"
-                                                base-color="none"
-                                                density="comfortable"
-                                                variant="outlined"
-                                                ref="customerComboBox"
-                                                open-on-clear
-                                                return-object
-                                                auto-complete="off"
-                                            >
-                                                <template v-slot:selection="{ item }">
-                                                    <!-- {{getText(item)}} -->
-                                                    <span>
-                                                        <!-- ertyuy -->
-                                                        ppppp
-                                                        <!-- {{ item.value.first_name + ' ' + item.value.last_name }} -->
-                                                        <!-- -{{ selectedCustomer.phone ? selectedCustomer.phone : '' }} -->
-                                                    </span>
-                                                </template>
-                                                <!-- <template v-slot:item="{ item }">
-                                                {{  item.first_name ? item.first_name : '' + ' ' + item.last_name ? item.last_name :
-                                                    '' + item.phone ? '-(' + item.phone + ')' : '' }}
-                                                </template> -->
-                                                <!-- <span v-if="!isExistingCustomer">{{ selectedCustomer.first_name }} </span> -->
-
-                                                <template v-slot:no-data>
-                                                    <v-list-item>
-                                                        <v-list-item-title>
-                                                            No results matching "<strong>{{ searchCustomer }}</strong
-                                                            >"
-                                                            <div class="mt-2">
-                                                                <v-btn
-                                                                    flat
-                                                                    class="table-icons-common text-left flat bg-primary"
-                                                                    @click.prevent.stop="onEnter(e)"
-                                                                >
-                                                                    <PlusIcon size="16" class="text-left" /> Add new customer</v-btn
-                                                                >
-                                                            </div>
-                                                        </v-list-item-title>
-                                                    </v-list-item>
-                                                </template>
-
-                                                <!-- <template v-slot:append-item>
-                                                <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
-                                                    ><PlusIcon stroke-width="1.5" size="20" class="text-primary"
-                                                /></v-btn>
-                                            </template> -->
-                                            </v-combobox>
-                                            <!-- <v-text-field v-model="customerName" variant="outlined" color="primary"></v-text-field> -->
-                                        </template>
                                     </v-col>
                                     <!---------------------------------- Mobile Number --------------------------------->
                                     <v-col cols="12" md="6">
@@ -649,6 +578,8 @@ import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import { router } from '@/router';
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const { emailPatternrule, requiredrule, mobilerule, ticketdropdownrule, amountRule } = formValidationsRules();
 
 //props for toastification
@@ -680,7 +611,7 @@ const customerOptions = ref([
 const showPicker = ref(false);
 const selectedDate = ref(null);
 
-const createticketform = ref();
+const editTicketform = ref();
 const problemType = ref([]);
 const problemTypeOptions = ref([]);
 const searchProblem = ref('');
@@ -735,6 +666,9 @@ const customerEmail = ref('');
 const page = ref({ title: 'Users' });
 const current_page = ref(1);
 const emptyProblemType = ref(false);
+/******************************************************** edit ticket **********************************************/
+const ticketId = ref(0)
+
 /********************************************************* emits ********************************************************/
 const emit = defineEmits(['ticketAdded']);
 /***************************************************** breadcrumbs ***********************************************/
@@ -745,7 +679,7 @@ const breadcrumbs = ref([
         href: '/tickets'
     },
     {
-        text: 'Create Ticket',
+        text: 'Edit Ticket',
         disabled: true,
         href: '#'
     }
@@ -900,8 +834,8 @@ function onBlur() {
         selectedCustomer.value = newItem;
     }
 }
-async function createTicket() {
-    const { valid } = await createticketform.value?.validate();
+async function editTicket() {
+    const { valid } = await editTicketform.value?.validate();
     const problem_type = problemType.value.map((data) => {
         return data.id;
     });
@@ -953,14 +887,14 @@ async function createTicket() {
             delete requestBody.payment_mode;
         }
         baseURlApi
-            .post('ticket/create', requestBody)
+            .post(`ticket/update/${ticketId.value}`, requestBody)
             .then((res) => {
                 // const addedData = res.data.data;
                 // emit('addUserClicked', addedData);
 
                 issubmit.value = false;
-                // createticketform.value.reset();
-                // createticketform.value.resetValidation();
+                // editTicketform.value.reset();
+                // editTicketform.value.resetValidation();
 
                 message.value = res.data.message;
                 isSnackbar.value = true;
@@ -1074,6 +1008,7 @@ function getAddress(customer) {
             .catch((error) => {
                 isSnackbar.value = true;
                 showSnackbar.value = true;
+                console.log("err", error.response.data.message)
                 message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';
@@ -1242,6 +1177,8 @@ function addTempCustomer(custName) {
 }
 
 onMounted(() => {
+    ticketId.value = parseInt(route.params.id)
+    console.log("rrr",ticketId.value)
     getTickets();
 });
 

@@ -29,7 +29,11 @@ const MainRoutes = {
                             name:'EditTicket',
                             path: 'edit',
                             component: () => import('@/views/tickets/EditTicket.vue'),
-                        }
+                        },
+                        {
+                            path: '',
+                            redirect: { name: 'EditTicket' }
+                        },
                     ]
                 },
             ]

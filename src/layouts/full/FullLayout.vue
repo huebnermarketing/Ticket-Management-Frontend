@@ -1,14 +1,23 @@
 <script setup>
-import { RouterView } from 'vue-router';
+import { ref } from 'vue'
+import { RouterView} from 'vue-router';
 import VerticalSidebarVue from './vertical-sidebar/VerticalSidebar.vue';
 import VerticalHeaderVue from './vertical-header/VerticalHeader.vue';
 import HorizontalHeader from './horizontal-header/HorizontalHeader.vue';
 import HorizontalSidebar from './horizontal-sidebar/HorizontalSidebar.vue';
 import Customizer from './customizer/Customizer.vue';
+import CustomizerCommon from '@/components/customizer/CustomizerCommon.vue';
 
 import { useCustomizerStore } from '../../stores/customizer';
 
 const customizer = useCustomizerStore();
+const name = ref(Customizer)
+
+function CustomizeClick(){
+    customizer.SET_CUSTOMIZER_DRAWER(!customizer.Customizer_drawer)
+    customizer.SET_COMPONENT_NAME(name.value)
+    customizer.SET_DRAWER_WIDTH('320')
+}
 </script>
 
 <template>
@@ -22,7 +31,10 @@ const customizer = useCustomizerStore();
                 customizer.setBorderCard ? 'cardBordered' : ''
             ]"
         >
-            <Customizer />
+            <!-- <Customizer /> -->
+            <CustomizerCommon />
+                <!-- <Customizer />
+            </CustomizerCommon> -->
             <VerticalSidebarVue v-if="!customizer.setHorizontalLayout" />
             <VerticalHeaderVue v-if="!customizer.setHorizontalLayout" />
             <HorizontalHeader v-if="customizer.setHorizontalLayout" />
@@ -40,7 +52,7 @@ const customizer = useCustomizerStore();
                             icon
                             variant="flat"
                             color="primary"
-                            @click.stop="customizer.SET_CUSTOMIZER_DRAWER(!customizer.Customizer_drawer)"
+                            @click.stop="CustomizeClick()"
                         >
                             <SettingsIcon />
                         </v-btn>

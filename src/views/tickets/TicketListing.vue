@@ -24,6 +24,9 @@
                             <v-btn btn color="primary" @click="openAddTicket()">
                                 <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add Ticket
                             </v-btn>
+                            <v-btn btn color="primary" flat @click="openFilterDrawer()">
+                                <v-icon> mdi-filter </v-icon>
+                            </v-btn>
                             <!-- <v-btn btn color="primary">
                                 <FilterIcon stroke-width="1.5" size="20" class="text-white" />
                             </v-btn> -->
@@ -55,7 +58,7 @@
                         :theme-color="themeColor"
                         :search="searchField"
                         table-class-name="customize-table"
-                        ref="refCustomerListTable"
+                        ref="refTicketListTable"
                         :loading="isLoading && current_page === 1"
                         :sort-by="sortBy"
                         :sort-type="sortType"
@@ -63,9 +66,7 @@
                     >
                         <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                         <template #item-id="{ unique_id }">
-                            <div class="player-wrapper text-capitalize">
-                                #{{ unique_id }}
-                            </div>
+                            <div class="player-wrapper text-capitalize">#{{ unique_id }}</div>
                         </template>
                         <template #item-customer_name="{ customer }">
                             <div class="player-wrapper text-capitalize">
@@ -163,7 +164,7 @@
                             <div class="d-flex align-center">
                                 <v-tooltip text="View">
                                     <template v-slot:activator="{ props }">
-                                        <v-btn class="table-icons-common" icon flat @click.stop v-bind="props"
+                                        <v-btn class="table-icons-common" icon flat @click="openViewDrawer(id)" v-bind="props"
                                             ><EyeIcon stroke-width="1.5" size="20" class="text-primary"
                                         /></v-btn>
                                     </template>
@@ -187,6 +188,7 @@
                     </EasyDataTable>
                 </div>
             </v-col>
+            <v-card> </v-card>
             <dialogBox
                 ref="deleteDialog"
                 @confirClk="confirmClick()"
@@ -202,26 +204,28 @@
                 <v-icon left>{{ icon }}</v-icon>
                 {{ message }}
             </v-snackbar>
-            <addCustomer ref="addcustomer" @addCustomerClicked="addCustomerData" />
-            <editCustomer ref="editcustomer" @updateClicked="filterData" />
         </v-row>
     </v-container>
+    <!-- <viewTicket ref="viewTicketRef" /> -->
 </template>
 <script setup>
 import { onMounted, ref, watch, defineExpose, onUpdated } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import TopCards from '@/components/cards/TopCards.vue';
+import viewTicket from './ViewTicket.vue';
+import filterTicket from './FilterTicket.vue';
 
-// import addCustomer from '@/views/customers/AddCustomer.vue';
-// import editCustomer from '@/views/customers/EditCustomer.vue';
 import dialogBox from '@/components/TicketComponents/dialog.vue';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import 'vue3-easy-data-table/dist/style.css';
+import { useCustomizerStore } from '@/stores/customizer';
+
 import { router } from '@/router';
 import { useRoute } from 'vue-router';
 const themeColor = ref('rgb(var(--v-theme-secondary))');
+const store = useCustomizerStore();
 const route = useRoute()
 const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
@@ -235,11 +239,9 @@ const title = ref('Delete Ticket');
 const editId = ref(0);
 
 //refs
-const addcustomer = ref();
-const editcustomer = ref();
-const changePasswordFromUser = ref();
+const viewTicketRef = ref();
 const deleteDialog = ref();
-const refCustomerListTable = ref();
+const refTicketListTable = ref();
 const ticketDashboard = ref({});
 const breadcrumbs = ref([
     {
@@ -299,17 +301,17 @@ const topCardsData = ref([
 ]);
 
 const headers = ref([
-    { text: 'Id', value: 'id'},
+    { text: 'Id', value: 'id' },
     { text: 'Customer Name', value: 'customer_name' },
-    { text: 'Problem Title', value: 'problem_title'},
-    { text: 'Mobile', value: 'mobile'},
-    { text: 'Company Name', value: 'company_name'},
-    { text: 'Due Date', value: 'due_date'},
-    { text: 'Engineer', value: 'engineer'},
-    { text: 'Appointment Type', value: 'appointment_type'},
-    { text: 'Priority', value: 'priority'},
-    { text: 'Ticket Status', value: 'ticket_status'},
-    { text: 'Payment Status', value: 'payment_status'},
+    { text: 'Problem Title', value: 'problem_title' },
+    { text: 'Mobile', value: 'mobile' },
+    { text: 'Company Name', value: 'company_name' },
+    { text: 'Due Date', value: 'due_date' },
+    { text: 'Engineer', value: 'engineer' },
+    { text: 'Appointment Type', value: 'appointment_type' },
+    { text: 'Priority', value: 'priority' },
+    { text: 'Ticket Status', value: 'ticket_status' },
+    { text: 'Payment Status', value: 'payment_status' },
     { text: 'Action', value: 'action' }
 ]);
 const serverItemsLength = ref(50);
@@ -333,7 +335,9 @@ const timer = ref(5000);
 const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
-const totalItems = ref(0)
+const totalItems = ref(0);
+
+const name = ref();
 //get users
 function searchUser() {
     const fd = new FormData();
@@ -347,8 +351,8 @@ function searchUser() {
 }
 function updateTopCardValues() {
     topCardsData.value.forEach((e) => {
-        e.number = ticketDashboard.value[e.key]
-    })
+        e.number = ticketDashboard.value[e.key];
+    });
 }
 function onScroll(e) {
     // if (e.scrollTop + e.clientHeight >= e.scrollHeight) {
@@ -356,17 +360,16 @@ function onScroll(e) {
     //     isFromAdd.value = false;
     //     getTickets();
     // }
-    const el = e.target?.scrollingElement
-    if (!el) return
-    if (current_page.value > 1 && items.value.length >= totalItems.value) return
-    const scrollPercent =
-        (100 * el.scrollTop) / (el.scrollHeight - el.clientHeight)
+    const el = e.target?.scrollingElement;
+    if (!el) return;
+    if (current_page.value > 1 && items.value.length >= totalItems.value) return;
+    const scrollPercent = (100 * el.scrollTop) / (el.scrollHeight - el.clientHeight);
     if (scrollPercent > 50) {
-        getTickets()
+        getTickets();
     }
 }
 function getTickets() {
-    if (current_page.value > 1 && (items.value.length >= totalItems.value) || isLoading.value) return
+    if ((current_page.value > 1 && items.value.length >= totalItems.value) || isLoading.value) return;
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
@@ -375,11 +378,11 @@ function getTickets() {
             isLoading.value = false;
             console.log('dataa11', res.data.data.allTicket.data);
             serverItemsLength.value = res.data.data.allTicket.total;
-            totalItems.value = res.data.data.allTicket.total
-            
+            totalItems.value = res.data.data.allTicket.total;
+
             ticketDashboard.value = res.data.data.ticketDashboard;
-            updateTopCardValues()
-            if (0){
+            updateTopCardValues();
+            if (0) {
                 let itemsData = [];
                 if (isFromAdd.value) {
                     let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data);
@@ -413,8 +416,8 @@ function getTickets() {
                 items.value = [...proxy];
                 items.value = [...JSON.parse(JSON.stringify(items.value))];
             }
-            items.value.push(...res.data.data.allTicket.data)
-            current_page.value++
+            items.value.push(...res.data.data.allTicket.data);
+            current_page.value++;
         })
         .catch((error) => {
             isLoading.value = false;
@@ -440,7 +443,6 @@ function addCustomerData(addedData) {
 
 //open modal
 function openAddTicket() {
-   
     router.push({
         name: 'AddTickets'
     });
@@ -453,6 +455,20 @@ function openEditDialog(id) {
         params: {id}
     });
     // editcustomer.value?.addaddressData()
+}
+function openViewDrawer() {
+    // viewTicketRef.value.openViewTicketDrawer();
+    store.SET_CUSTOMIZER_DRAWER(!store.Customizer_drawer);
+    name.value = viewTicket
+    store.SET_COMPONENT_NAME(name.value);
+    store.SET_DRAWER_WIDTH('1000')
+}
+
+function openFilterDrawer() {
+    store.SET_CUSTOMIZER_DRAWER(!store.Customizer_drawer);
+    name.value = filterTicket
+    store.SET_COMPONENT_NAME(name.value);
+    store.SET_DRAWER_WIDTH('500')
 }
 function openChangePasswordDialog(id) {
     changePasswordFromUser.value?.open(id);
@@ -489,7 +505,6 @@ function deleteTicket(id) {
 }
 onMounted(() => {
     getTickets();
-      
 });
 // TODO: split routes & remove block below
 watch(() => route.name, (e) => {

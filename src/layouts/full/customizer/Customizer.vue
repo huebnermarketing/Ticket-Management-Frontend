@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { useCustomizerStore } from '@/stores/customizer';
+import CustomizerCommon from '@/components/customizer/CustomizerCommon.vue';
 import {
     CheckIcon,
     LayoutColumnsIcon,
@@ -9,8 +10,8 @@ import {
     LayoutDistributeVerticalIcon,
     LayoutNavbarIcon,
     LayoutSidebarLeftCollapseIcon,
-TextDirectionLtrIcon,
-TextDirectionRtlIcon
+    TextDirectionLtrIcon,
+    TextDirectionRtlIcon
 } from 'vue-tabler-icons';
 
 const theme = useTheme();
@@ -59,7 +60,7 @@ const DarkthemeColors = ref([
 <!-- Customizer -->
 <!------------------------------------->
 <template>
-    <v-navigation-drawer app temporary elevation="10" location="right" v-model="customizer.Customizer_drawer" width="320">
+        <!-- <v-navigation-drawer app temporary elevation="10" location="right" v-model="customizer.Customizer_drawer" width="320"> -->
         <div class="pa-6">
             <h5 class="text-h5">Settings</h5>
         </div>
@@ -67,7 +68,13 @@ const DarkthemeColors = ref([
         <perfect-scrollbar style="height: calc(100vh - 90px)">
             <div class="pa-6">
                 <h6 class="text-h6 mb-2">Sidebar Layout</h6>
-                <v-btn-toggle v-model="customizer.setHorizontalLayout" color="primary" class="my-2 btn-group-custom  gap-3" rounded="0" group>
+                <v-btn-toggle
+                    v-model="customizer.setHorizontalLayout"
+                    color="primary"
+                    class="my-2 btn-group-custom gap-3"
+                    rounded="0"
+                    group
+                >
                     <v-btn :value="false" variant="text" elevation="9" class="rounded-md">
                         <LayoutColumnsIcon stroke-width="1.5" size="21" class="mr-2" /> Vertical
                     </v-btn>
@@ -80,7 +87,7 @@ const DarkthemeColors = ref([
                 <h6 class="text-h6 mt-8 mb-5">Theme Direction</h6>
                 <v-btn-toggle v-model="customizer.setRTLLayout" color="primary" class="my-2 btn-group-custom gap-3" rounded="0" group>
                     <v-btn :value="false" variant="text" elevation="9" class="rounded-md">
-                        <TextDirectionLtrIcon stroke-width="1.5" size="21"  /> LTR
+                        <TextDirectionLtrIcon stroke-width="1.5" size="21" /> LTR
                     </v-btn>
                     <v-btn :value="true" variant="text" elevation="9" class="rounded-md">
                         <TextDirectionRtlIcon stroke-width="1.5" size="21" /> RTL
@@ -127,24 +134,24 @@ const DarkthemeColors = ref([
                         <LayoutDistributeVerticalIcon stroke-width="1.5" size="21" class="mr-2" />
                         Boxed
                     </v-btn>
-                    <v-btn :value="false" variant="text" elevation="9" class="rounded-md ">
+                    <v-btn :value="false" variant="text" elevation="9" class="rounded-md">
                         <LayoutDistributeHorizontalIcon stroke-width="1.5" size="21" class="mr-2" />
                         Full
                     </v-btn>
                 </v-btn-toggle>
                 <!---Horizontal demo hide this option --->
                 <v-sheet v-if="customizer.setHorizontalLayout != true">
-                <h6 class="text-h6 mt-11 mb-2">Sidebar Type</h6>
-                <v-btn-toggle v-model="customizer.mini_sidebar" color="primary" class="my-2 btn-group-custom gap-3" rounded="0" group>
-                    <v-btn :value="false" variant="text" elevation="9" class="rounded-md">
-                        <LayoutSidebarIcon stroke-width="1.5" size="21" class="mr-2" />
-                        Full
-                    </v-btn>
-                    <v-btn :value="true" variant="text" elevation="9" class="rounded-md">
-                        <LayoutSidebarLeftCollapseIcon stroke-width="1.5" size="21" class="mr-2" />
-                        Collapse
-                    </v-btn>
-                </v-btn-toggle>
+                    <h6 class="text-h6 mt-11 mb-2">Sidebar Type</h6>
+                    <v-btn-toggle v-model="customizer.mini_sidebar" color="primary" class="my-2 btn-group-custom gap-3" rounded="0" group>
+                        <v-btn :value="false" variant="text" elevation="9" class="rounded-md">
+                            <LayoutSidebarIcon stroke-width="1.5" size="21" class="mr-2" />
+                            Full
+                        </v-btn>
+                        <v-btn :value="true" variant="text" elevation="9" class="rounded-md">
+                            <LayoutSidebarLeftCollapseIcon stroke-width="1.5" size="21" class="mr-2" />
+                            Collapse
+                        </v-btn>
+                    </v-btn-toggle>
                 </v-sheet>
                 <h6 class="text-h6 mt-11 mb-2">Card with</h6>
                 <v-btn-toggle v-model="customizer.setBorderCard" color="primary" class="my-2 btn-group-custom gap-3" rounded="0" group>
@@ -159,7 +166,9 @@ const DarkthemeColors = ref([
                 </v-btn-toggle>
             </div>
         </perfect-scrollbar>
-    </v-navigation-drawer>
+
+
+    <!-- </v-navigation-drawer> -->
 </template>
 
 <style lang="scss"></style>

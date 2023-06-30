@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
 import config from "@/config"
+import { Component } from "react"
 
 export const useCustomizerStore = defineStore({
   id: "customizer",
@@ -11,10 +12,14 @@ export const useCustomizerStore = defineStore({
     setRTLLayout: config.setRTLLayout, // RTL layout
     actTheme: config.actTheme,
     boxed: config.boxed,
-    setBorderCard: config.setBorderCard
+    setBorderCard: config.setBorderCard,
+    ComponentName : null,
+    drawerWidth:""
   }),
 
-  getters: {},
+  getters: {
+    getComponentName: (state) => { return state.ComponentName },
+  },
   actions: {
     SET_SIDEBAR_DRAWER() {
       this.Sidebar_drawer = !this.Sidebar_drawer
@@ -25,7 +30,6 @@ export const useCustomizerStore = defineStore({
     SET_CUSTOMIZER_DRAWER(payload) {
       this.Customizer_drawer = payload
     },
-
     SET_LAYOUT(payload) {
       this.setHorizontalLayout = payload
     },
@@ -34,6 +38,12 @@ export const useCustomizerStore = defineStore({
     },
     SET_CARD_BORDER(payload) {
       this.setBorderCard = payload
+    },
+    SET_COMPONENT_NAME(payload) {
+      this.ComponentName = payload
+    },
+    SET_DRAWER_WIDTH(payload) {
+      this.drawerWidth = payload
     }
   }
 })

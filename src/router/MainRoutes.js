@@ -59,18 +59,18 @@ const MainRoutes = {
 
         {
             name: 'UserProfile',
-            path: '/apps/user/profile',
+            path: '/profile',
             component: () => import('@/views/apps/user-profile/Profile.vue')
         },
+        // {
+        //     name: 'Account Setting',
+        //     path: '/pages/account-settings',
+        //     component: () => import('@/views/account-settings/AccountSettings.vue')
+        // },
         {
             name: 'Account Setting',
-            path: '/pages/account-settings',
-            component: () => import('@/views/account-settings/AccountSettings.vue')
-        },
-        {
-            name: 'Account Setting',
-            path: '/pages/company-settings',
-            component: () => import('@/views/company-settings/CompanySettings.vue')
+            path: '/company-settings',
+            component: () => import('@/views/company-settings/CompanySettings.vue'),
         },
     ]
 };

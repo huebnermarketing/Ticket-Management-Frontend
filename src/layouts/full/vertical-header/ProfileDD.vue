@@ -132,14 +132,14 @@ const profileDD = [
     {
         // avatar: JSON.parse(localStorage.getItem('user')).profile_photo,
         title: 'Company Setting',
-        href: '/pages/company-settings',
+        href: '/company-settings',
         subtitle: 'Manage organizational level settings',
         icon: SettingsIcon
     },
     {
         // avatar: JSON.parse(localStorage.getItem('user')).profile_photo,
         title: 'User Profile',
-        href: '/apps/user/profile',
+        href: '/profile',
         subtitle: ' Account Settings',
         icon: UserIcon
     }

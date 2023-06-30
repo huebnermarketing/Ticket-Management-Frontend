@@ -526,7 +526,6 @@
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import BasicHeaderForm from '@/components/forms/form-layouts/BasicHeaderForm.vue';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
@@ -620,7 +619,7 @@ const page = ref({ title: 'Users' });
 const current_page = ref(1);
 const emptyProblemType = ref(false);
 /******************************************************** edit ticket **********************************************/
-const ticketId = ref(0);
+// const ticketId = ref(0);
 
 /********************************************************* emits ********************************************************/
 const emit = defineEmits(['ticketAdded']);
@@ -1059,8 +1058,10 @@ function addTempCustomer(custName) {
     customerEmail.value = '';
 }
 
+const ticketId = computed(()=>route.params.id);
+
 onMounted(() => {
-    ticketId.value = parseInt(localStorage.getItem('ticketId'));
+    // ticketId.value = parseInt(localStorage.getItem('ticketId'));
     getTicketData();
     console.log('rrr', ticketId.value);
     getTickets();

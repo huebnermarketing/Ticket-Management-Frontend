@@ -1,7 +1,7 @@
 
 <template>
     <v-container v-scroll="onScroll" fluid class="pa-0">
-        <v-row no-gutters v-show="router.currentRoute.value.name === 'Tickets'">
+        <v-row no-gutters>
             <v-col cols="12" md="12">
                 <v-row justify="space-between" class="align-center mb-3">
                     <v-col cols="12">
@@ -205,7 +205,6 @@
                 {{ message }}
             </v-snackbar>
         </v-row>
-        <router-view />
     </v-container>
     <!-- <viewTicket ref="viewTicketRef" /> -->
 </template>
@@ -449,10 +448,11 @@ function openAddTicket() {
     });
 }
 function openEditDialog(id) {
-    localStorage.setItem('ticketId', id);
-    console.log('openn');
-    router.push({
-        name: 'EditTickets'
+    //  localStorage.setItem("ticketId",id)
+    //  console.log("openn")
+      router.push({
+        name: 'EditTicket',
+        params: {id}
     });
     // editcustomer.value?.addaddressData()
 }

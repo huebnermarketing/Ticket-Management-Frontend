@@ -1,46 +1,23 @@
 <script setup>
 import { ref } from 'vue';
-// common components
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import UiParentCard from '@/components/shared/UiParentCard.vue';
 
 /*import tabler icons*/
-import { UserCircleIcon,BellIcon,ArticleIcon,LockIcon } from 'vue-tabler-icons';
+import { UserCircleIcon,ArticleIcon,LockIcon } from 'vue-tabler-icons';
 
 //components
 import AccountTab from '@/views/account-settings/AccountTab.vue';
-// import NotificationTab from '@/components/pages/account-settings/NotificationTab.vue';
-// import BillsTab from '@/components/pages/account-settings/BillsTab.vue';
-// import SecurityTab from '@/components/pages/account-settings/SecurityTab.vue';
 
 /*tab*/
 const tab = ref(null);
 
-// theme breadcrumb
-const page = ref({ title: 'Account Setting' });
-const breadcrumbs = ref([
-    {
-        text: 'User profile',
-        disabled: false,
-        href: '#'
-    },
-    {
-        text: 'Account Setting',
-        disabled: true,
-        href: '#'
-    }
-]);
 </script>
 
 <template>
-    <!-- <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs" class="my-5"></BaseBreadcrumb> -->
     <v-row class="justify-center">
-        <!--Account Settings tabs-->
         <v-col cols="12" md="12">
             <v-card elevation="10" class=" " rounded="md">
                 <v-tabs v-model="tab" bg-color="transparent" min-height="70" height="70" color="primary">
                     <v-tab value="Account" class="text-medium-emphasis" ><UserCircleIcon class="mr-2" size="20"/>User Profile</v-tab>
-                    <!-- <v-tab value="Notification"  class="text-medium-emphasis"><BellIcon class="mr-2" size="20"/>Notification</v-tab>
                     <v-tab value="Bills"  class="text-medium-emphasis"><ArticleIcon class="mr-2" size="20"/>Bills</v-tab>
                     <v-tab value="Security"  class="text-medium-emphasis"><LockIcon class="mr-2" size="20"/>Security</v-tab> -->
                 </v-tabs>
@@ -50,15 +27,6 @@ const breadcrumbs = ref([
                         <v-window-item value="Account">
                             <AccountTab/>
                         </v-window-item>
-                        <!-- <v-window-item value="Notification">
-                            <NotificationTab/>
-                        </v-window-item>
-                        <v-window-item value="Bills">
-                            <BillsTab/>
-                        </v-window-item>
-                        <v-window-item value="Security">
-                            <SecurityTab/>
-                        </v-window-item> -->
                     </v-window>
                 </v-card-text>
             </v-card>

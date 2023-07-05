@@ -961,7 +961,7 @@ async function createTicket() {
             remaining_amount: remainingAmount.value ? parseInt(remainingAmount.value) : 0,
             payment_mode: paymentMode.value
         };
-        if (paymentMode.value.length == 0) {
+        if (paymentMode.value?.length == 0) {
             delete requestBody.payment_mode;
         }
         baseURlApi

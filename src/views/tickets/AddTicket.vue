@@ -67,6 +67,7 @@
                                                     @keyup="searchNewCustomers"
                                                     v-model="customerSearchModel"
                                                     ref="customInput"
+                                                    autocomplete="off"
                                                 ></v-text-field>
                                             </template>
                                             <v-list class="pa-0">
@@ -204,6 +205,10 @@
                                             persistent-clear
                                             persistent-counter
                                         >
+                                            <!-- <template v-slot:item="{ item }">
+                                                {{  item?.value?.address_line1 + ','+item?.value?.area + ','+item?.value?.city+ '-'+item?.value?.zipcode }}
+                                                </template>
+                                         -->
                                             <template v-slot:prepend-item>
                                                 <div style="text-align: right; padding: 4px 10px 10px">
                                                     <v-btn color="primary" class="m-0 p-0" flat @click="addNewAddress()" v-bind="props"
@@ -400,7 +405,7 @@
                                             :rules="ticketdropdownrule"
                                         ></v-select>
                                         <template v-slot:selection="{ item }">
-                                            <span>{{ assignErOptions.first_name + ' ' + assignErOptions.last_name }} </span>
+                                            <span>{{ assignErOptions?.first_name + ' ' + assignErOptions?.last_name }} </span>
                                         </template>
                                     </v-col>
                                     <!---------------------------------- Ticket Priority --------------------------------->
@@ -700,6 +705,7 @@ const ticketAmount = ref('');
 const collectedAmount = ref('');
 const remainingAmount = ref(0);
 const isExistingCustomer = ref(true);
+const isnewCustomer = ref(false);
 const isExistingProblem = ref(true);
 const addressOptions = ref([]);
 const contract = ref([]);
@@ -904,12 +910,13 @@ async function createTicket() {
     const problem_type = problemType.value.map((data) => {
         return data.id;
     });
-    if (isExistingCustomer.value == false) {
+    if (isnewCustomer.value == true) {
+        console.log("existng enter")
         // if(newCutomerValue.value.includes(" ")){
         // const data = newCutomerValue.value ;
         // var index = data.indexOf(' ');
-        selectedCustomerModel.value.first_name = newCutomerValue.value.first_name; // Gets the first part
-        selectedCustomerModel.value.last_name = newCutomerValue.value.last_name.replace(' ', '');
+        selectedCustomerModel.value.first_name = newCutomerValue.value?.first_name; // Gets the first part
+        selectedCustomerModel.value.last_name = newCutomerValue.value?.last_name.replace(' ', '');
         // }
         // else{
         //     selectedCustomerModel.value.first_name = newCutomerValue.value
@@ -917,13 +924,19 @@ async function createTicket() {
     }
     if (valid) {
         issubmit.value = true;
+
         const requestBody = {
             ticket_type: tiketTypeRadio.value,
-            // customer_name: selectedCustomer.value.first_name + ' ' + selectedCustomer.value.last_name,
+            // customer_name: selectedCustomerModel.value?.first_name + ' ' + selectedCustomerModel.value?.last_name,
             // customer_name: selectedCustomer.value.first_name + selectedCustomer.value.last_name,
-            customer_name: [selectedCustomerModel.value.first_name, selectedCustomerModel.value.last_name].join(' ').trim(),
+            // customer_name: selectedCustomerModel?.value.first_name
+            //     ? [selectedCustomerModel.value?.first_name, selectedCustomerModel.value?.last_name].join(' ').trim()
+            //     : customerSearchModel.value,
+              customer_name: 
+                [selectedCustomerModel.value?.first_name, selectedCustomerModel.value?.last_name].join(' ').trim(),
+               
             is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
-            customer_id: isExistingCustomer.value == true ? selectedCustomerModel.value.id : '',
+            customer_id: selectedCustomerModel.value?.id,
             email: customerEmail.value,
             customer_locations_id: selectAddress.value ? selectAddress.value.id : '',
             company_name: companyName.value,
@@ -1083,7 +1096,7 @@ function getAddress(customer) {
 function getTickets() {
     selectedCustomer.value = null;
     baseURlApi
-        .get('ticket/get-detail')
+        .post('ticket/get-detail')
         .then((res) => {
             const data = res.data.data;
             problemTypeOptions.value = data.problem_types;
@@ -1225,6 +1238,7 @@ function addTempCustomer(custName) {
     newCutomerValue.value = newCustomer;
     selectCustomerList.value.unshift(newCustomer);
     isExistingCustomer.value = false;
+    isnewCustomer.value = true
     selectAddress.value = '';
     addressLineOne.value = '';
     area.value = '';

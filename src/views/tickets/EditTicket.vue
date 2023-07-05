@@ -34,6 +34,7 @@
                                 <v-row>
                                     <!---------------------------------- customer name --------------------------------->
                                     <v-col cols="12" md="6">
+                                        {{ customerSearchModel }}
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Customer Name</v-label>
                                         <v-menu open-on-focus>
                                             <template v-slot:activator="{ props }">
@@ -362,13 +363,16 @@
                                     <v-col
                                         cols="12"
                                         md="6"
-                                        v-if="paymentStatus.unique_id !== '10003' && paymentStatus.unique_id !== '10004'"
+                                        v-if="
+                                            paymentStatus?.payment_type?.toLowerCase() !== 'unpaid' &&
+                                            paymentStatus?.payment_type?.toLowerCase() !== 'uncollectible'
+                                        "
                                     >
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">collected amount</v-label>
                                         <v-text-field
                                             v-model="collectedAmount"
                                             variant="outlined"
-                                            color="primary"                                      
+                                            color="primary"
                                             @input="remainAmount"
                                             disabled="true"
                                         ></v-text-field>
@@ -388,7 +392,10 @@
                                     <v-col
                                         cols="12"
                                         md="6"
-                                        v-if="paymentStatus.unique_id !== '10003' && paymentStatus.unique_id !== '10004'"
+                                        v-if="
+                                            paymentStatus?.payment_type?.toLowerCase() !== 'unpaid' &&
+                                            paymentStatus?.payment_type?.toLowerCase() !== 'uncollectible'
+                                        "
                                     >
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">payment mode</v-label>
                                         <v-select
@@ -560,6 +567,8 @@ const customerOptions = ref([
         value: '2'
     }
 ]);
+
+
 const showPicker = ref(false);
 const selectedDate = ref(null);
 
@@ -618,6 +627,7 @@ const customerEmail = ref('');
 const page = ref({ title: 'Users' });
 const current_page = ref(1);
 const emptyProblemType = ref(false);
+const isnewCustomer = ref(false);
 /******************************************************** edit ticket **********************************************/
 // const ticketId = ref(0);
 
@@ -664,7 +674,7 @@ function getTicketData() {
             tiketTypeRadio.value = data.ticket_type;
             customerSearchModel.value = data.customer.first_name + ' ' + data.customer.last_name;
             selectedCustomerModel.value = data.customer;
-            const mobileDetails = data.customer.phones.find((element) => element.is_primary === 1)
+            const mobileDetails = data.customer.phones.find((element) => element.is_primary === 1);
             mobile.value = mobileDetails.phone;
             customerEmail.value = data.customer.email;
             selectAddress.value = data.customer_location;
@@ -822,17 +832,18 @@ async function editTicket() {
     const problem_type = problemType.value.map((data) => {
         return data.id;
     });
-    if (isExistingCustomer.value == false) {
-        selectedCustomerModel.value.first_name = newCutomerValue.value.first_name; // Gets the first part
-        selectedCustomerModel.value.last_name = newCutomerValue.value.last_name.replace(' ', '');
-    }
+    // if (isnewCustomer.value == true) {
+    //  console.log("existng enter",customerSearchModel.value)
+    // selectedCustomerModel.value.first_name = customerSearchModel.value?.first_name; // Gets the first part
+    // selectedCustomerModel.value.last_name = customerSearchModel.value?.last_name.replace(' ', '');
+    // }
     if (valid) {
         issubmit.value = true;
         const requestBody = {
             ticket_type: tiketTypeRadio.value,
-            customer_name: [selectedCustomerModel.value.first_name, selectedCustomerModel.value.last_name].join(' ').trim(),
+            customer_name: customerSearchModel.value,
             is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
-            customer_id: isExistingCustomer.value == true ? selectedCustomerModel.value.id : '',
+            customer_id: selectedCustomerModel.value.id,
             email: customerEmail.value,
             customer_locations_id: selectAddress.value ? selectAddress.value.id : '',
             company_name: companyName.value,
@@ -901,6 +912,7 @@ function addNewAddress() {
     countryName.value = 'India';
     companyName.value = '';
     isExistingCustomer.value = false;
+    isnewCustomer.value = true;
     selectAddress.value = '';
 }
 function getText(item) {
@@ -950,7 +962,7 @@ function getAddress(customerId) {
 function getTickets() {
     selectedCustomer.value = null;
     baseURlApi
-        .get('ticket/get-detail')
+        .post('ticket/get-detail')
         .then((res) => {
             const data = res.data.data;
             problemTypeOptions.value = data.problem_types;
@@ -1046,6 +1058,7 @@ function addTempCustomer(custName) {
     newCutomerValue.value = newCustomer;
     selectCustomerList.value.unshift(newCustomer);
     isExistingCustomer.value = false;
+    isnewCustomer.value = false;
     selectAddress.value = '';
     addressLineOne.value = '';
     area.value = '';
@@ -1058,7 +1071,7 @@ function addTempCustomer(custName) {
     customerEmail.value = '';
 }
 
-const ticketId = computed(()=>route.params.id);
+const ticketId = computed(() => route.params.id);
 
 onMounted(() => {
     // ticketId.value = parseInt(localStorage.getItem('ticketId'));

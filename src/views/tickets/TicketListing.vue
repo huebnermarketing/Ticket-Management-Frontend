@@ -188,7 +188,7 @@
                     </EasyDataTable>
                 </div>
             </v-col>
-            <v-card> </v-card>
+
             <dialogBox
                 ref="deleteDialog"
                 @confirClk="confirmClick()"
@@ -209,7 +209,7 @@
     <!-- <viewTicket ref="viewTicketRef" /> -->
 </template>
 <script setup>
-import { onMounted, ref, watch, defineExpose, onUpdated } from 'vue';
+import { onMounted, ref, watch, defineExpose, onUpdated, computed } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import TopCards from '@/components/cards/TopCards.vue';
@@ -221,12 +221,15 @@ import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import 'vue3-easy-data-table/dist/style.css';
 import { useCustomizerStore } from '@/stores/customizer';
+import useEventsBus from '@/mixins/eventBus';
 
 import { router } from '@/router';
 import { useRoute } from 'vue-router';
+const { bus } = useEventsBus();
+
 const themeColor = ref('rgb(var(--v-theme-secondary))');
 const store = useCustomizerStore();
-const route = useRoute()
+const route = useRoute();
 const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
@@ -336,6 +339,9 @@ const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
 const totalItems = ref(0);
+const filters = ref(null);
+const computedResult = ref(null);
+const is_filter = ref(false);
 
 const name = ref();
 //get users
@@ -372,50 +378,65 @@ function getTickets() {
     if ((current_page.value > 1 && items.value.length >= totalItems.value) || isLoading.value) return;
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };
+    let requestbody = null;
+    if (filters.value) {
+        let ticketStatusIDs = filters.value[0]?.ticket_status_id?.map((data) => {
+            return data.id;
+        });
+        requestbody = {
+            customer_id: filters.value[0]?.customer_id?.customer_id ? [filters.value[0]?.customer_id?.customer_id] : [],
+            problem_type_id: filters.value[0]?.problem_type_id?.id ? [filters.value[0]?.problem_type_id?.id] : [],
+            ticket_status_id: filters.value[0]?.ticket_status_id.length > 0 ? ticketStatusIDs : [],
+            appointment_type_id: filters.value[0]?.appointment_type_id?.id ? [filters.value[0]?.appointment_type_id?.id] : [],
+            payment_type_id: filters.value[0]?.payment_type_id?.id ? [filters.value[0]?.payment_type_id?.id] : [],
+            priority_id: filters.value[0]?.priority_id?.id ? [filters.value[0]?.priority_id?.id] : []
+            // is_filter: true
+        };
+    }
+    const filtersparams = filters.value ? requestbody : null;
     baseURlApi
-        .get('ticket/list', { params })
+        .post(`ticket/list`, filtersparams, { params: params })
         .then((res) => {
             isLoading.value = false;
-            console.log('dataa11', res.data.data.allTicket.data);
             serverItemsLength.value = res.data.data.allTicket.total;
             totalItems.value = res.data.data.allTicket.total;
 
             ticketDashboard.value = res.data.data.ticketDashboard;
             updateTopCardValues();
-            if (0) {
-                let itemsData = [];
-                if (isFromAdd.value) {
-                    let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data);
+            // if (0) {
+            //     let itemsData = [];
+            //     if (isFromAdd.value) {
+            //         let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data);
 
-                    // Declare an empty object
-                    let uniqueObject = {};
+            //         // Declare an empty object
+            //         let uniqueObject = {};
 
-                    // Loop for the array elements
-                    for (let i in newArray) {
-                        // Extract the title
-                        let objid = newArray[i]['id'];
+            //         // Loop for the array elements
+            //         for (let i in newArray) {
+            //             // Extract the title
+            //             let objid = newArray[i]['id'];
 
-                        // Use the title as the index
-                        uniqueObject[objid] = newArray[i];
-                    }
+            //             // Use the title as the index
+            //             uniqueObject[objid] = newArray[i];
+            //         }
 
-                    // Loop to push unique object into array
-                    for (let i in uniqueObject) {
-                        itemsData.push(uniqueObject[i]);
-                    }
-                } else {
-                    itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data));
-                }
-                items.value = itemsData.slice();
-                items.value = JSON.parse(JSON.stringify(items.value));
-                const proxy = new Proxy(items.value, {
-                    get(target, prop, receiver) {
-                        return target[prop];
-                    }
-                });
-                items.value = [...proxy];
-                items.value = [...JSON.parse(JSON.stringify(items.value))];
-            }
+            //         // Loop to push unique object into array
+            //         for (let i in uniqueObject) {
+            //             itemsData.push(uniqueObject[i]);
+            //         }
+            //     } else {
+            //         itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data));
+            //     }
+            //     items.value = itemsData.slice();
+            //     items.value = JSON.parse(JSON.stringify(items.value));
+            //     const proxy = new Proxy(items.value, {
+            //         get(target, prop, receiver) {
+            //             return target[prop];
+            //         }
+            //     });
+            //     items.value = [...proxy];
+            //     items.value = [...JSON.parse(JSON.stringify(items.value))];
+            // }
             items.value.push(...res.data.data.allTicket.data);
             current_page.value++;
         })
@@ -450,25 +471,26 @@ function openAddTicket() {
 function openEditDialog(id) {
     //  localStorage.setItem("ticketId",id)
     //  console.log("openn")
-      router.push({
+    router.push({
         name: 'EditTicket',
-        params: {id}
+        params: { id }
     });
     // editcustomer.value?.addaddressData()
 }
-function openViewDrawer() {
+function openViewDrawer(id) {
     // viewTicketRef.value.openViewTicketDrawer();
+    store.SET_TICKET_ID(id);
     store.SET_CUSTOMIZER_DRAWER(!store.Customizer_drawer);
-    name.value = viewTicket
+    name.value = viewTicket;
     store.SET_COMPONENT_NAME(name.value);
-    store.SET_DRAWER_WIDTH('1000')
+    store.SET_DRAWER_WIDTH('1000');
 }
 
 function openFilterDrawer() {
     store.SET_CUSTOMIZER_DRAWER(!store.Customizer_drawer);
-    name.value = filterTicket
+    name.value = filterTicket;
     store.SET_COMPONENT_NAME(name.value);
-    store.SET_DRAWER_WIDTH('500')
+    store.SET_DRAWER_WIDTH('500');
 }
 function openChangePasswordDialog(id) {
     changePasswordFromUser.value?.open(id);
@@ -481,6 +503,8 @@ function confirmClick() {
         .delete(`ticket/delete/${deleteId.value}`)
         .then((res) => {
             deleteDialog.value?.close();
+            current_page.value = 1;
+            items.value = [];
             getTickets();
             showSnackbar.value = true;
             isSnackbar.value = true;
@@ -506,14 +530,38 @@ function deleteTicket(id) {
 onMounted(() => {
     getTickets();
 });
+
+//  filters.value = computed(() => {
+//       return bus.value.get('filterdata')
+// })
 // TODO: split routes & remove block below
-watch(() => route.name, (e) => {
-    if (e === 'Tickets') {
-        current_page.value = 1
-        items.value = []
-        getTickets()
+watch(
+    () => route.name,
+    (e) => {
+        if (e === 'Tickets') {
+            current_page.value = 1;
+            items.value = [];
+            getTickets();
+        }
     }
-})
+);
+watch(
+    () => bus.value.get('filterdata'),
+    (val) => {
+        console.log('val', val);
+        //  if(val.is_filter){
+        //     is_filter.value = true
+        filters.value = val;
+        current_page.value = 1;
+        items.value = [];
+        getTickets();
+        //  }
+    }
+);
+// watch(()=>filters.value,(val) => {
+//     console.log("cs",val)
+//     getTickets()
+// })
 </script>
 
 <style>

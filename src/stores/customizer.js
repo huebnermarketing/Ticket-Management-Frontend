@@ -14,7 +14,9 @@ export const useCustomizerStore = defineStore({
     boxed: config.boxed,
     setBorderCard: config.setBorderCard,
     ComponentName : null,
-    drawerWidth:""
+    drawerWidth:"",
+    ticketID: 0,
+    filterData : null
   }),
 
   getters: {
@@ -44,6 +46,12 @@ export const useCustomizerStore = defineStore({
     },
     SET_DRAWER_WIDTH(payload) {
       this.drawerWidth = payload
+    },
+    SET_TICKET_ID(payload) {
+      this.ticketID = payload
+    },
+    SET_FILTER_DATA(payload) {
+      this.ticketID = payload
     }
   }
 })

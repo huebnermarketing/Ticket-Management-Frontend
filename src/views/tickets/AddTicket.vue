@@ -307,8 +307,6 @@
                                     <!---------------------------------- Problem type --------------------------------->
                                     <v-col cols="12" md="6">
                                                                                     <!-- @blur="onEnterProblem(e)" -->
-
-                                        {{problemType}}----->{{searchProblem}}
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Problem type</v-label>
                                         <v-combobox
                                             class="prolem-typ"

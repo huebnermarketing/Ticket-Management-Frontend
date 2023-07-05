@@ -70,7 +70,7 @@
                                                     autocomplete="off"
                                                 ></v-text-field>
                                             </template>
-                                            <v-list class="pa-0">
+                                            <v-list class="pa-0 combotext" style="box-shadow:none !imporatant">
                                                 <v-row v-if="!filteredCustomers.length && customerSearchModel.length" class="ma-0">
                                                     <v-col cols="12">No customers found matching "{{ customerSearchModel }}"</v-col>
                                                     <v-col>
@@ -306,15 +306,18 @@
                                     <v-divider class="ticket-devider"></v-divider>
                                     <!---------------------------------- Problem type --------------------------------->
                                     <v-col cols="12" md="6">
+                                                                                    <!-- @blur="onEnterProblem(e)" -->
+
+                                        {{problemType}}----->{{searchProblem}}
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Problem type</v-label>
                                         <v-combobox
                                             class="prolem-typ"
                                             v-model="problemType"
                                             v-model:search="searchProblem"
                                             :items="problemTypeOptions"
+                                            @blur="onBlurCalled()"
                                             @click:clear="getInitialDataProblemType()"
                                             @keydown.enter="onEnterProblem(e)"
-                                            @blur="onEnterProblem(e)"
                                             @keydown.enter.capture.prevent.stop
                                             :hide-no-data="false"
                                             item-title="problem_name"
@@ -865,7 +868,14 @@ function onEnter() {
         selectAddress.value = '';
     }
 }
+function onBlurCalled() {
+    searchProblem.value = ' '
+    if(problemType.value.length <= 0){
+        problemType.value = []
+    }
+}
 function onEnterProblem() {
+    console.log("search prblm",searchProblem.value,problemType.value)
     if (searchProblem.value.length > 0) {
         if (problemTypeOptions.value.filter((data) => data.problem_name.toUpperCase() === searchProblem.value.toUpperCase()).length == 0) {
             const requestBody = {
@@ -875,7 +885,6 @@ function onEnterProblem() {
                 .post('settings/problem-type/add', requestBody)
                 .then((res) => {
                     searchProblem.value = '';
-
                     problemTypeOptions.value.unshift(res.data.data);
 
                     let prblmType = problemType.value.filter((x) => typeof x === 'object');

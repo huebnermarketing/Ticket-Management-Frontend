@@ -34,7 +34,6 @@
                                 <v-row>
                                     <!---------------------------------- customer name --------------------------------->
                                     <v-col cols="12" md="6">
-                                        {{ customerSearchModel }}
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Customer Name</v-label>
                                         <v-menu open-on-focus>
                                             <template v-slot:activator="{ props }">
@@ -842,10 +841,10 @@ async function editTicket() {
         const requestBody = {
             ticket_type: tiketTypeRadio.value,
             customer_name: customerSearchModel.value,
-            is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
+            // is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
             customer_id: selectedCustomerModel.value.id,
             email: customerEmail.value,
-            customer_locations_id: selectAddress.value ? selectAddress.value.id : '',
+            customer_locations_id: selectAddress.value ? selectAddress.value.id :"",
             company_name: companyName.value,
             address_line1: addressLineOne.value,
             area: area.value,

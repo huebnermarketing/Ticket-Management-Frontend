@@ -41,21 +41,21 @@ const AuthRoutes = {
             path: '/forgot-password',
             component: () => import('@/views/authentication/ForgotPassword.vue')
         },
-        {
-            name: 'Boxed Forgot Password',
-            path: '/forgot-password2',
-            component: () => import('@/views/authentication/BoxedForgotPassword.vue')
-        },
-        {
-            name: 'Side Two Steps',
-            path: '/auth/two-step',
-            component: () => import('@/views/authentication/SideTwoStep.vue')
-        },
-        {
-            name: 'Boxed Two Steps',
-            path: '/auth/two-step2',
-            component: () => import('@/views/authentication/BoxedTwoStep.vue')
-        },
+        // {
+        //     name: 'Boxed Forgot Password',
+        //     path: '/forgot-password2',
+        //     component: () => import('@/views/authentication/BoxedForgotPassword.vue')
+        // },
+        // {
+        //     name: 'Side Two Steps',
+        //     path: '/auth/two-step',
+        //     component: () => import('@/views/authentication/SideTwoStep.vue')
+        // },
+        // {
+        //     name: 'Boxed Two Steps',
+        //     path: '/auth/two-step2',
+        //     component: () => import('@/views/authentication/BoxedTwoStep.vue')
+        // },
         {
             name: 'Error',
             path: '/auth/404',

@@ -212,7 +212,6 @@ const {
     countyrule,
     arearule,
     addresslinerule,
-    companynamerule,
     confirmpwd,
     newpwd,
     firstnamerule,

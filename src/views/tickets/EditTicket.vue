@@ -253,9 +253,9 @@
                                         ></v-textarea>
                                     </v-col>
                                     <!---------------------------------- Due Date --------------------------------->
-                                    <v-col cols="12" sm="6">
+                                    <v-col cols="12" sm="6" class="position-relative">
                                         <v-label for="due_date" class="mb-2 font-weight-medium text-capitalize required">Due Date</v-label>
-                                        <v-text-field
+                                        <!-- <v-text-field
                                             class="due-date"
                                             color="primary"
                                             variant="outlined"
@@ -264,7 +264,28 @@
                                             @keydown="restrictKeyUp($event)"
                                             v-model="dueDate"
                                             :rules="requiredrule"
-                                        ></v-text-field>
+                                        ></v-text-field> -->
+                                        <flat-pickr
+                                            id="projectStartDate"
+                                            noCalendar="true"
+                                            v-model="dueDate"
+                                            class="v-field__input end-d"
+                                            @input="isEmptyStartDate = false"
+                                            :class="isEmptyStartDate ? 'custom-border-color' : ''"
+                                            :config="startDateConfig"
+                                            :rules="requiredrule"
+                                        />
+
+                                        <div class="flat-calender" data-toggle>
+                                            <CalendarIcon width="21" stroke-width="1.5" />
+                                        </div>
+                                        <div class="v-input__details" v-if="isEmptyStartDate">
+                                            <div class="v-messages text-error custom-err">
+                                                <div class="v-messages__message custom-err" style="transform-origin: center top 0px">
+                                                    This field is required.
+                                                </div>
+                                            </div>
+                                        </div>
                                     </v-col>
                                     <!---------------------------------- Assign Engineer --------------------------------->
                                     <v-col cols="12" md="6">
@@ -340,6 +361,7 @@
                                             color="primary"
                                             :rules="amountRule"
                                             @input="remainAmount"
+                                            v-bind="amountFormat"
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- Payment status --------------------------------->
@@ -373,6 +395,7 @@
                                             variant="outlined"
                                             color="primary"
                                             @input="remainAmount"
+                                            v-bind="amountFormat"
                                             disabled="true"
                                         ></v-text-field>
                                     </v-col>
@@ -385,6 +408,7 @@
                                             variant="outlined"
                                             color="primary"
                                             disabled
+                                            v-bind="amountFormat"
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- payment mode --------------------------------->
@@ -537,6 +561,9 @@ import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import { router } from '@/router';
 import { useRoute } from 'vue-router';
+import moment from 'moment';
+import flatPickr from 'vue-flatpickr-component';
+import 'flatpickr/dist/flatpickr.css';
 const route = useRoute();
 const { emailPatternrule, requiredrule, mobilerule, ticketdropdownrule, amountRule } = formValidationsRules();
 
@@ -567,9 +594,9 @@ const customerOptions = ref([
     }
 ]);
 
-
 const showPicker = ref(false);
 const selectedDate = ref(null);
+const isEmptyStartDate = ref(false);
 
 const editTicketform = ref();
 const problemType = ref([]);
@@ -627,6 +654,16 @@ const page = ref({ title: 'Users' });
 const current_page = ref(1);
 const emptyProblemType = ref(false);
 const isnewCustomer = ref(false);
+const amountFormat = ref({
+    prefix: '$ ',
+    masked: false
+});
+const startDateConfig = ref({
+    wrap: 'true',
+    disableMobile: 'true',
+    dateFormat: 'Y-m-d',
+    altFormat: 'Y-m-d'
+});
 /******************************************************** edit ticket **********************************************/
 // const ticketId = ref(0);
 
@@ -688,7 +725,7 @@ function getTicketData() {
             problemType.value = data.problem_types;
             problemTitle.value = data.problem_title;
             description.value = data.description;
-            dueDate.value = data.due_date;
+            dueDate.value = moment(data.due_date).format('YYYY-MM-DD');
             assignEr.value = data.assigned_engineer;
             Ticketpriority.value = data.ticket_priority;
             ticketStatus.value = data.ticket_status;
@@ -831,12 +868,15 @@ async function editTicket() {
     const problem_type = problemType.value.map((data) => {
         return data.id;
     });
+      if (dueDate.value == '') {
+        isEmptyStartDate.value = true;
+    }
     // if (isnewCustomer.value == true) {
     //  console.log("existng enter",customerSearchModel.value)
     // selectedCustomerModel.value.first_name = customerSearchModel.value?.first_name; // Gets the first part
     // selectedCustomerModel.value.last_name = customerSearchModel.value?.last_name.replace(' ', '');
     // }
-    if (valid) {
+    if (valid && dueDate.value !== '') {
         issubmit.value = true;
         const requestBody = {
             ticket_type: tiketTypeRadio.value,
@@ -844,7 +884,7 @@ async function editTicket() {
             // is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
             customer_id: selectedCustomerModel.value.id,
             email: customerEmail.value,
-            customer_locations_id: selectAddress.value ? selectAddress.value.id :"",
+            customer_locations_id: selectAddress.value ? selectAddress.value.id : '',
             company_name: companyName.value,
             address_line1: addressLineOne.value,
             area: area.value,
@@ -1069,14 +1109,28 @@ function addTempCustomer(custName) {
     mobile.value = '';
     customerEmail.value = '';
 }
-
+function getCurrency() {
+    baseURlApi
+        .get('settings/company/get-currency')
+        .then((res) => {
+            amountFormat.value.prefix = res.data.data.currency.symbol + ' ';
+        })
+        .catch((error) => {
+            // isLoading.value = false;
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
 const ticketId = computed(() => route.params.id);
 
 onMounted(() => {
     // ticketId.value = parseInt(localStorage.getItem('ticketId'));
     getTicketData();
-    console.log('rrr', ticketId.value);
     getTickets();
+    getCurrency();
 });
 </script>
 <style scoped>

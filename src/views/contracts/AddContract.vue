@@ -15,14 +15,13 @@
                                     <!---------------------------------- customer name --------------------------------->
                                     <v-col cols="12" md="4">
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Customer Name</v-label>
-
                                         <v-menu open-on-focus>
                                             <template v-slot:activator="{ props }">
                                                 <v-text-field
                                                     @click:clear="
                                                         () => {
                                                             customerSearchModel = '';
-                                                            selectedCustomerModel = {};
+                                                            selectedCustomerModel = null;
                                                             isExistingCustomer = false;
                                                             selectAddress = '';
                                                             addressLineOne = '';
@@ -39,7 +38,9 @@
                                                             customerEmail.value = '';
                                                         }
                                                     "
-                                                 
+                                                    @change="isEmptyCustomerName = false"
+                                                    @input="isEmptyCustomerName = false"
+                                                    @update:modelValue="isEmptyCustomerName = false"
                                                     clearable
                                                     hide-details
                                                     placeholder="Please select customer"
@@ -52,7 +53,7 @@
                                                     :rules="requiredrule"
                                                 >
                                                 </v-text-field>
-                                                <div class="v-input__details" v-if="isEmptyStartDate">
+                                                <div class="v-input__details" v-if="isEmptyCustomerName">
                                                     <div class="v-messages text-error custom-err">
                                                         <div
                                                             class="v-messages__message custom-err"
@@ -217,7 +218,6 @@
                                             </v-col>
                                             <!---------------------------------- service type --------------------------------->
                                             <v-col cols="12" md="6">
-                                                <!-- @blur="oneEnterService(e)" -->
                                                 <v-label class="mb-2 font-weight-medium text-capitalize required">service type</v-label>
                                                 <v-combobox
                                                     class="prolem-typ"
@@ -348,6 +348,7 @@
                                                                     variant="outlined"
                                                                     type="text"
                                                                     :rules="amountRule"
+                                                                    v-bind="amountFormat"
                                                                 />
                                                             </div>
                                                         </v-col>
@@ -388,6 +389,7 @@
                                                 <v-text-field
                                                     v-model="contractAmount"
                                                     variant="outlined"
+                                                    v-bind="amountFormat"
                                                     color="primary"
                                                     :rules="amountRule"
                                                 ></v-text-field>
@@ -409,9 +411,6 @@
                                                     label="Please select contract duration"
                                                     :rules="ticketdropdownrule"
                                                 ></v-select>
-                                                <!-- <template v-slot:selection="{ item }">
-                                                    <span>{{ contractDurationOptions?.first_name + ' ' + contractDurationOptions?.last_name }} </span>
-                                                </template> -->
                                             </v-col>
                                             <!---------------------------------- payment term --------------------------------->
                                             <v-col cols="12" md="6">
@@ -458,17 +457,6 @@
                                                     </div>
                                                     <!---->
                                                 </div>
-                                                <!-- <v-text-field
-                                                    class="due-date"
-                                                    color="primary"
-                                                    variant="outlined"
-                                                    type="date"
-                                                    id="due_date"
-                                                    @keydown="restrictKeyUp($event)"
-                                                    @input="selectedEndDateval()"
-                                                    v-model="startDate"
-                                                    :rules="requiredrule"
-                                                ></v-text-field> -->
                                             </v-col>
                                             <!---------------------------------- end Date --------------------------------->
                                             <v-col cols="12" sm="6" class="position-relative">
@@ -586,28 +574,21 @@ const mobile = ref('');
 const customerName = ref('');
 const customers = ref([]);
 const issubmit = ref(false);
-const customerOptions = ref([
-    {
-        name: 'one',
-        value: '1'
-    },
-    {
-        name: 'two',
-        value: '2'
-    }
-]);
 const showPicker = ref(false);
 const selectedDate = ref(null);
 const isAutoRenew = ref(true);
 
+const amountFormat = ref({
+    prefix: '$ ',
+    masked: false
+});
 const createContractform = ref();
 const tabsform = ref();
 const serviceType = ref([]);
 const serviceTypeOptions = ref([]);
 const productServiceTypeOptions = ref([]);
 const searchService = ref('');
-const Ticketpriority = ref([]);
-const TicketpriorityOptions = ref([]);
+
 const addressLineOne = ref('');
 const area = ref('');
 const city = ref('');
@@ -628,39 +609,18 @@ const isnewCustomer = ref(false);
 const isExistingProblem = ref(true);
 const addressOptions = ref([]);
 const contract = ref([]);
-const contractOptions = ref([
-    {
-        name: 'one',
-        value: '1'
-    },
-    {
-        name: 'two',
-        value: '2'
-    }
-]);
+
 const contractDuration = ref([]);
-const customerComboBox = ref();
-const newCutomerValue = ref(null);
 const customInput = ref();
 const contractDurationOptions = ref([]);
 const paymentTerm = ref([]);
 const paymentTermOptions = ref([]);
-const ticketStatus = ref([]);
-const ticketStatusOptions = ref();
-const paymentStatus = ref([]);
-const paymentStatusOptions = ref([]);
-const paymentMode = ref([]);
-const paymentModeOptions = ref([]);
-const appointmentType = ref([]);
-const appointmentTypeOptions = ref([]);
-const gender = ref(['Male', 'Female']);
-const tiketTypeRadio = ref('adhoc');
+
+const customerSearchModel = ref('');
 const country = ref(['USA', 'United Kingdom', 'India', 'Srilanka']);
-const tab = ref(null);
 const customerEmail = ref('');
 const page = ref({ title: 'Users' });
 const current_page = ref(1);
-const emptyserviceType = ref(false);
 const isEmptyStartDate = ref(false);
 const isEmptyCustomerName = ref(false);
 /********************************************************** flat picker ***********************************************/
@@ -685,34 +645,7 @@ const breadcrumbs = ref([
         href: '#'
     }
 ]);
-/***************************************************** validations rules *********************************************/
-const collectAmountRule = [
-    () => {
-        if (collectedAmount.value.length > 0) {
-            if (parseInt(collectedAmount.value) <= parseInt(contractAmount.value)) return true;
-            return 'Collected amount must be a less than ticket amount.';
-        }
-    },
-    () => {
-        if (collectedAmount.value) return true;
-        return 'This field is required.';
-    },
-    () => {
-        if (parseInt(collectedAmount.value) >= 0) return true;
-        return 'This field must be a positive value.';
-    }
-];
-
 /********************************************** methods  ********************************************************/
-function renderItemTitle(item) {
-    const fname = item?.raw?.first_name;
-    const lname = item?.raw?.last_name;
-    const phone = item?.raw?.phone;
-    const name = [fname, lname].filter(Boolean).join(' ');
-    if (phone) return name + ' - (' + phone + ')';
-    // return name
-    return item.title;
-}
 function getEndDate() {
     isEmptyStartDate.value = false;
     let tempDate;
@@ -732,12 +665,8 @@ function getEndDate() {
         tempDate = new Date(startDate.value).fp_incr(30);
         endDate.value = tempDate;
     }
-    // let tempd = new Date(startDate.value).fp_incr(10);
-
-    console.log('end date', tempDate);
 }
 function getinputs() {
-    console.log('inputttt');
     addressLineOne.value = selectAddress.value?.address_line1;
     area.value = selectAddress.value?.area;
     city.value = selectAddress.value?.city;
@@ -764,77 +693,22 @@ function getCustomersList() {
     baseURlApi
         .get('customer/list', { params })
         .then((res) => {
-            //  isLoading.value = false;
-            //  serverItemsLength.value = res.data.data.total;
             selectCustomerList.value = res.data.data.data;
         })
         .catch((error) => {
-            // isLoading.value = false;
-            // isSnackbar.value = true;
-            // showSnackbar.value = true
-            // message.value = error.response.data.message;
-            // color.value = 'error';
-            // icon.value = 'mdi-close-circle';
+            isLoading.value = false;
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
         });
 }
 function closeDialog() {
     router.push('/contracts');
 }
-function onEnter() {
-    const data = (searchCustomer.value || '').trim();
-    let val = {};
-    if (data.includes(' ')) {
-        var index = data.indexOf(' ');
-        var id = data.slice(0, index); // Gets the first part
-        var text = data.slice(index + 1);
-        val = {
-            id: '',
-            first_name: id,
-            last_name: text,
-            email: '',
-            created_at: '',
-            updated_at: '',
-            // customer_id: '',
-            phone: ''
-        };
-    } else {
-        val = {
-            id: '',
-            first_name: data,
-            last_name: '',
-            email: '',
-            created_at: '',
-            updated_at: '',
-            // customer_id: '',
-            phone: ''
-        };
-    }
-
-    // var someString = data;
-    // var index = someString.indexOf(' ');
-    // if (index) {
-    //     // Gets the first index where a space occours
-    //     var id = someString.slice(0, index); // Gets the first part
-    //     var text = someString.slice(index + 1);
-
-    // } // Gets the text part
-
-    if (!selectCustomerList.value.includes(data)) {
-        addressLineOne.value = '';
-        area.value = '';
-        city.value = '';
-        zipcode.value = '';
-        state.value = '';
-        countryName.value = 'India';
-        companyName.value = '';
-        selectCustomerList.value.unshift(val);
-        isExistingCustomer.value = false;
-        selectAddress.value = '';
-    }
-}
 
 function oneEnterService() {
-    console.log('search prblm', searchService.value, serviceType.value);
     if (searchService.value.length > 0) {
         if (serviceTypeOptions.value.filter((data) => data.contract_name.toUpperCase() === searchService.value.toUpperCase()).length == 0) {
             const requestBody = {
@@ -863,17 +737,8 @@ function oneEnterService() {
     }
 }
 
-/*methods*/
-function onBlur() {
-    if (searchCustomer.value?.length) {
-        const newItem = {
-            first_name: selectedCustomer.value,
-            id: selectCustomerList.value.length + 1
-        };
-        // selectCustomerList.value.unshift(newItem)
-        selectedCustomer.value = newItem;
-    }
-}
+/******************************************** methods **********************************************/
+
 function confirmClick() {
     issubmit.value = true;
     const contractTypeId = serviceType.value.map((data) => {
@@ -926,26 +791,16 @@ function confirmClick() {
 async function createContract() {
     const { valid } = await createContractform.value?.validate();
     const { validtabs } = await tabsform.value?.validate();
-    //   confirmDialog.value?.open();
-    // console.log('dialofff', confirmDialog.value.open());
     if (startDate.value == '') {
         isEmptyStartDate.value = true;
     }
-    if(!selectedCustomerModel.value){
-        isEmptyCustomerName.value = true
+    console.log(selectedCustomerModel.value);
+    if (selectedCustomerModel.value == null) {
+        isEmptyCustomerName.value = true;
     }
-    if (valid && startDate.value !== '' && selectedCustomerModel.value) {
-        // deleteId.value = 1;
+    if (valid && startDate.value !== '' && selectedCustomerModel.value !== null) {
         confirmDialog.value?.open();
     }
-}
-function getFieldText(item) {
-    return (
-        `${item?.first_name ? item.first_name : ''}` +
-        ' ' +
-        `${item?.last_name ? item.last_name : ''}` +
-        ` ${item?.phone ? '-(' + item.phone + ')' : ''}`
-    );
 }
 function getAddressText(item) {
     return (
@@ -956,12 +811,6 @@ function getAddressText(item) {
         `${item?.city ? item.city : ''}` +
         ` ${item?.zipcode ? '-(' + item.zipcode + ')' : ''}`
     );
-}
-function getText(item) {
-    return `${item.first_name ? item.first_name : ''}` + ' ' + `${item.last_name ? item.last_name : ''}`;
-}
-function getCustomers() {
-    return selectCustomerList.value;
 }
 function getPaymentTermsinputs() {
     startDate.value = '';
@@ -1007,35 +856,6 @@ function getPaymentTermsinputs() {
         return (paymentTermOptions.value = tempPaymentTerms);
     }
 }
-function clearOnInput() {
-    selectedCustomer.value = null;
-}
-function searchCustomers() {
-    const fd = new FormData();
-    if (selectedCustomer.value.length > 0) {
-        fd.append('search_text', selectedCustomer.value);
-        baseURlApi
-            .post(`customer/search?total_record=${current_page.value}`, fd)
-            .then((res) => {
-                customerOptions.value = res.data.data.data;
-            })
-            .catch((error) => {});
-    }
-}
-// function searchNewCustomers() {
-//     clearTimeout(searchTimer.value);
-//     searchTimer.value = setTimeout(() => {
-//         if (customerSearchModel.value.trim().length < 3) return;
-//         const fd = new FormData();
-//         fd.append('search_text', customerSearchModel.value);
-//         baseURlApi
-//             .post(`customer/search?total_record=50`, fd)
-//             .then((res) => {
-//                 selectCustomerList.value = res.data.data.data;
-//             })
-//             .catch((error) => {});
-//     }, 400);
-// }
 function getcustomerdata(customer) {
     customer = customer || selectedCustomer.value || {};
     mobile.value = customer.phone;
@@ -1046,11 +866,6 @@ function getcustomerdata(customer) {
             .get(`ticket/get-customer-address/${customer.id}`)
             .then((res) => {
                 addressOptions.value = res.data.data;
-
-                // addressOptions.value.push({
-                //     address_line1: 'Add new address',
-                //     color: 'primary'
-                // });
                 selectAddress.value = addressOptions.value.filter((data) => data.is_primary == 1)[0];
                 addressLineOne.value = selectAddress.value.address_line1;
                 area.value = selectAddress.value.area;
@@ -1069,55 +884,16 @@ function getcustomerdata(customer) {
             });
     }
 }
-
-function getTickets() {
-    selectedCustomer.value = null;
-    baseURlApi
-        .post('ticket/get-detail')
-        .then((res) => {
-            const data = res.data.data;
-            // serviceTypeOptions.value = data.problem_types;
-            // contractDurationOptions.value = data.assign_engineer;
-            ticketStatusOptions.value = data.ticket_status;
-            data.ticket_status.map((data) => {
-                if (data.unique_id == '10001') {
-                    ticketStatus.value = data;
-                }
-            });
-            data.payment_status.map((data) => {
-                if (data.unique_id == '10003') {
-                    paymentStatus.value = data;
-                }
-            });
-            appointmentTypeOptions.value = data.appointment_type;
-            paymentStatusOptions.value = data.payment_status;
-            paymentModeOptions.value = data.payment_mode;
-            TicketpriorityOptions.value = data.ticket_priorities;
-            getCustomersList();
-            // selectCustomerList.value = data.customers;
-        })
-        .catch((error) => {
-            isSnackbar.value = true;
-            showSnackbar.value = true;
-            message.value = error.response.data.message;
-            color.value = 'error';
-            icon.value = 'mdi-close-circle';
-        });
-}
 function getDropDownData() {
-    // isLoading.value = true;
-    // isSnackbar.value = false;
     baseURlApi
         .get('contract/get-details')
         .then((res) => {
-            // isLoading.value = false;
             serviceTypeOptions.value = res.data.data.contract_services;
             productServiceTypeOptions.value = res.data.data.product_services;
             contractDurationOptions.value = res.data.data.contract_duration;
             paymentTermOptions.value = res.data.data.contract_payment_terms;
         })
         .catch((error) => {
-            // isLoading.value = false;
             isSnackbar.value = true;
             showSnackbar.value = true;
             message.value = error.response.data.message;
@@ -1132,16 +908,12 @@ function getInitialData() {
     selectAddress.value = '';
     customerEmail.value = '';
     customInput.value.reset();
-
-    // customerComboBox.value.reset();
 }
 function clearInput() {
     isExistingCustomer.value = false;
-    // getAddress()
 }
 function getInitialDataserviceType() {
     serviceType.value = '';
-    // isExistingCustomer.value = false;
 }
 function onBlurCalled() {
     console.log('tempServiceType', serviceType.value, searchService.value);
@@ -1151,26 +923,7 @@ function onBlurCalled() {
     }
     console.log('tempServiceType', serviceType.value, searchService.value);
 }
-function restrictKeyUp(event) {
-    event.preventDefault();
-}
-function changePaymentMode() {
-    if (paymentStatus.value.unique_id == '10003' || paymentStatus.value.unique_id == '10004') {
-        remainingAmount.value = 0;
-    }
-
-    if (paymentStatus.value.id == 2) {
-        paymentMode.value = paymentModeOptions.value[1];
-    } else {
-        paymentMode.value = [];
-    }
-}
-
 /************************* computed  ***************************/
-const remainAmount = computed(() => {
-    return (remainingAmount.value = parseInt(contractAmount.value) - parseInt(collectedAmount.value));
-});
-
 const fromDateDisp = computed(() => {
     return fromDateVal.value;
     // format/do something with date
@@ -1189,14 +942,8 @@ const filteredCustomers = computed(() => {
             );
     });
 });
-function selectedEndDateval() {
-    var date = startDate.value;
-    let tempDate = date.setDate(date.getDate() + 30);
-    console.log('temp date', tempDate);
-    endDate.value = tempDate;
-}
-const customerSearchModel = ref('');
-const selectedCustomerModel = ref({});
+
+const selectedCustomerModel = ref(null);
 const searchTimer = ref({});
 
 function addTempCustomer(custName) {
@@ -1231,7 +978,7 @@ function addTempCustomer(custName) {
     //     phone: '',
     //     id: selectCustomerList.value.length + 1
     // };
-    newCutomerValue.value = newCustomer;
+    // newCutomerValue.value = newCustomer;
     selectCustomerList.value.unshift(newCustomer);
     isExistingCustomer.value = false;
     isnewCustomer.value = true;
@@ -1249,25 +996,27 @@ function addTempCustomer(custName) {
 
     // selectCustomerList.value.unshift(val);
 }
-
+function getCurrency() {
+    baseURlApi
+        .get('settings/company/get-currency')
+        .then((res) => {
+            amountFormat.value.prefix = res.data.data.currency.symbol + ' ';
+        })
+        .catch((error) => {
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
 onMounted(() => {
-    getTickets();
+    getCustomersList();
     getDropDownData();
+    getCurrency();
 });
-
-// watch(selectedCustomer.value, (val) => {
-//     if (val.length > 5) {
-//         this.$nextTick(() => selectedCustomer.value.pop());
-//         console.lof('watchh', selectedCustomer.value);
-//     }
-// });
 </script>
 <style scoped>
-.flat-calender {
-    position: absolute;
-    right: 21px;
-    top: 54px;
-}
 .v-input--density-default,
 .v-field--variant-solo,
 .v-field--variant-filled {
@@ -1310,23 +1059,6 @@ div.v-tabs-bar {
 }
 .ticket-type-radio {
     margin-left: 20px !important;
-}
-.end-d {
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    padding: 0 !important;
-    padding: 12px 6px 8px 16px !important;
-    font-size: 14px;
-    min-height: 42px;
-}
-.disabled-inp {
-    background: #eee;
-}
-.custom-err {
-    opacity: 1 !important;
-}
-.custom-border-color {
-    border-color: rgb(250, 137, 107) !important;
 }
 /* #due_date{
     cursor: pointer !important;

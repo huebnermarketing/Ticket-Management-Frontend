@@ -292,6 +292,7 @@
 import { ref, defineExpose, onMounted, computed } from 'vue';
 import { useCustomizerStore } from '@/stores/customizer';
 import { baseURlApi } from '@/api/axios';
+import dialogBox from '@/components/TicketComponents/dialog.vue';
 import TopCards from '@/components/cards/TopCards.vue';
 import { router } from '@/router';
 const store = useCustomizerStore();
@@ -437,8 +438,7 @@ function cancelComment() {
 }
 function deleteComment(id) {
     deleteId.value = id;
-    deleteDialog.value?.open();
-   
+    deleteDialog.value?.open();  
 }
 //cancel delete from dialog
 function cancelClick() {
@@ -449,13 +449,15 @@ function cancelClick() {
 function confirmClick() {
    isLoading.value = true;
     baseURlApi
-        .delete(`ticket/comment/delete/${id}`)
+        .delete(`ticket/comment/delete/${deleteId.value}`)
         .then((res) => {
+            deleteDialog.value?.close();
             isLoading.value = false;
             getComments();
         })
         .catch((error) => {
             console.log('errr', error);
+            deleteDialog.value?.close();
             isSnackbar.value = true;
             showSnackbar.value = true;
             message.value = error.response.data.message;

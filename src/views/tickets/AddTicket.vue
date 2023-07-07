@@ -41,7 +41,7 @@
                                                     @click:clear="
                                                         () => {
                                                             customerSearchModel = '';
-                                                            selectedCustomerModel = {};
+                                                            selectedCustomerModel = null;
                                                             isExistingCustomer = false;
                                                             selectAddress = '';
                                                             addressLineOne = '';
@@ -49,7 +49,6 @@
                                                             city = '';
                                                             zipcode = '';
                                                             state = '';
-
                                                             countryName = 'India';
                                                             companyName = '';
                                                             mobile = '';
@@ -68,9 +67,22 @@
                                                     v-model="customerSearchModel"
                                                     ref="customInput"
                                                     autocomplete="off"
-                                                ></v-text-field>
+                                                    :rules="requiredrule"
+                                                >
+                                                </v-text-field>
+                                                <div class="v-input__details" v-if="isEmptyCustomerName">
+                                                    <div class="v-messages text-error custom-err">
+                                                        <div
+                                                            class="v-messages__message custom-err"
+                                                            style="transform-origin: center top 0px"
+                                                        >
+                                                            This field is required.
+                                                        </div>
+                                                    </div>
+                                                    <!---->
+                                                </div>
                                             </template>
-                                            <v-list class="pa-0 combotext" style="box-shadow:none !imporatant">
+                                            <v-list class="pa-0 combotext" style="box-shadow: none !imporatant">
                                                 <v-row v-if="!filteredCustomers.length && customerSearchModel.length" class="ma-0">
                                                     <v-col cols="12">No customers found matching "{{ customerSearchModel }}"</v-col>
                                                     <v-col>
@@ -306,7 +318,7 @@
                                     <v-divider class="ticket-devider"></v-divider>
                                     <!---------------------------------- Problem type --------------------------------->
                                     <v-col cols="12" md="6">
-                                                                                    <!-- @blur="onEnterProblem(e)" -->
+                                        <!-- @blur="onEnterProblem(e)" -->
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Problem type</v-label>
                                         <v-combobox
                                             class="prolem-typ"
@@ -378,9 +390,9 @@
                                         ></v-textarea>
                                     </v-col>
                                     <!---------------------------------- Due Date --------------------------------->
-                                    <v-col cols="12" sm="6">
+                                    <v-col cols="12" sm="6" class="position-relative">
                                         <v-label for="due_date" class="mb-2 font-weight-medium text-capitalize required">Due Date</v-label>
-                                        <v-text-field
+                                        <!-- <v-text-field
                                             class="due-date"
                                             color="primary"
                                             variant="outlined"
@@ -389,7 +401,28 @@
                                             @keydown="restrictKeyUp($event)"
                                             v-model="dueDate"
                                             :rules="requiredrule"
-                                        ></v-text-field>
+                                        ></v-text-field> -->
+                                        <flat-pickr
+                                            id="projectStartDate"
+                                            noCalendar="true"
+                                            v-model="dueDate"
+                                            class="v-field__input end-d"
+                                            @input="isEmptyStartDate = false"
+                                            :class="isEmptyStartDate ? 'custom-border-color' : ''"
+                                            :config="startDateConfig"
+                                            :rules="requiredrule"
+                                        />
+
+                                        <div class="flat-calender" data-toggle>
+                                            <CalendarIcon width="21" stroke-width="1.5" />
+                                        </div>
+                                        <div class="v-input__details" v-if="isEmptyStartDate">
+                                            <div class="v-messages text-error custom-err">
+                                                <div class="v-messages__message custom-err" style="transform-origin: center top 0px">
+                                                    This field is required.
+                                                </div>
+                                            </div>
+                                        </div>
                                     </v-col>
                                     <!---------------------------------- Assign Engineer --------------------------------->
                                     <v-col cols="12" md="6">
@@ -464,6 +497,7 @@
                                             color="primary"
                                             :rules="amountRule"
                                             @input="remainAmount"
+                                            v-bind="amountFormat"
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- Payment status --------------------------------->
@@ -493,6 +527,7 @@
                                             v-model="collectedAmount"
                                             variant="outlined"
                                             color="primary"
+                                            v-bind="amountFormat"
                                             :rules="collectAmountRule"
                                             @input="remainAmount"
                                         ></v-text-field>
@@ -503,6 +538,7 @@
                                         <v-text-field
                                             type="number"
                                             v-model="remainingAmount"
+                                            v-bind="amountFormat"
                                             variant="outlined"
                                             color="primary"
                                             disabled
@@ -650,10 +686,13 @@
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import dialogBox from '@/components/TicketComponents/dialog.vue';
 import { formValidationsRules } from '@/mixins/formValidationRules.js';
 import { Form } from 'vee-validate';
 import { baseURlApi } from '@/api/axios';
 import { router } from '@/router';
+import flatPickr from 'vue-flatpickr-component';
+import 'flatpickr/dist/flatpickr.css';
 const { emailPatternrule, requiredrule, mobilerule, ticketdropdownrule, amountRule } = formValidationsRules();
 
 //props for toastification
@@ -664,6 +703,7 @@ const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
 
+const isEmptyStartDate = ref(false);
 const selectCustomerList = ref([]);
 const selectedCustomer = ref(null);
 const searchCustomer = ref('');
@@ -682,6 +722,12 @@ const customerOptions = ref([
         value: '2'
     }
 ]);
+const startDateConfig = ref({
+    wrap: 'true',
+    disableMobile: 'true',
+    dateFormat: 'Y-m-d',
+    altFormat: 'Y-m-d'
+});
 const showPicker = ref(false);
 const selectedDate = ref(null);
 
@@ -709,6 +755,7 @@ const isExistingCustomer = ref(true);
 const isnewCustomer = ref(false);
 const isExistingProblem = ref(true);
 const addressOptions = ref([]);
+const isEmptyCustomerName = ref(false);
 const contract = ref([]);
 const contractOptions = ref([
     {
@@ -720,6 +767,10 @@ const contractOptions = ref([
         value: '2'
     }
 ]);
+const amountFormat = ref({
+    prefix: '$ ',
+    masked: false
+});
 const assignEr = ref([]);
 const customerComboBox = ref();
 const newCutomerValue = ref(null);
@@ -867,13 +918,13 @@ function onEnter() {
     }
 }
 function onBlurCalled() {
-    searchProblem.value = ' '
-    if(problemType.value.length <= 0){
-        problemType.value = []
+    searchProblem.value = ' ';
+    if (problemType.value.length <= 0) {
+        problemType.value = [];
     }
 }
 function onEnterProblem() {
-    console.log("search prblm",searchProblem.value,problemType.value)
+    console.log('search prblm', searchProblem.value, problemType.value);
     if (searchProblem.value.length > 0) {
         if (problemTypeOptions.value.filter((data) => data.problem_name.toUpperCase() === searchProblem.value.toUpperCase()).length == 0) {
             const requestBody = {
@@ -918,7 +969,7 @@ async function createTicket() {
         return data.id;
     });
     if (isnewCustomer.value == true) {
-        console.log("existng enter")
+        console.log('existng enter');
         // if(newCutomerValue.value.includes(" ")){
         // const data = newCutomerValue.value ;
         // var index = data.indexOf(' ');
@@ -929,7 +980,13 @@ async function createTicket() {
         //     selectedCustomerModel.value.first_name = newCutomerValue.value
         // }
     }
-    if (valid) {
+    if (dueDate.value == '') {
+        isEmptyStartDate.value = true;
+    }
+    if (selectedCustomerModel.value == null) {
+        isEmptyCustomerName.value = true;
+    }
+    if (valid && dueDate.value !== '' && selectedCustomerModel.value !== null) {
         issubmit.value = true;
 
         const requestBody = {
@@ -939,9 +996,8 @@ async function createTicket() {
             // customer_name: selectedCustomerModel?.value.first_name
             //     ? [selectedCustomerModel.value?.first_name, selectedCustomerModel.value?.last_name].join(' ').trim()
             //     : customerSearchModel.value,
-              customer_name: 
-                [selectedCustomerModel.value?.first_name, selectedCustomerModel.value?.last_name].join(' ').trim(),
-               
+            customer_name: [selectedCustomerModel.value?.first_name, selectedCustomerModel.value?.last_name].join(' ').trim(),
+
             is_existing_customer: isExistingCustomer.value == true ? 1 : 0,
             customer_id: selectedCustomerModel.value?.id,
             email: customerEmail.value,
@@ -1065,6 +1121,7 @@ function searchNewCustomers() {
     }, 400);
 }
 function getAddress(customer) {
+  
     customer = customer || selectedCustomer.value || {};
     mobile.value = customer.phone;
     customerEmail.value = customer.email;
@@ -1182,19 +1239,6 @@ const filteredCustomers = computed(() => {
         return [];
     }
     const _model = (customerSearchModel.value || '').toLowerCase().trim();
-    // return selectCustomerList.value.filter(e=>{
-    //     debugger
-    //     return (
-    //         (e.first_name || '') +
-    //         (e.last_name || '') +
-    //         (e.phone || '')
-    //     ).toLowerCase().trim().includes(_model)
-    // })
-    // return selectCustomerList.value.filter(e=>{
-    //     return ((e.first_name || '').toLowerCase().includes(_model)
-    //     || (e.last_name || '').toLowerCase().includes(_model)
-    //     || (e.phone+'').includes(_model))
-    // })
     return selectCustomerList.value.filter((e) => {
         return _model
             .split(' ')
@@ -1207,7 +1251,7 @@ const filteredCustomers = computed(() => {
     });
 });
 const customerSearchModel = ref('');
-const selectedCustomerModel = ref({});
+const selectedCustomerModel = ref(null);
 const searchTimer = ref({});
 
 function addTempCustomer(custName) {
@@ -1231,21 +1275,10 @@ function addTempCustomer(custName) {
             id: selectCustomerList.value.length + 1
         };
     }
-
-    // const [first, last] = custName
-    //     .split(' ')
-    //     .map((e) => e.trim())
-    //     .filter(Boolean);
-    // const newCustomer = {
-    //     first_name: first || '',
-    //     last_name: last || '',
-    //     phone: '',
-    //     id: selectCustomerList.value.length + 1
-    // };
     newCutomerValue.value = newCustomer;
     selectCustomerList.value.unshift(newCustomer);
     isExistingCustomer.value = false;
-    isnewCustomer.value = true
+    isnewCustomer.value = true;
     selectAddress.value = '';
     addressLineOne.value = '';
     area.value = '';
@@ -1257,12 +1290,24 @@ function addTempCustomer(custName) {
     companyName.value = '';
     mobile.value = '';
     customerEmail.value = '';
-
-    // selectCustomerList.value.unshift(val);
 }
-
+function getCurrency() {
+    baseURlApi
+        .get('settings/company/get-currency')
+        .then((res) => {
+            amountFormat.value.prefix = res.data.data.currency.symbol + ' ';
+        })
+        .catch((error) => {
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
 onMounted(() => {
     getTickets();
+    getCurrency();
 });
 
 // watch(selectedCustomer.value, (val) => {

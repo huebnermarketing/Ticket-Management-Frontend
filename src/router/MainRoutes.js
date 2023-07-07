@@ -47,7 +47,33 @@ const MainRoutes = {
         {
             name: 'Contracts',
             path: '/contracts',
-            component: () => import('@/views/contracts/ContractListing.vue')
+            component: () => import('@/views/Empty.vue'),          
+            children: [
+                {
+                    path: '',
+                    component: () => import('@/views/contracts/ContractListing.vue'),
+                },
+                {
+                    name: 'AddContract',
+                    path: 'add',
+                    component: () => import('@/views/contracts/AddContract.vue'),
+                },
+                // {
+                //     path: ':id',
+                //     component: () => import('@/views/Empty.vue'),
+                //     children: [
+                //         {
+                //             name:'EditTicket',
+                //             path: 'edit',
+                //             component: () => import('@/views/tickets/EditTicket.vue'),
+                //         },
+                //         {
+                //             path: '',
+                //             redirect: { name: 'EditTicket' }
+                //         },
+                //     ]
+                // },
+            ]
         },
 //---------------------------------- Reports ---------------------------------------------//
 

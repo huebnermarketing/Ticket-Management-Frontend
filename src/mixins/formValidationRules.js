@@ -119,7 +119,6 @@ export const formValidationsRules = () => {
     ];
     const ticketdropdownrule = [
         (value) => {
-            console.log("drop",value.length)
             if(value ? Object.keys(value).length > 0 : '') return true
             return 'Please select an item.';
         }
@@ -217,6 +216,10 @@ export const formValidationsRules = () => {
         (value) => {
             if (parseInt(value) >= 0) return true;
             return 'This field must be a positive value.';
+        },
+        (value) => {
+            if (parseInt(value) !== 0) return true;
+            return 'This field must be greater than zero.';
         }
     ];
 

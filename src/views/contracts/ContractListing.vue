@@ -43,9 +43,9 @@
                                 return-object
                                 single-line
                                 variant="outlined"
-                                class="activefilter mr-2"
+                                class="activefilter"
                             ></v-select>
-                            <v-btn btn color="primary" @click="openAddUserDialog()">
+                            <v-btn btn color="primary" @click="openAddTicket()" class="ml-2">
                                 <PlusIcon stroke-width="1.5" size="20" class="text-white" />Create Contract
                             </v-btn>
                             <!-- <v-btn btn color="primary">
@@ -87,15 +87,15 @@
                     >
                         <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                         <template #item-id="{ id }">
-                            <div class="player-wrapper text-capitalize">#{{ id }}</div>
+                            <div class="player-wrapper text-capitalize text-primary cursor-pointer">#{{ id }}</div>
                         </template>
                         <template #item-customer_name="{ first_name, last_name }">
-                            <div class="player-wrapper text-capitalize">
+                            <div class="player-wrapper text-capitalize text-primary cursor-pointer">
                                 {{ first_name + ' ' + last_name }}
                             </div>
                         </template>
                         <template #item-active_contract="{ contract_count }">
-                            <div class="player-wrapper text-capitalize">
+                            <div class="player-wrapper text-capitalize text-primary cursor-pointer">
                                 {{ contract_count }}
                             </div>
                         </template>
@@ -130,11 +130,7 @@
 <script setup>
 import { onMounted, ref, watch, defineExpose, onUpdated, computed } from 'vue';
 import { baseURlApi } from '@/api/axios';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import TopCards from '@/components/cards/TopCards.vue';
-// import viewTicket from './ViewTicket.vue';
-// import filterTicket from './FilterTicket.vue';
-
 import dialogBox from '@/components/TicketComponents/dialog.vue';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
@@ -164,7 +160,7 @@ const editId = ref(0);
 const viewTicketRef = ref();
 const deleteDialog = ref();
 const refTicketListTable = ref();
-const ticketDashboard = ref({});
+const contractDashboard = ref({});
 const breadcrumbs = ref([
     {
         text: 'tickets',
@@ -180,29 +176,29 @@ const breadcrumbs = ref([
 const topCardsData = ref([
     {
         title: 'Active Contract',
-        key: 'unresolved',
-        number: ticketDashboard.value.unresolved,
+        key: 'active_contract',
+        number: contractDashboard.value.active_contract,
         bgcolor: 'lightprimary',
         textcolor: 'primary'
     },
     {
         title: 'Paid Amount',
-        key: 'overdue',
-        number: ticketDashboard.value.overdue,
+        key: 'paid_amount',
+        number: contractDashboard.value.paid_amount,
         bgcolor: 'lightwarning',
         textcolor: 'warning'
     },
     {
         title: 'Remaining Amount',
-        key: 'due_today',
-        number: ticketDashboard.value.due_today,
+        key: 'remaining_amount',
+        number: contractDashboard.value.remaining_amount,
         bgcolor: 'lightprimary',
         textcolor: 'primary'
     },
     {
         title: 'Open Contract Ticket',
-        key: 'due_this_week',
-        number: ticketDashboard.value.due_this_week,
+        key: 'open_contract_ticket',
+        number: contractDashboard.value.open_contract_ticket,
         bgcolor: 'lightwarning',
         textcolor: 'warning'
     }
@@ -221,10 +217,9 @@ const items = ref([]);
 const searchField = ref('name', 'mobile', 'email');
 const searchValue = ref('');
 const total_record = ref();
-const deleteId = ref(0);
 const isLoading = ref(false);
-const resizableDiv = ref();
 const isFromAdd = ref(false);
+
 //props for toastification
 const showSnackbar = ref(false);
 const message = ref('');
@@ -242,12 +237,10 @@ const is_filter = ref(false);
 const name = ref();
 
 //************************************* contacts ****************************************//
-const contractFilter = ref(
-    {
-        id: 1,
-        status: 'Active'
-    }
-);
+const contractFilter = ref({
+    id: 1,
+    status: 'Active'
+});
 const contractFilterOptions = ref([
     {
         id: 1,
@@ -262,24 +255,19 @@ const contractFilterOptions = ref([
 function searchUser() {
     const fd = new FormData();
     if (searchValue.value.length > 0) {
-        fd.append('search_text', searchValue.value);
-        baseURlApi
-            .post(`ticket/search?total_record=${current_page.value}`, fd)
-            .then((res) => {})
-            .catch((error) => {});
+        const requestBody = {
+            search_text: searchValue.value
+        };
+        baseURlApi.post(`contract/search`), requestBody.then((res) => {}).catch((error) => {});
     }
 }
 function updateTopCardValues() {
     topCardsData.value.forEach((e) => {
-        e.number = ticketDashboard.value[e.key];
+        console.log("dashh",e.key)
+        e.number = contractDashboard.value[e.key];
     });
 }
 function onScroll(e) {
-    // if (e.scrollTop + e.clientHeight >= e.scrollHeight) {
-    //     current_page.value = current_page.value + 1;
-    //     isFromAdd.value = false;
-    //     getContracts();
-    // }
     const el = e.target?.scrollingElement;
     if (!el) return;
     if (current_page.value > 1 && items.value.length >= totalItems.value) return;
@@ -289,17 +277,16 @@ function onScroll(e) {
     }
 }
 
-function updateFilterVal(){
-            current_page.value = 1;
-            items.value = [];
-            getContracts()
+function updateFilterVal() {
+    current_page.value = 1;
+    items.value = [];
+    getContracts();
 }
 function getContracts() {
-    console.log("contarcts")
     if ((current_page.value > 1 && items.value.length >= totalItems.value) || isLoading.value) return;
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };
-    console.log("dataa",contractFilter.value.status)
+    console.log('dataa', contractFilter.value.status);
     const requestbody = {
         type: contractFilter.value.status
     };
@@ -309,11 +296,11 @@ function getContracts() {
         .then((res) => {
             console.log('res dfata', res.data.data);
             isLoading.value = false;
-            serverItemsLength.value = res.data.data.list.total;
-            totalItems.value = res.data.data.list.total;
-            // ticketDashboard.value = res.data.data.list.data;
-            // updateTopCardValues();
-            items.value.push(...res.data.data.list.data);
+            serverItemsLength.value = res.data.data.all_client.total;
+            totalItems.value = res.data.data.all_client.total;
+            items.value.push(...res.data.data.all_client.data);
+            contractDashboard.value = res.data.data.client_dashboard;
+            updateTopCardValues();
             current_page.value++;
         })
         .catch((error) => {
@@ -325,124 +312,44 @@ function getContracts() {
             icon.value = 'mdi-close-circle';
         });
 }
-function filterData(addedData) {
-    // const existing = items.value.find((e) => e.id === editedData.id);
-    // if (existing) Object.assign(existing, editedData);
-    const existing = items.value.find((e) => e.id === addedData.id);
-    if (existing) Object.assign(existing, addedData);
-}
 function addCustomerData(addedData) {
     isFromAdd.value = true;
     getContracts();
 }
 
-//set table height
-
 //open modal
 function openAddTicket() {
     router.push({
-        name: 'AddTickets'
+        name: 'AddContract'
     });
 }
 function openEditDialog(id) {
-    //  localStorage.setItem("ticketId",id)
-    //  console.log("openn")
     router.push({
         name: 'EditTicket',
         params: { id }
     });
-    // editcustomer.value?.addaddressData()
-}
-function openViewDrawer(id) {
-    // viewTicketRef.value.openViewTicketDrawer();
-    store.SET_TICKET_ID(id);
-    store.SET_CUSTOMIZER_DRAWER(!store.Customizer_drawer);
-    name.value = viewTicket;
-    store.SET_COMPONENT_NAME(name.value);
-    store.SET_DRAWER_WIDTH('1000');
 }
 
-function openFilterDrawer() {
-    store.SET_CUSTOMIZER_DRAWER(!store.Customizer_drawer);
-    name.value = filterTicket;
-    store.SET_COMPONENT_NAME(name.value);
-    store.SET_DRAWER_WIDTH('500');
-}
-function openChangePasswordDialog(id) {
-    changePasswordFromUser.value?.open(id);
-}
-function cancelClick() {
-    deleteDialog.value?.close();
-}
-function confirmClick() {
-    baseURlApi
-        .delete(`ticket/delete/${deleteId.value}`)
-        .then((res) => {
-            deleteDialog.value?.close();
-            current_page.value = 1;
-            items.value = [];
-            getContracts();
-            showSnackbar.value = true;
-            isSnackbar.value = true;
-            message.value = res.data.message;
-            icon.value = 'mdi-check-circle';
-            color.value = 'success';
-        })
-        .catch((error) => {
-            deleteDialog.value?.close();
-            showSnackbar.value = true;
-            isSnackbar.value = true;
-            message.value = error.response.data.message;
-            color.value = 'error';
-            icon.value = 'mdi-close-circle';
-        });
-}
-
-//delete user
-function deleteTicket(id) {
-    deleteId.value = id;
-    deleteDialog.value?.open();
-}
 onMounted(() => {
     getContracts();
 });
 
-//  filters.value = computed(() => {
-//       return bus.value.get('filterdata')
-// })
 // TODO: split routes & remove block below
 watch(
     () => route.name,
     (e) => {
-        if (e === 'Tickets') {
+        if (e === 'Contracts') {
             current_page.value = 1;
             items.value = [];
             getContracts();
         }
     }
 );
-watch(
-    () => bus.value.get('filterdata'),
-    (val) => {
-        console.log('val', val);
-        //  if(val.is_filter){
-        //     is_filter.value = true
-        filters.value = val;
-        current_page.value = 1;
-        items.value = [];
-        getContracts();
-        //  }
-    }
-);
-// watch(()=>filters.value,(val) => {
-//     console.log("cs",val)
-//     getContracts()
-// })
 </script>
 
 <style >
-.activefilter .v-input__details{
-display: none !important;
+.activefilter .v-input__details {
+    display: none !important;
 }
 .vue3-easy-data-table__footer {
     display: none !important;

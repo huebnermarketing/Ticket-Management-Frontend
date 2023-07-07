@@ -27,9 +27,6 @@
                             <v-btn btn color="primary" flat @click="openFilterDrawer()">
                                 <v-icon> mdi-filter </v-icon>
                             </v-btn>
-                            <!-- <v-btn btn color="primary">
-                                <FilterIcon stroke-width="1.5" size="20" class="text-white" />
-                            </v-btn> -->
                         </div>
                     </v-col>
                 </v-row>

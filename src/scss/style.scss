@@ -53,7 +53,7 @@
     width: fit-content !important;
 }
 .v-input--disabled .v-input__control {
-    background :#e0e0e0;
+    background :#eee;
     border-radius: 6px;
     // background: #000 !important;
 }
@@ -66,6 +66,29 @@
 // }
 .v-input--density-default .v-field--variant-outlined, .v-input--density-default .v-field--single-line{
     --v-field-padding-bottom: 0 !important; 
+}
+.end-d {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 0 !important;
+    padding: 12px 6px 8px 16px !important;
+    font-size: 14px;
+    min-height: 42px;
+}
+.disabled-inp {
+    background: #eee;
+}
+.custom-err {
+    opacity: 1 !important;
+}
+.custom-border-color {
+    border-color: rgb(250, 137, 107) !important;
+}
+.flat-calender {
+    position: absolute;
+    right: 21px;
+    top: 54px;
+    cursor: pointer;
 }
 // .v-field__input{
 //     padding: 23px;

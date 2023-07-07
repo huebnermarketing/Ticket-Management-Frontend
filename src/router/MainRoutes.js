@@ -26,7 +26,7 @@ const MainRoutes = {
                     component: () => import('@/views/Empty.vue'),
                     children: [
                         {
-                            name:'EditTicket',
+                            name: 'EditTicket',
                             path: 'edit',
                             component: () => import('@/views/tickets/EditTicket.vue'),
                         },
@@ -43,13 +43,40 @@ const MainRoutes = {
             path: '/users',
             component: () => import('@/views/users/UserListing.vue')
         },
-//---------------------------------- Contracts ---------------------------------------------//
+        //---------------------------------- Contracts ---------------------------------------------//
         {
             name: 'Contracts',
             path: '/contracts',
-            component: () => import('@/views/contracts/ContractListing.vue')
+            component: () => import('@/views/Empty.vue'),
+            children: [
+                {
+                    path: '',
+                    component: () => import('@/views/contracts/ClientListing.vue'),
+                },
+               
+                {
+                    name: 'AddContract',
+                    path: 'add',
+                    component: () => import('@/views/contracts/AddContract.vue'),
+                },
+                {
+                    path: ':id',
+                    component: () => import('@/views/Empty.vue'),
+                    children: [
+                        {
+                            name: 'ContractList',
+                            path: 'contracts-list',
+                            component: () => import('@/views/contracts/ContractListingFromClient.vue'),
+                        },
+                        {
+                            path: '',
+                            redirect: { name: 'ContractList' }
+                        },
+                    ]
+                },
+            ]
         },
-//---------------------------------- Reports ---------------------------------------------//
+        //---------------------------------- Reports ---------------------------------------------//
 
         {
             name: 'Reports',

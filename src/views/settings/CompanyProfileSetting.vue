@@ -373,9 +373,24 @@ async function updateProfile() {
             });
     }
 }
-
+function getCurrency() {
+    baseURlApi
+        .get('settings/company/get-currency')
+        .then((res) => {
+           currency.value = res.data.data.currency
+        })
+        .catch((error) => {
+            // isLoading.value = false;
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
 onMounted(() => {
     getCompanyprofileData();
+    getCurrency()
 });
 </script>
 <style>

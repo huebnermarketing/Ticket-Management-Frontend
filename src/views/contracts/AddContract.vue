@@ -443,8 +443,8 @@
                                                     :rules="requiredrule"
                                                 />
 
-                                                <div class="flat-calender" data-toggle>
-                                                    <CalendarIcon width="21" stroke-width="1.5" />
+                                                <div class="flat-calender cusror-pointer" data-toggle>
+                                                    <CalendarIcon width="21" stroke-width="1.5"/>
                                                 </div>
                                                 <div class="v-input__details" v-if="isEmptyStartDate">
                                                     <div class="v-messages text-error custom-err">

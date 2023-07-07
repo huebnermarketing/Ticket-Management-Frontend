@@ -32,7 +32,7 @@
                             variant="outlined"
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" lg="3" md="3"> 
                         <div class="d-flex gap-2 justify-end align-center">
                             <v-select
                                 v-model="contractFilter"
@@ -44,9 +44,10 @@
                                 single-line
                                 variant="outlined"
                                 class="activefilter"
+                                style="min-width:150px !important"
                             ></v-select>
-                            <v-btn btn color="primary" @click="openAddTicket()" class="ml-2">
-                                <PlusIcon stroke-width="1.5" size="20" class="text-white" />Create Contract
+                            <v-btn btn color="primary" @click="openAddTicket()" class="ml-2" style="height:44px">
+                                <PlusIcon stroke-width="1.5" size="22" class="text-white" />Create Contract
                             </v-btn>
                             <!-- <v-btn btn color="primary">
                             <FilterIcon stroke-width="1.5" size="20" class="text-white" />
@@ -54,15 +55,6 @@
                         </div>
                     </v-col>
                 </v-row>
-                <!-- style="height:300px !important; overflow-y: scroll !important" -->
-
-                <!-- <div v-if="current_page > 1">
-                    <transition name="fade">
-                        <div class="loading" v-if="isLoading">
-                            <v-progress-circular indeterminate color="white"></v-progress-circular> <span class="ml-2">Loading</span>
-                        </div>
-                    </transition>
-                </div> -->
                 <div id="infinite-list">
                     <!-- :search-value="searchValue" -->
                     <EasyDataTable
@@ -87,15 +79,15 @@
                     >
                         <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                         <template #item-id="{ id }">
-                            <div class="player-wrapper text-capitalize text-primary cursor-pointer">#{{ id }}</div>
+                            <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">#{{ id }}</div>
                         </template>
-                        <template #item-customer_name="{ first_name, last_name }">
-                            <div class="player-wrapper text-capitalize text-primary cursor-pointer">
+                        <template #item-customer_name="{ first_name, last_name,id}">
+                            <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">
                                 {{ first_name + ' ' + last_name }}
                             </div>
                         </template>
-                        <template #item-active_contract="{ contract_count }">
-                            <div class="player-wrapper text-capitalize text-primary cursor-pointer">
+                        <template #item-active_contract="{ contract_count,id }">
+                            <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">
                                 {{ contract_count }}
                             </div>
                         </template>
@@ -281,6 +273,13 @@ function updateFilterVal() {
     current_page.value = 1;
     items.value = [];
     getContracts();
+}
+function redirectToContracts(id){
+    console.log(id)
+     router.push({
+        name: 'ContractList',
+        params: { id }
+    });
 }
 function getContracts() {
     if ((current_page.value > 1 && items.value.length >= totalItems.value) || isLoading.value) return;

@@ -17,12 +17,14 @@
                                     label="Adhoc"
                                     value="adhoc"
                                     color="primary"
+                                     disabled
                                 ></v-radio>
                                 <v-radio
                                     class="font-weight-medium text-capitalize border-1 mr-5 radio-lbl"
                                     label="Contract"
                                     value="contract"
                                     color="primary"
+                                     disabled
                                 ></v-radio>
                             </v-radio-group>
                         </v-col>

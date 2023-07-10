@@ -320,7 +320,7 @@
                                     <v-col cols="12" md="6">
                                         <!-- @blur="onEnterProblem(e)" -->
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Problem type</v-label>
-                                        <v-combobox
+                                        <v-autocomplete
                                             class="prolem-typ"
                                             v-model="problemType"
                                             v-model:search="searchProblem"
@@ -362,7 +362,7 @@
                                                     </v-list-item-title>
                                                 </v-list-item>
                                             </template>
-                                        </v-combobox>
+                                        </v-autocomplete>
                                     </v-col>
                                     <!---------------------------------- problem title --------------------------------->
                                     <v-col cols="12" md="6">

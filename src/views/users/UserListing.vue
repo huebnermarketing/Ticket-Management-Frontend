@@ -248,41 +248,6 @@ function getUsers() {
             isLoading.value = false;
             serverItemsLength.value = res.data.data.total;
             items.value = res.data.data.data;
-            // let itemsData = [];
-            // console.log(res.data.data.data
-            // )
-            // if (isFromAdd.value) {
-            //     let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data);
-
-            //     // Declare an empty object
-            //     let uniqueObject = {};
-
-            //     // Loop for the array elements
-            //     for (let i in newArray) {
-            //         // Extract the title
-            //         let objid = newArray[i]['id'];
-
-            //         // Use the title as the index
-            //         uniqueObject[objid] = newArray[i];
-            //     }
-
-            //     // Loop to push unique object into array
-            //     for (let i in uniqueObject) {
-            //         itemsData.push(uniqueObject[i]);
-            //     }
-            // } else {
-            //     itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data));
-            // }
-            // console.log(itemsData)
-            // items.value = itemsData.slice();
-            // items.value = JSON.parse(JSON.stringify(items.value));
-            // const proxy = new Proxy(items.value, {
-            //     get(target, prop, receiver) {
-            //         return target[prop];
-            //     }
-            // });
-            // items.value = [...proxy];
-            // items.value = [...JSON.parse(JSON.stringify(items.value))];
         })
         .catch((error) => {
             isLoading.value = false;

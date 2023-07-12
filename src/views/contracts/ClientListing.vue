@@ -15,7 +15,7 @@
                                     :class="'text-subtitle-1 text-capitalize font-weight-bold mt-3 text-' + card.textcolor"
                                     v-text="card.title"
                                 ></div>
-                                <h4 :class="'text-h4 mt-1 text-' + card.textcolor" v-text="card.number"></h4>
+                                <h4 :class="'text-h4 mt-1 text-' + card.textcolor" v-text="card.prefix ? card.prefix + card.number : card.number"></h4>
                             </div>
                         </div>
                     </v-col>
@@ -32,7 +32,7 @@
                             variant="outlined"
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="12" lg="3" md="3"> 
+                    <v-col cols="12" lg="3" md="3">
                         <div class="d-flex gap-2 justify-end align-center">
                             <v-select
                                 v-model="contractFilter"
@@ -44,9 +44,9 @@
                                 single-line
                                 variant="outlined"
                                 class="activefilter"
-                                style="min-width:150px !important"
+                                style="min-width: 150px !important"
                             ></v-select>
-                            <v-btn btn color="primary" @click="openAddTicket()" class="ml-2" style="height:44px">
+                            <v-btn btn color="primary" @click="openCreateContract()" class="ml-2" style="height: 44px">
                                 <PlusIcon stroke-width="1.5" size="22" class="text-white" />Create Contract
                             </v-btn>
                             <!-- <v-btn btn color="primary">
@@ -79,14 +79,16 @@
                     >
                         <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                         <template #item-id="{ id }">
-                            <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">#{{ id }}</div>
+                            <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">
+                                #{{ id }}
+                            </div>
                         </template>
-                        <template #item-customer_name="{ first_name, last_name,id}">
+                        <template #item-customer_name="{ first_name, last_name, id }">
                             <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">
                                 {{ first_name + ' ' + last_name }}
                             </div>
                         </template>
-                        <template #item-active_contract="{ contract_count,id }">
+                        <template #item-active_contract="{ contract_count, id }">
                             <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">
                                 {{ contract_count }}
                             </div>
@@ -100,7 +102,7 @@
                 </div>
             </v-col>
 
-            <dialogBox
+            <!-- <dialogBox
                 ref="deleteDialog"
                 @confirClk="confirmClick()"
                 @cancelClk="cancelClick()"
@@ -109,7 +111,7 @@
                 :dialogTitle="dialogTitle"
                 :cancelText="cancelText"
                 :title="title"
-            />
+            /> -->
 
             <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" v-if="isSnackbar">
                 <v-icon left>{{ icon }}</v-icon>
@@ -123,7 +125,7 @@
 import { onMounted, ref, watch, defineExpose, onUpdated, computed } from 'vue';
 import { baseURlApi } from '@/api/axios';
 import TopCards from '@/components/cards/TopCards.vue';
-import dialogBox from '@/components/TicketComponents/dialog.vue';
+// import dialogBox from '@/components/TicketComponents/dialog.vue';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import 'vue3-easy-data-table/dist/style.css';
@@ -141,12 +143,12 @@ const page = ref({ title: 'Users' });
 const isOpenDialog = ref(false);
 
 //dialog props
-const dialogTitle = ref('Are you sure you want to delete this ticket ?');
-const dialogText = ref('This will delete this ticket permanently, you can not undo this action.');
-const cancelText = ref('Cancel');
-const confirmText = ref('Delete');
-const title = ref('Delete Ticket');
-const editId = ref(0);
+// const dialogTitle = ref('Are you sure you want to delete this ticket ?');
+// const dialogText = ref('This will delete this ticket permanently, you can not undo this action.');
+// const cancelText = ref('Cancel');
+// const confirmText = ref('Delete');
+// const title = ref('Delete Ticket');
+// const editId = ref(0);
 
 //refs
 const viewTicketRef = ref();
@@ -165,36 +167,7 @@ const breadcrumbs = ref([
         href: '#'
     }
 ]);
-const topCardsData = ref([
-    {
-        title: 'Active Contract',
-        key: 'active_contract',
-        number: contractDashboard.value.active_contract,
-        bgcolor: 'lightprimary',
-        textcolor: 'primary'
-    },
-    {
-        title: 'Paid Amount',
-        key: 'paid_amount',
-        number: contractDashboard.value.paid_amount,
-        bgcolor: 'lightwarning',
-        textcolor: 'warning'
-    },
-    {
-        title: 'Remaining Amount',
-        key: 'remaining_amount',
-        number: contractDashboard.value.remaining_amount,
-        bgcolor: 'lightprimary',
-        textcolor: 'primary'
-    },
-    {
-        title: 'Open Contract Ticket',
-        key: 'open_contract_ticket',
-        number: contractDashboard.value.open_contract_ticket,
-        bgcolor: 'lightwarning',
-        textcolor: 'warning'
-    }
-]);
+const topCardsData = ref([]);
 
 const headers = ref([
     { text: 'Id', value: 'id' },
@@ -243,6 +216,10 @@ const contractFilterOptions = ref([
         status: 'Inactive'
     }
 ]);
+const amountFormat = ref({
+    prefix: ' ',
+    masked: false
+});
 //get users
 function searchUser() {
     const fd = new FormData();
@@ -255,7 +232,6 @@ function searchUser() {
 }
 function updateTopCardValues() {
     topCardsData.value.forEach((e) => {
-        console.log("dashh",e.key)
         e.number = contractDashboard.value[e.key];
     });
 }
@@ -274,9 +250,8 @@ function updateFilterVal() {
     items.value = [];
     getContracts();
 }
-function redirectToContracts(id){
-    console.log(id)
-     router.push({
+function redirectToContracts(id) {
+    router.push({
         name: 'ContractList',
         params: { id }
     });
@@ -285,7 +260,6 @@ function getContracts() {
     if ((current_page.value > 1 && items.value.length >= totalItems.value) || isLoading.value) return;
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };
-    console.log('dataa', contractFilter.value.status);
     const requestbody = {
         type: contractFilter.value.status
     };
@@ -293,7 +267,6 @@ function getContracts() {
     baseURlApi
         .post(`contract/client-list`, requestbody, { params: params })
         .then((res) => {
-            console.log('res dfata', res.data.data);
             isLoading.value = false;
             serverItemsLength.value = res.data.data.all_client.total;
             totalItems.value = res.data.data.all_client.total;
@@ -317,7 +290,7 @@ function addCustomerData(addedData) {
 }
 
 //open modal
-function openAddTicket() {
+function openCreateContract() {
     router.push({
         name: 'AddContract'
     });
@@ -328,8 +301,54 @@ function openEditDialog(id) {
         params: { id }
     });
 }
-
+function getCurrency() {
+    baseURlApi
+        .get('settings/company/get-currency')
+        .then((res) => {
+            amountFormat.value.prefix = res.data.data.currency.symbol + ' ';
+            topCardsData.value.push(
+                {
+                    title: 'Active Contract',
+                    key: 'active_contract',
+                    number: contractDashboard.value.active_contract,
+                    bgcolor: 'lightprimary',
+                    textcolor: 'primary'
+                },
+                {
+                    title: 'Paid Amount',
+                    key: 'paid_amount',
+                    number: contractDashboard.value.paid_amount,
+                    bgcolor: 'lightwarning',
+                    textcolor: 'warning',
+                    prefix: amountFormat.value?.prefix
+                },
+                {
+                    title: 'Remaining Amount',
+                    key: 'remaining_amount',
+                    number: contractDashboard.value.remaining_amount,
+                    bgcolor: 'lightprimary',
+                    textcolor: 'primary',
+                    prefix: amountFormat.value?.prefix
+                },
+                {
+                    title: 'Open Contract Ticket',
+                    key: 'open_contract_ticket',
+                    number: contractDashboard.value.open_contract_ticket,
+                    bgcolor: 'lightwarning',
+                    textcolor: 'warning'
+                }
+            );
+        })
+        .catch((error) => {
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
 onMounted(() => {
+    getCurrency();
     getContracts();
 });
 

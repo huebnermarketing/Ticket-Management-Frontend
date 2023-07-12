@@ -453,8 +453,6 @@ function openAddTicket() {
     });
 }
 function openEditDialog(id) {
-    //  localStorage.setItem("ticketId",id)
-    //  console.log("openn")
     router.push({
         name: 'EditTicket',
         params: { id }
@@ -546,7 +544,9 @@ watch(
 watch(
     () => route.query,
     (val) => {
-        console.log('cs', val);
+        //  if(val.is_filter){
+        //     is_filter.value = true
+        filters.value = val;
         current_page.value = 1;
         items.value = [];
         getTickets();

@@ -185,7 +185,6 @@ async function addAddress() {
                     is_primary: 0
                 });
                 store.setUpdateAddress(...data);
-                // console.log("ddd 111",store.getupdateAddress)
                 emit('editAddressClicked', data);
                 issubmit.value = false;
                 createAddressForm.value?.reset();

@@ -295,24 +295,6 @@ function filterData() {
 }
 function addaddressData() {
     getCustomersData(customerId.value)
-    // store.getupdateAddress;
-    // addaddress.value = addaddress.value.concat(store.getupdateAddress);
-
-    // baseURlApi
-    //     .get(`customer/address/get/${customerId.value}`)
-    //     .then((res) => {
-    //         isLoading.value = false;
-    //         const data = res.data.data;
-    //         addaddress.value = data;
-    //         console.log('adddress', data);
-    //         if (addaddress.value.length == 1) {
-    //             addaddress.value[0].is_primary = 1;
-    //         }
-    //         if (addaddress.value.length > 0) isEmptyAddress.value = false;
-    //     })
-    //     .catch((error) => {
-    //         isLoading.value = false;
-    //     });
 }
 async function updateCustomer() {
     const { valid } = await updatecustomerform.value?.validate();
@@ -401,9 +383,6 @@ function openAddAddressDialog() {
     addNewaddress.value?.open();
 }
 function openEditDialog(id) {
-    // singleAddressDetail.value = data;
-    // singleAddressDetail.value.id = id;
-    // console.log('singlee', singleAddressDetail.value);
     updateaddressfromeditcustomer.value?.open();
     updateaddressfromeditcustomer.value?.getAddressData(id);
 }

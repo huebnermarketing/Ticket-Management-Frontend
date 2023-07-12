@@ -5,12 +5,15 @@
                 <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
             </v-col>
             <v-col cols="10" style="margin: 0 auto">
-                <h5 class="text-h5 mb-6 mt-3">Create New Contract</h5>
+                <div class=" mb-6 mt-3">
+                    Edit Contract - <b class="text-h5">{{ selectedCustomerModel?.first_name + selectedCustomerModel?.last_name }} | {{ companyName }} |
+                    {{ area }}</b>
+                </div>
                 <v-card elevation="10" class="t-add-card" rounded="md">
                     <!------------------------------------  form ----------------------------------->
                     <v-row style="padding: 12px">
                         <v-col cols="12">
-                            <v-form @submit.prevent="createContract" ref="createContractform">
+                            <v-form @submit.prevent="updateContract" ref="updateContractForm">
                                 <v-row>
                                     <!---------------------------------- customer name --------------------------------->
                                     <v-col cols="12" md="4">
@@ -33,15 +36,10 @@
                                                             countryName = 'India';
                                                             companyName = '';
                                                             mobile = '';
-                                                            getInitialData();
-                                                            clearInput();
                                                             customerEmail.value = '';
                                                         }
                                                     "
-                                                    @change="isEmptyCustomerName = false"
-                                                    @input="isEmptyCustomerName = false"
-                                                    @update:modelValue="isEmptyCustomerName = false"
-                                                    clearable
+                                                    disabled
                                                     hide-details
                                                     placeholder="Please select customer"
                                                     browser-autocomplete="name"
@@ -62,36 +60,8 @@
                                                             This field is required.
                                                         </div>
                                                     </div>
-                                                    <!---->
                                                 </div>
                                             </template>
-                                            <v-list class="pa-0 combotext" style="box-shadow: none !imporatant">
-                                                <v-row v-if="!filteredCustomers.length && customerSearchModel.length" class="ma-0">
-                                                    <v-col cols="12">No customers found matching "{{ customerSearchModel }}"</v-col>
-                                                </v-row>
-                                                <v-list-item
-                                                    v-for="(item, index) in filteredCustomers"
-                                                    :key="index"
-                                                    @click.stop="
-                                                        () => {
-                                                            selectedCustomerModel = item;
-                                                            customerSearchModel = (
-                                                                selectedCustomerModel.first_name +
-                                                                '' +
-                                                                ' ' +
-                                                                (selectedCustomerModel.last_name || '')
-                                                            ).trim();
-                                                            getcustomerdata(item);
-                                                            isExistingCustomer = false;
-                                                        }
-                                                    "
-                                                >
-                                                    <v-list-item-title>
-                                                        {{ item.first_name }} {{ item.last_name }}
-                                                        <template v-if="item.phone"> - ({{ item.phone }})</template>
-                                                    </v-list-item-title>
-                                                </v-list-item>
-                                            </v-list>
                                         </v-menu>
                                     </v-col>
                                     <!---------------------------------- Mobile Number --------------------------------->
@@ -123,12 +93,10 @@
                                                     v-model="selectAddress"
                                                     :items="addressOptions"
                                                     :item-title="getAddressText"
-                                                    @keydown.capture.prevent.stop
-                                                    @update:modelValue="getinputs()"
                                                     item-value="id"
                                                     return-object
                                                     single-line
-                                                    :disabled="isExistingCustomer"
+                                                    disabled
                                                     variant="outlined"
                                                     bg-color="none"
                                                     base-color="none"
@@ -224,10 +192,6 @@
                                                     v-model="serviceType"
                                                     v-model:search="searchService"
                                                     :items="serviceTypeOptions"
-                                                    @blur="onBlurCalled()"
-                                                    @click:clear="getInitialDataserviceType()"
-                                                    @keydown.enter="oneEnterService(e)"
-                                                    @keydown.enter.capture.prevent.stop
                                                     :hide-no-data="false"
                                                     item-title="contract_name"
                                                     item-value="id"
@@ -238,13 +202,14 @@
                                                     single-line
                                                     variant="outlined"
                                                     multiple
+                                                    disabled
                                                     density="comfortable"
                                                     base-color="none"
                                                     label="Please select service type"
                                                     :rules="ticketdropdownrule"
                                                     id="problemCombo"
                                                 >
-                                                    <template v-slot:no-data>
+                                                    <!-- <template v-slot:no-data>
                                                         <v-list-item>
                                                             <v-list-item-title>
                                                                 No results matching "<strong>{{ searchService }}</strong
@@ -260,7 +225,7 @@
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
-                                                    </template>
+                                                    </template> -->
                                                 </v-combobox>
                                             </v-col>
                                             <!---------------------------------- contract details --------------------------------->
@@ -320,9 +285,7 @@
                                                                 >
                                                                     <template v-slot:no-data>
                                                                         <v-list-item>
-                                                                            <v-list-item-title>
-                                                                                No results matching
-                                                                            </v-list-item-title>
+                                                                            <v-list-item-title> No results matching </v-list-item-title>
                                                                         </v-list-item>
                                                                     </template>
                                                                 </v-combobox>
@@ -362,7 +325,7 @@
                                                                         v-if="productTabs.length - 1 == i"
                                                                     />
                                                                 </button>
-                                                                <button class="ml-2">
+                                                                <b-button class="ml-2">
                                                                     <TrashIcon
                                                                         stroke-width="1.5"
                                                                         size="25"
@@ -370,7 +333,7 @@
                                                                         @click="deleteInput(i)"
                                                                         v-if="productTabs.length > 1"
                                                                     />
-                                                                </button>
+                                                                </b-button>
                                                             </div>
                                                         </v-col>
                                                     </div>
@@ -403,9 +366,9 @@
                                                     :items="contractDurationOptions"
                                                     item-title="display_name"
                                                     item-value="id"
-                                                    @update:modelValue="getPaymentTermsinputs()"
                                                     return-object
                                                     single-line
+                                                    disabled
                                                     variant="outlined"
                                                     label="Please select contract duration"
                                                     :rules="ticketdropdownrule"
@@ -421,6 +384,7 @@
                                                     item-value="id"
                                                     return-object
                                                     single-line
+                                                    disabled
                                                     variant="outlined"
                                                     label="Please select engineer"
                                                     :rules="ticketdropdownrule"
@@ -435,7 +399,8 @@
                                                     id="projectStartDate"
                                                     noCalendar="true"
                                                     v-model="startDate"
-                                                    class="v-field__input end-d"
+                                                    disabled="true"
+                                                    class="v-field__input end-d disabled-inp"
                                                     :class="isEmptyStartDate ? 'custom-border-color' : ''"
                                                     :config="startDateConfig"
                                                     @input="getEndDate()"
@@ -470,45 +435,59 @@
                                                     :config="startDateConfig"
                                                     @input="getEndDate()"
                                                 />
-
                                                 <div class="flat-calender" data-toggle>
                                                     <CalendarIcon width="21" stroke-width="1.5" />
                                                 </div>
                                             </v-col>
                                             <!---------------------------------- active user --------------------------------->
                                             <v-col cols="12" md="12">
-                                              <div class="ml-2 d-flex align-center mt-2">
-                                                                <button type="submit" >
-                                                                    <CirclePlusIcon
-                                                                        stroke-width="1.5"
-                                                                        size="25"
-                                                                        class="text-primary cursor-pointer"
-                                                                         @click="addInput(i)"
-                                                                       
-                                                                        v-if="productTabs.length - 1 == i"
-                                                                    />
-                                                                </button>
-                                                                <b-button class="ml-2">
-                                                                    <TrashIcon
-                                                                        stroke-width="1.5"
-                                                                        size="25"
-                                                                        class="text-error cursor-pointer"
-                                                                        @click="deleteInput(i)"
-                                                                        v-if="productTabs.length > 1"
-                                                                    />
-                                                                </b-button>
-                                                            </div>
+                                                <div class="d-flex justify-between">
+                                                    <div class="d-flex align-center justify-between w-25">
+                                                        <v-label class="mb-2 font-weight-medium text-capitalize">Auto-Renew</v-label>
+                                                        <div class="ml-4">
+                                                            <v-switch
+                                                                class="user-switch mb-1"
+                                                                v-model="isAutoRenew"
+                                                                :color="isAutoRenew ? 'primary' : 'secondary'"
+                                                                hide-details
+                                                            ></v-switch>
+                                                        </div>
+                                                    </div>
+                                                    <div class="ml-7">
+                                                        <div>
+                                                            <v-alert type="info" variant="tonal" class="mb-4">
+                                                                <!-- <h5 class="text-h6 text-capitalize">warning</h5> -->
+                                                                <div style="font-size: 12px">
+                                                                    This contract will auto-renew by [next day from end-date of current
+                                                                    contract period.] System will notify you when next contract created
+                                                                    automatically.
+                                                                </div>
+                                                            </v-alert>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </v-col>
                                         </v-row>
                                     </v-card>
                                     <!---------------------------------- Action ------------------------------------>
-                                    <v-col cols="12" class="mt-4">
+                                    <v-col cols="12" class="mt-4 d-flex justify-space-between" style="padding-left: 0; padding-right: 0">
                                         <!-- <v-btn color="error" class="mr-3">Cancel</v-btn>
                                         <v-btn color="primary" type="submit">Submit</v-btn> -->
-                                        <v-btn color="error" class="mr-3" @click="closeDialog()" v-if="!issubmit">Cancel</v-btn>
-                                        <v-btn color="primary" type="submit" v-if="!issubmit">Save</v-btn>
-                                        <v-btn color="error" class="mr-3" v-if="issubmit" disabled>Cancel</v-btn>
-                                        <v-btn color="primary" v-if="issubmit" disabled>Save</v-btn>
+                                        <div>
+                                            <v-btn color="error" class="mr-3" @click="closeDialog()" v-if="!issubmit">Cancel</v-btn>
+                                            <v-btn color="primary" type="submit" v-if="!issubmit">Save</v-btn>
+                                            <v-btn color="error" class="mr-3" v-if="issubmit" disabled>Cancel</v-btn>
+                                            <v-btn color="primary" v-if="issubmit" disabled>Save</v-btn>
+                                        </div>
+                                        <div>
+                                            <v-btn
+                                                color="error"
+                                                class=""
+                                                :disabled="issubmit && (user.role.id == 1 || user.role.id == 2) && isSuspended"
+                                                @click="suspendContract()"
+                                                >Suspend Contract</v-btn
+                                            >
+                                        </div>
                                     </v-col>
                                 </v-row>
                             </v-form>
@@ -517,7 +496,15 @@
                 </v-card>
             </v-col>
         </v-col>
-        <dialogBox ref="confirmDialog" @confirClk="confirmClick()" :dialogText="dialogText" :confirmText="confirmText" :title="title" />
+        <dialogBox
+            ref="deleteDialog"
+            @confirClk="confirmClick()"
+            :cancelText="cancelText"
+            @cancelClk="cancelClick()"
+            :dialogText="dialogText"
+            :confirmText="confirmText"
+            :title="title"
+        />
         <v-snackbar :color="color" :timeout="timer" v-model="showSnackbar" :top="'top'" v-if="isSnackbar">
             <v-icon left>{{ icon }}</v-icon>
             {{ message }}
@@ -540,21 +527,15 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const { emailPatternrule, requiredrule, alternativemobilerule, ticketdropdownrule, amountRule } = formValidationsRules();
 //product details
-const productTabs = ref([
-    {
-        selectedProductServiceTab: null,
-        quantity: '',
-        amount: ''
-    }
-]);
+const productTabs = ref([]);
 
 //dialog props
 
-const dialogText = ref('Please note that once contract has been created, you wont able to modify Client details and Financial details. ');
-// const cancelText = ref('Cancel');
+const dialogText = ref('Please note that this action is irreversible. You can not undo this action after making this contract suspended.');
+const cancelText = ref('Cancel');
 const confirmText = ref('Confirm');
-const confirmDialog = ref();
-const title = ref('Create Contract');
+const deleteDialog = ref();
+const title = ref('Suspend Contract');
 //props for toastification
 const showSnackbar = ref(false);
 const message = ref('');
@@ -563,6 +544,7 @@ const icon = ref('');
 const timer = ref(5000);
 const isSnackbar = ref(false);
 
+const isSuspended = ref(false);
 const selectCustomerList = ref([]);
 const selectedCustomer = ref(null);
 const searchCustomer = ref('');
@@ -579,7 +561,7 @@ const amountFormat = ref({
     prefix: '$ ',
     masked: false
 });
-const createContractform = ref();
+const updateContractForm = ref();
 const tabsform = ref();
 const serviceType = ref([]);
 const serviceTypeOptions = ref([]);
@@ -613,6 +595,7 @@ const contractDurationOptions = ref([]);
 const paymentTerm = ref([]);
 const paymentTermOptions = ref([]);
 
+const user = JSON.parse(localStorage.getItem('user'));
 const customerSearchModel = ref('');
 const country = ref(['USA', 'United Kingdom', 'India', 'Srilanka']);
 const customerEmail = ref('');
@@ -629,23 +612,12 @@ const startDateConfig = ref({
     wrap: 'true',
     disableMobile: 'true',
     dateFormat: 'Y-m-d',
-    altFormat: 'd-m-Y',
-    altInput: true,
+    altFormat: 'Y-m-d'
 });
-/********************************************************* emits ********************************************************/
-const emit = defineEmits(['ticketAdded']);
+
 /***************************************************** breadcrumbs ***********************************************/
 const breadcrumbs = ref([
-    {
-        text: 'Contracts',
-        disabled: false,
-        href: '/contracts'
-    },
-    {
-        text: 'Create Contract',
-        disabled: true,
-        href: '#'
-    }
+   
 ]);
 /********************************************** methods  ********************************************************/
 function getEndDate() {
@@ -668,15 +640,7 @@ function getEndDate() {
         endDate.value = tempDate;
     }
 }
-function getinputs() {
-    addressLineOne.value = selectAddress.value?.address_line1;
-    area.value = selectAddress.value?.area;
-    city.value = selectAddress.value?.city;
-    zipcode.value = selectAddress.value?.zipcode;
-    state.value = selectAddress.value?.state;
-    countryName.value = selectAddress.value?.country;
-    companyName.value = selectAddress.value?.company_name;
-}
+
 
 function addInput(i) {
     let temp = productTabs.value[productTabs.value.length - 1];
@@ -696,23 +660,9 @@ function getCustomersList() {
         .get('customer/list', { params })
         .then((res) => {
             selectCustomerList.value = res.data.data.data;
-            if (customersId.value) {
-                selectedCustomer.value = selectCustomerList.value.filter((e) => {
-                    if (e.id == parseInt(customersId.value)) {
-                        selectedCustomerModel.value = e;
-                        getcustomerdata(selectedCustomerModel.value)
-                         customerSearchModel.value = (
-                                                                selectedCustomerModel.value?.first_name +
-                                                                '' +
-                                                                ' ' +
-                                                                (selectedCustomerModel.value?.last_name || '')
-                                                            ).trim();
-                    }
-                });
-            }
         })
         .catch((error) => {
-            isLoading.value = false;
+            // isLoading.value = false;
             isSnackbar.value = true;
             showSnackbar.value = true;
             message.value = error.response.data.message;
@@ -721,90 +671,48 @@ function getCustomersList() {
         });
 }
 function closeDialog() {
-    router.push('/contracts');
-}
-
-function oneEnterService() {
-    if (searchService.value.length > 0) {
-        if (serviceTypeOptions.value.filter((data) => data.contract_name.toUpperCase() === searchService.value.toUpperCase()).length == 0) {
-            const requestBody = {
-                contract_name: searchService.value
-            };
-            baseURlApi
-                .post('settings/contract-type/add', requestBody)
-                .then((res) => {
-                    searchService.value = '';
-                    serviceTypeOptions.value.unshift(res.data.data);
-
-                    let tempServiceType = serviceType.value.filter((x) => typeof x === 'object');
-
-                    tempServiceType.push(serviceTypeOptions.value[0]);
-                    serviceType.value = tempServiceType;
-                })
-                .catch((error) => {
-                    showSnackbar.value = true;
-                    isSnackbar.value = true;
-                    message.value = error.response.data.message;
-                    color.value = 'error';
-                    icon.value = 'mdi-close-circle';
-                });
-        }
-    }
+    const id = parseInt(custId.value);
+    router.push(`/contracts/${id}/contracts-list`);
 }
 
 /******************************************** methods **********************************************/
-
+function cancelClick() {
+    deleteDialog.value?.close();
+}
 function confirmClick() {
     issubmit.value = true;
-    const contractTypeId = serviceType.value.map((data) => {
-        return data.id;
-    });
-    const productServices = productTabs.value.map((data) => {
-        return {
-            product_service_id: data.selectedProductServiceTab.id,
-            product_qty: data.quantity,
-            product_amount: data.amount
-        };
-    });
     const requestBody = {
-        customer_id: selectedCustomerModel.value.id,
-        customer_location_id: selectAddress.value.id,
-        contract_title: contractTitle.value,
-        contract_details: contractDescription.value,
-        contract_type_id: contractTypeId,
-        contract_product_service_id: productServices,
-        amount: contractAmount.value,
-        duration_id: contractDuration.value.id,
-        payment_term_id: paymentTerm.value.id,
-        start_date: startDate.value,
-        end_date: endDate.value
+        contract_id: parseInt(contractId.value)
     };
     baseURlApi
-        .post('contract/create', requestBody)
+        .post('contract/suspend-contract', requestBody)
         .then((res) => {
-            confirmDialog.value?.close();
+            const id = parseInt(custId.value);
+            deleteDialog.value?.close();
             issubmit.value = false;
             message.value = res.data.message;
             isSnackbar.value = true;
             showSnackbar.value = true;
             icon.value = 'mdi-check-circle';
             color.value = 'success';
-            router.push('/contracts');
+            router.push(`/contracts/${id}/contracts-list`);
         })
         .catch((error) => {
-            confirmDialog.value?.close();
+            deleteDialog.value?.close();
+            message.value = error.response.data.message;
+            message.value = res.data.message;
             issubmit.value = false;
             showSnackbar.value = true;
             isSnackbar.value = true;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
-            if (error.response.error?.length) {
-                message.value = 'Missing required fields ' + Object.keys(error.response.error).join(' ');
-            } else message.value = error.response.data.message;
         });
 }
-async function createContract() {
-    const { valid } = await createContractform.value?.validate();
+function suspendContract() {
+    deleteDialog.value?.open();
+}
+async function updateContract() {
+    const { valid } = await updateContractForm.value?.validate();
     const { validtabs } = await tabsform.value?.validate();
     if (startDate.value == '') {
         isEmptyStartDate.value = true;
@@ -813,7 +721,46 @@ async function createContract() {
         isEmptyCustomerName.value = true;
     }
     if (valid && startDate.value !== '' && selectedCustomerModel.value !== null) {
-        confirmDialog.value?.open();
+        issubmit.value = true;
+        const contractTypeId = serviceType.value.map((data) => {
+            return data.id;
+        });
+        const productServices = productTabs.value.map((data) => {
+            return {
+                product_service_id: data.selectedProductServiceTab.id,
+                product_qty: data.quantity,
+                product_amount: data.amount
+            };
+        });
+        const requestBody = {
+            contract_id: parseInt(contractId.value),
+            contract_title: contractTitle.value,
+            contract_details: contractDescription.value,
+            contract_type_id: contractTypeId,
+            contract_product_service_id: productServices,
+            amount: contractAmount.value,
+            is_auto_renew: isAutoRenew.value == true ? 1 : 0
+        };
+        baseURlApi
+            .put('contract/update', requestBody)
+            .then((res) => {
+                const id = parseInt(custId.value);
+                issubmit.value = false;
+                message.value = res.data.message;
+                isSnackbar.value = true;
+                showSnackbar.value = true;
+                icon.value = 'mdi-check-circle';
+                color.value = 'success';
+                router.push(`/contracts/${id}/contracts-list`);
+            })
+            .catch((error) => {
+                message.value = error.response.data.message;
+                issubmit.value = false;
+                showSnackbar.value = true;
+                isSnackbar.value = true;
+                color.value = 'error';
+                icon.value = 'mdi-close-circle';
+            });
     }
 }
 function getAddressText(item) {
@@ -825,78 +772,6 @@ function getAddressText(item) {
         `${item?.city ? item.city : ''}` +
         ` ${item?.zipcode ? '-(' + item.zipcode + ')' : ''}`
     );
-}
-function getPaymentTermsinputs() {
-    startDate.value = '';
-    endDate.value = '';
-    let tempPaymentTermsOpt = [
-        {
-            id: 1,
-            slug: 'month',
-            display_name: 'Month'
-        },
-        {
-            id: 2,
-            slug: 'qtr',
-            display_name: 'Qtr'
-        },
-        {
-            id: 3,
-            slug: 'half-year',
-            display_name: 'Half Year'
-        },
-        {
-            id: 4,
-            slug: 'all-at-once',
-            display_name: 'All at Once'
-        }
-    ];
-    let tempPaymentTerms = [...tempPaymentTermsOpt];
-    paymentTermOptions.value = [];
-    paymentTerm.value = [];
-    if (contractDuration.value.id == 1) {
-        return (paymentTermOptions.value = [...tempPaymentTerms]);
-    }
-    if (contractDuration.value.id == 2) {
-        tempPaymentTerms.splice(2, 1);
-        return (paymentTermOptions.value = tempPaymentTerms);
-    }
-    if (contractDuration.value.id == 3) {
-        tempPaymentTerms.splice(1, 2);
-        return (paymentTermOptions.value = tempPaymentTerms);
-    }
-    if (contractDuration.value.id == 4) {
-        tempPaymentTerms.splice(0, 3);
-        return (paymentTermOptions.value = tempPaymentTerms);
-    }
-}
-function getcustomerdata(customer) {
-    customer = customer || selectedCustomer.value || {};
-    mobile.value = customer.phone;
-    customerEmail.value = customer.email;
-    isExistingCustomer.value = false;
-    if (customer.id) {
-        baseURlApi
-            .get(`ticket/get-customer-address/${customer.id}`)
-            .then((res) => {
-                addressOptions.value = res.data.data;
-                selectAddress.value = addressOptions.value.filter((data) => data.is_primary == 1)[0];
-                addressLineOne.value = selectAddress.value.address_line1;
-                area.value = selectAddress.value.area;
-                city.value = selectAddress.value.city;
-                zipcode.value = selectAddress.value.zipcode;
-                state.value = selectAddress.value.state;
-                countryName.value = selectAddress.value.country;
-                companyName.value = selectAddress.value.company_name;
-            })
-            .catch((error) => {
-                isSnackbar.value = true;
-                showSnackbar.value = true;
-                message.value = error.response.data.message;
-                color.value = 'error';
-                icon.value = 'mdi-close-circle';
-            });
-    }
 }
 function getDropDownData() {
     baseURlApi
@@ -915,97 +790,11 @@ function getDropDownData() {
             icon.value = 'mdi-close-circle';
         });
 }
-function getInitialData() {
-    isExistingCustomer.value = false;
-    selectedCustomer.value = null;
-    searchCustomer.value = '';
-    selectAddress.value = '';
-    customerEmail.value = '';
-    customInput.value.reset();
-}
-function clearInput() {
-    isExistingCustomer.value = false;
-}
-function getInitialDataserviceType() {
-    serviceType.value = '';
-}
-function onBlurCalled() {
-    searchService.value = '';
-    if (serviceType.value.length <= 0) {
-        serviceType.value = [];
-    }
-}
 /************************* computed  ***************************/
-const fromDateDisp = computed(() => {
-    return fromDateVal.value;
-    // format/do something with date
-});
-const filteredCustomers = computed(() => {
-    const _model = (customerSearchModel.value || '').toLowerCase().trim();
+const contractId = computed(() => route.params.id);
+const custId = computed(() => route.params.custId);
 
-    return selectCustomerList.value.filter((e) => {
-        return _model
-            .split(' ')
-            .some(
-                (m) =>
-                    (e.first_name || '').toLowerCase().includes(m) ||
-                    (e.last_name || '').toLowerCase().includes(m) ||
-                    (e.phone + '').includes(m)
-            );
-    });
-});
-const customersId = computed(() => route.params.id);
 
-function addTempCustomer(custName) {
-    let newCustomer = {};
-    if (custName.includes(' ')) {
-        var index = custName.indexOf(' ');
-        var first = custName.slice(0, index); // Gets the first part
-        var last = custName.slice(index + 1);
-
-        newCustomer = {
-            first_name: first || '',
-            last_name: last || '',
-            phone: '',
-            id: selectCustomerList.value.length + 1
-        };
-    } else {
-        newCustomer = {
-            first_name: custName || '',
-            last_name: '',
-            phone: '',
-            id: selectCustomerList.value.length + 1
-        };
-    }
-
-    // const [first, last] = custName
-    //     .split(' ')
-    //     .map((e) => e.trim())
-    //     .filter(Boolean);
-    // const newCustomer = {
-    //     first_name: first || '',
-    //     last_name: last || '',
-    //     phone: '',
-    //     id: selectCustomerList.value.length + 1
-    // };
-    // newCutomerValue.value = newCustomer;
-    selectCustomerList.value.unshift(newCustomer);
-    isExistingCustomer.value = false;
-    isnewCustomer.value = true;
-    selectAddress.value = '';
-    addressLineOne.value = '';
-    area.value = '';
-    city.value = '';
-    zipcode.value = '';
-    state.value = '';
-
-    countryName.value = 'India';
-    companyName.value = '';
-    mobile.value = '';
-    customerEmail.value = '';
-
-    // selectCustomerList.value.unshift(val);
-}
 function getCurrency() {
     baseURlApi
         .get('settings/company/get-currency')
@@ -1020,9 +809,72 @@ function getCurrency() {
             icon.value = 'mdi-close-circle';
         });
 }
+function getContractDetails() {
+    baseURlApi
+        .get(`contract/view/${contractId.value}`)
+        .then((res) => {
+
+            const data = res.data.data.contract_details;
+            selectedCustomerModel.value = data.customers;
+            customerSearchModel.value = (
+                selectedCustomerModel.value?.first_name +
+                '' +
+                ' ' +
+                (selectedCustomerModel.value?.last_name || '')
+            ).trim();
+            serviceType.value.push(data.contract_services_types[0].contract_types);
+
+            const mobileDetails = data.customers.phones.find((element) => element.is_primary === 1);
+            mobile.value = mobileDetails.phone;
+            isSuspended.value = res.data.data.suspend_flag;
+            customerEmail.value = data.customers.email;
+            selectAddress.value = data.customer_location;
+            addressLineOne.value = data.customer_location.address_line1;
+            area.value = data.customer_location.area;
+            city.value = data.customer_location.city;
+            zipcode.value = data.customer_location.zipcode;
+            state.value = data.customer_location.state;
+            countryName.value = data.customer_location.country;
+            companyName.value = data.customer_location.company_name;
+            contractTitle.value = data.contract_title;
+            contractDescription.value = data.contract_details;
+            contractAmount.value = data.amount;
+            contractDuration.value.push(data.duration);
+            paymentTerm.value.push(data.payment_term);
+            startDate.value = data.start_date;
+            endDate.value = data.end_date;
+            isAutoRenew.value = data.is_auto_renew == 1 ? true : false
+
+            data.product_service.map((item) =>
+                productTabs.value.push({
+                    selectedProductServiceTab: item.product_service,
+                    quantity: item.product_qty,
+                    amount: item.product_amount
+                })
+            );
+        })
+        .catch((error) => {
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
 onMounted(() => {
+    breadcrumbs.value.push( {
+        text: 'Contracts',
+        disabled: false,
+        href: `/contracts/${parseInt(custId.value)}/contracts-list`
+    },
+    {
+        text: 'Edit Contract',
+        disabled: true,
+        href: '#'
+    })
     getCustomersList();
     getDropDownData();
+    getContractDetails();
     getCurrency();
 });
 </script>

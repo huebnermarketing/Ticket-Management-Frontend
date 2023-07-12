@@ -385,10 +385,6 @@ function getTicketStatus() {
         .then((res) => {
             isLoading.value = false;
             items.value = res.data.data;
-            // message.value = res.data.message;
-            // isSnackbar.value = true;
-            // icon.value = 'mdi-check-circle';
-            // color.value = 'success';
         })
         .catch((error) => {
             isLoading.value = false;
@@ -400,9 +396,6 @@ function getTicketStatus() {
         });
 }
 
-function focusChange() {
-    console.log('focusde');
-}
 //cancel update
 function cancelUpdate(id) {
     isEditable.value = false;

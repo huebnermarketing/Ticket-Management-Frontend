@@ -176,9 +176,8 @@ function applyFilter() {
             filterData[section.id] = section.selected
         }
     }
-    // console.log(filterData)
-    // emit('filterdata', filterData)
-    // store.SET_FILTER_DATA(filterData)
+    emit('filterdata',filterData)
+    store.SET_FILTER_DATA(filterData)
     store.SET_CUSTOMIZER_DRAWER(store.Customizer_drawer = false);
     updateQuery(filterData)
 }

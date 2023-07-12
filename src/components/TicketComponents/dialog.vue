@@ -37,7 +37,6 @@ function open() {
 }
 function close(){
   opendialog.value = false;
-    console.log("closee",opendialog.value)
 
 }
 

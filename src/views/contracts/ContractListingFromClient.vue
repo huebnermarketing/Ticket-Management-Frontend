@@ -15,38 +15,34 @@
                                     :class="'text-subtitle-1 text-capitalize font-weight-bold mt-3 text-' + card.textcolor"
                                     v-text="card.title"
                                 ></div>
-                                <h4 :class="'text-h4 mt-1 text-' + card.textcolor" v-text="card.number"></h4>
+                                <h4
+                                    :class="'text-h4 mt-1 text-' + card.textcolor"
+                                    v-text="card.prefix ? card.prefix + card.number : card.number"
+                                ></h4>
                             </div>
                         </div>
                     </v-col>
                 </v-row>
                 <v-row justify="space-between" class="align-center mb-3">
                     <v-col cols="12" lg="4" md="6" class="d-flex align-center">
-                        <label class="mr-5 text-h5">Contracts ({{ totalItems }})</label>
-                        <v-text-field
-                            density="compact"
-                            @input="searchUser()"
-                            v-model="searchValue"
-                            label="Search"
-                            hide-details
-                            variant="outlined"
-                        ></v-text-field>
+                        <label class="mr-5 text-h5">Contracts -{{ contractClientName }} ({{ ActiveContractsNum }})</label>
                     </v-col>
                     <v-col cols="12" md="3">
                         <div class="d-flex gap-2 justify-end align-center">
                             <v-select
                                 v-model="contractFilter"
                                 :items="contractFilterOptions"
-                                item-title="status"
+                                item-title="status_name"
                                 item-value="id"
                                 @update:modelValue="updateFilterVal()"
                                 return-object
                                 single-line
                                 variant="outlined"
+                                style="min-width: 150px !important"
                                 class="activefilter"
                             ></v-select>
-                            <v-btn btn color="primary" @click="openAddTicket()" class="ml-2">
-                                <PlusIcon stroke-width="1.5" size="20" class="text-white" />Create Contract
+                            <v-btn btn color="primary" @click="openCreateContract()" class="ml-2" style="height: 44px">
+                                <PlusIcon stroke-width="1.5" size="22" class="text-white" />Create Contract
                             </v-btn>
                             <!-- <v-btn btn color="primary">
                             <FilterIcon stroke-width="1.5" size="20" class="text-white" />
@@ -61,7 +57,6 @@
                         fixed
                         id="ticketlist"
                         responsive
-                        :server-items-length="serverItemsLength"
                         :headers="headers"
                         :fixed-headers="true"
                         :hide-footer="true"
@@ -76,35 +71,59 @@
                         :sort-type="sortType"
                         must-sort
                     >
+                        {{ items }}
                         <!-- slot name for item is #item-{headername.value} = {"items from items array"} -->
                         <template #item-id="{ id }">
-                            <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">
-                                #{{ id }}
+                            <div class="player-wrapper text-capitalize">#{{ id }}</div>
+                        </template>
+                        <template #item-contract_title="{ contract_title }">
+                            <div class="player-wrapper text-capitalize">
+                                {{ contract_title }}
                             </div>
                         </template>
-                        <template #item-customer_name="{ first_name, last_name, id }">
-                            <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">
-                                {{ first_name + ' ' + last_name }}
+                        <template #item-company_name="{ customer_location }">
+                            <div class="player-wrapper text-capitalize">
+                                {{ customer_location.company_name ? customer_location.company_name : '-' }}
                             </div>
                         </template>
-                        <template #item-active_contract="{ contract_count, id }">
-                            <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">
-                                {{ contract_count }}
+                        <template #item-area="{ customer_location }">
+                            <div class="player-wrapper text-capitalize">
+                                {{ customer_location.area }}
                             </div>
                         </template>
-
-
-
+                        <template #item-start_date="{ start_date }">
+                            <div class="player-wrapper text-capitalize">
+                                {{ start_date }}
+                            </div>
+                        </template>
+                        <template #item-end_date="{ end_date }">
+                            <div class="player-wrapper text-capitalize">
+                                {{ end_date }}
+                            </div>
+                        </template>
+                        <template #item-open_tickets="{ open_tickets, tickets_count }">
+                            <div class="player-wrapper text-capitalize text-primary cursor-pointer" @click="redirectToContracts(id)">
+                                {{ `${open_tickets} (${tickets_count})` }}
+                            </div>
+                        </template>
+                        <template #item-service_type="{ contract_services_types }">
+                            <div class="player-wrapper text-capitalize">
+                                <v-chip v-for="(data, i) in contract_services_types" :key="i" color="warning">
+                                    {{ data.contract_types.contract_name }}
+                                </v-chip>
+                                <!-- <ArrowNarrowUpIcon v-if="ticket_priority.id == 1" stroke-width="1.5" size="20" class="text-error" /> -->
+                                <!-- <ArrowNarrowDownIcon v-if="ticket_priority.id == 2" stroke-width="1.5" size="20" class="text-success" /> -->
+                            </div>
+                        </template>
+                        <template #item-amount="{ amount }">
+                            <div class="player-wrapper text-capitalize">{{ amountFormat?.prefix }} {{ amount }}</div>
+                        </template>
+                        <template #item-remaining_amount="{ remaining_amount }">
+                            <div class="player-wrapper text-capitalize">{{ amountFormat?.prefix }} {{ remaining_amount }}</div>
+                        </template>
                         <!--------------------------- actions ------------------------------>
-                         <template #item-action="{ id }">
+                        <template #item-action="{ id }">
                             <div class="d-flex align-center">
-                                <v-tooltip text="View">
-                                    <template v-slot:activator="{ props }">
-                                        <v-btn class="table-icons-common" icon flat @click="openViewDrawer(id)" v-bind="props"
-                                            ><EyeIcon stroke-width="1.5" size="20" class="text-primary"
-                                        /></v-btn>
-                                    </template>
-                                </v-tooltip>
                                 <v-tooltip text="Edit">
                                     <template v-slot:activator="{ props }">
                                         <v-btn class="table-icons-common" icon flat @click="openEditDialog(id)" v-bind="props"
@@ -112,11 +131,13 @@
                                         /></v-btn>
                                     </template>
                                 </v-tooltip>
-                                <v-tooltip text="Delete">
+                                <v-tooltip text="Invoice">
                                     <template v-slot:activator="{ props }">
-                                        <v-btn class="table-icons-common" icon flat @click="deleteTicket(id)" v-bind="props"
-                                            ><TrashIcon stroke-width="1.5" size="20" class="text-error"
-                                        /></v-btn>
+                                        <v-btn class="table-icons-common" icon flat @click="openInvoiceDialog(id)" v-bind="props">
+                                            <ReceiptIcon stroke-width="1.5" size="20" class="text-primary" />
+                                            <!-- <PencilIcon stroke-width="1.5" size="20" class="text-secondary"
+                                        /> -->
+                                        </v-btn>
                                     </template>
                                 </v-tooltip>
                             </div>
@@ -142,7 +163,7 @@
             </v-snackbar>
         </v-row>
     </v-container>
-    <!-- <viewTicket ref="viewTicketRef" /> -->
+    <TicketInvoice ref="invoiceTicketRef" />
 </template>
 <script setup>
 import { onMounted, ref, watch, defineExpose, onUpdated, computed } from 'vue';
@@ -154,9 +175,11 @@ import UiParentCard from '@/components/shared/UiParentCard.vue';
 import 'vue3-easy-data-table/dist/style.css';
 import { useCustomizerStore } from '@/stores/customizer';
 import useEventsBus from '@/mixins/eventBus';
+import TicketInvoice from './TikcetInvoice.vue'
 
 import { router } from '@/router';
 import { useRoute } from 'vue-router';
+import { TicketIcon } from 'vue-tabler-icons';
 const { bus } = useEventsBus();
 
 const themeColor = ref('rgb(var(--v-theme-secondary))');
@@ -190,44 +213,31 @@ const breadcrumbs = ref([
         href: '#'
     }
 ]);
-const topCardsData = ref([
-    {
-        title: 'Active Contract Amount',
-        key: 'active_contract',
-        number: contractDashboard.value.active_contract,
-        bgcolor: 'lightprimary',
-        textcolor: 'primary'
-    },
-    {
-        title: 'Remaining Amount',
-        key: 'remaining_amount',
-        number: contractDashboard.value.remaining_amount,
-        bgcolor: 'lightwarning',
-        textcolor: 'warning'
-    },
-    {
-        title: 'Open Contract Ticket',
-        key: 'paid_amount',
-        number: contractDashboard.value.paid_amount,
-        bgcolor: 'lightprimary',
-        textcolor: 'primary'
-    }
-]);
+const amountFormat = ref({
+    prefix: ' ',
+    masked: false
+});
 
+const topCardsData = ref([]);
+
+const contractClientName = ref('');
+const ActiveContractsNum = ref(0);
 const headers = ref([
     { text: 'Id', value: 'id' },
-    { text: 'Contract Name', value: 'contract_name' },
+    { text: 'Contract Name', value: 'contract_title' },
     { text: 'Company Name', value: 'company_name' },
-    { text: 'Location(area)', value: 'location' },
+    { text: 'Location(area)', value: 'area' },
     { text: 'Start Date', value: 'start_date' },
     { text: 'End Date', value: 'end_date' },
-    { text: 'Ticket', value: 'ticket' },
+    { text: 'Ticket', value: 'open_tickets' },
     { text: 'Service Type', value: 'service_type' },
-     { text: 'Amount', value: 'amount' },
-    { text: 'Unpaid Amount', value: 'unpaid_amount' }
+    { text: 'Amount', value: 'amount' },
+    { text: 'Unpaid Amount', value: 'remaining_amount' },
+    { text: 'Action', value: 'action' }
 ]);
 const serverItemsLength = ref(50);
 const current_page = ref(1);
+const customerID = ref(0);
 const sortBy = 'first_name';
 const sortType = 'desc';
 const items = ref([]);
@@ -247,27 +257,14 @@ const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
 const totalItems = ref(0);
-const filters = ref(null);
-const computedResult = ref(null);
-const is_filter = ref(false);
-
-const name = ref();
+const invoiceTicketRef = ref()
 
 //************************************* contacts ****************************************//
 const contractFilter = ref({
     id: 1,
-    status: 'Active'
+    status_name: 'Active'
 });
-const contractFilterOptions = ref([
-    {
-        id: 1,
-        status: 'Active'
-    },
-    {
-        id: 2,
-        status: 'Inactive'
-    }
-]);
+const contractFilterOptions = ref([]);
 //get users
 function searchUser() {
     const fd = new FormData();
@@ -280,7 +277,6 @@ function searchUser() {
 }
 function updateTopCardValues() {
     topCardsData.value.forEach((e) => {
-        console.log('dashh', e.key);
         e.number = contractDashboard.value[e.key];
     });
 }
@@ -295,12 +291,9 @@ function onScroll(e) {
 }
 
 function updateFilterVal() {
-    current_page.value = 1;
-    items.value = [];
     getContracts();
 }
 function redirectToContracts(id) {
-    console.log(id);
     router.push({
         name: 'ContractList',
         params: { id }
@@ -309,23 +302,36 @@ function redirectToContracts(id) {
 function getContracts() {
     if ((current_page.value > 1 && items.value.length >= totalItems.value) || isLoading.value) return;
     isLoading.value = true;
-    const params = { total_record: 50, page: parseInt(current_page.value) };
-    console.log('dataa', contractFilter.value.status);
     const requestbody = {
-        type: contractFilter.value.status
+        customer_id: parseInt(customersId.value),
+        status_type: contractFilter.value.status_name
     };
 
     baseURlApi
-        .post(`contract/client-list`, requestbody, { params: params })
+        .post(`contract/contract-list`, requestbody)
         .then((res) => {
-            console.log('res dfata', res.data.data);
             isLoading.value = false;
-            serverItemsLength.value = res.data.data.all_client.total;
-            totalItems.value = res.data.data.all_client.total;
-            items.value.push(...res.data.data.all_client.data);
-            contractDashboard.value = res.data.data.client_dashboard;
+            contractDashboard.value = res.data.data.contract_dashboard;
             updateTopCardValues();
-            current_page.value++;
+            contractClientName.value = res.data.data.contract_dashboard.client_name;
+            ActiveContractsNum.value = res.data.data.contract_dashboard.client_total_active_contract;
+            items.value = res.data.data.contract_list;
+        })
+        .catch((error) => {
+            isLoading.value = false;
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
+function getFilterData() {
+    baseURlApi
+        .get(`contract/get-details`)
+        .then((res) => {
+            contractFilterOptions.value = res.data.data.contract_statuses;
+            contractFilter.value = res.data.data.contract_statuses.filter((e) => e.status_name.toLowerCase() === 'active');
         })
         .catch((error) => {
             isLoading.value = false;
@@ -340,22 +346,70 @@ function addCustomerData(addedData) {
     isFromAdd.value = true;
     getContracts();
 }
-
+const customersId = computed(() => route.params.id);
 //open modal
-function openAddTicket() {
+function openCreateContract() {
+    let id = parseInt(customersId.value);
     router.push({
-        name: 'AddContract'
-    });
-}
-function openEditDialog(id) {
-    router.push({
-        name: 'EditTicket',
+        name: 'AddContract',
         params: { id }
     });
 }
-
+function openEditDialog(id) {
+    const custId = customersId.value;
+    router.push({
+        name: 'EditContract',
+        params: { id, custId }
+    });
+}
+function openInvoiceDialog(contractID) {
+    // invoiceTicketRef.value?.getCurrency()
+    invoiceTicketRef.value?.getUsersData(contractID);
+    invoiceTicketRef.value?.open();
+}
+function getCurrency() {
+    baseURlApi
+        .get('settings/company/get-currency')
+        .then((res) => {
+            amountFormat.value.prefix = res.data.data.currency.symbol + ' ';
+            topCardsData.value.push(
+                {
+                    title: 'Active Contract Amount',
+                    key: 'active_contract_amount',
+                    number: contractDashboard.value.active_contract_amount,
+                    bgcolor: 'lightprimary',
+                    textcolor: 'primary',
+                    prefix: amountFormat.value?.prefix
+                },
+                {
+                    title: 'Remaining Amount',
+                    key: 'remaining_amount',
+                    number: contractDashboard.value.remaining_amount,
+                    bgcolor: 'lightwarning',
+                    textcolor: 'warning',
+                    prefix: amountFormat.value?.prefix
+                },
+                {
+                    title: 'Open Contract Ticket',
+                    key: 'open_contract_ticket',
+                    number: contractDashboard.value.open_contract_ticket,
+                    bgcolor: 'lightprimary',
+                    textcolor: 'primary'
+                }
+            );
+        })
+        .catch((error) => {
+            isSnackbar.value = true;
+            showSnackbar.value = true;
+            message.value = error.response.data.message;
+            color.value = 'error';
+            icon.value = 'mdi-close-circle';
+        });
+}
 onMounted(() => {
     getContracts();
+    getFilterData();
+    getCurrency();
 });
 
 // TODO: split routes & remove block below

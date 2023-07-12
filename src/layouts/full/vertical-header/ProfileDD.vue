@@ -164,9 +164,7 @@ function loggedout() {
  userProfile.value = computed(() => {
     return store.getUserProfile;
 });
-// onMounted(()=>{
-//    console.log('updatedd', store.getUserProfile)
-// })
+
 </script>
 <style scoped>
 .maxWidth {

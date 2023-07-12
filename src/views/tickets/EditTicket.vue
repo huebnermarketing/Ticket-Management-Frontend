@@ -334,7 +334,6 @@
                                             variant="outlined"
                                             label="Please select ticket status"
                                             :rules="ticketdropdownrule"
-                                            disabled="true"
                                         ></v-select>
                                     </v-col>
                                     <!---------------------------------- Appointment type --------------------------------->
@@ -595,6 +594,7 @@ const customerOptions = ref([
     }
 ]);
 
+
 const showPicker = ref(false);
 const selectedDate = ref(null);
 const isEmptyStartDate = ref(false);
@@ -707,7 +707,6 @@ function getTicketData() {
     baseURlApi
         .get(`ticket/view/${ticketId.value}`)
         .then((res) => {
-            console.log('ress', res.data.data.ticket_detail);
             const data = res.data.data.ticket_detail;
             tiketTypeRadio.value = data.ticket_type;
             customerSearchModel.value = data.customer.first_name + ' ' + data.customer.last_name;
@@ -741,7 +740,6 @@ function getTicketData() {
         .catch((error) => {
             isSnackbar.value = true;
             showSnackbar.value = true;
-            console.log('err', error.response.data.message);
             message.value = error.response.data.message;
             color.value = 'error';
             icon.value = 'mdi-close-circle';
@@ -873,11 +871,6 @@ async function editTicket() {
       if (dueDate.value == '') {
         isEmptyStartDate.value = true;
     }
-    // if (isnewCustomer.value == true) {
-    //  console.log("existng enter",customerSearchModel.value)
-    // selectedCustomerModel.value.first_name = customerSearchModel.value?.first_name; // Gets the first part
-    // selectedCustomerModel.value.last_name = customerSearchModel.value?.last_name.replace(' ', '');
-    // }
     if (valid && dueDate.value !== '') {
         issubmit.value = true;
         const requestBody = {
@@ -992,7 +985,6 @@ function getAddress(customerId) {
             .catch((error) => {
                 isSnackbar.value = true;
                 showSnackbar.value = true;
-                console.log('err', error.response.data.message);
                 message.value = error.response.data.message;
                 color.value = 'error';
                 icon.value = 'mdi-close-circle';

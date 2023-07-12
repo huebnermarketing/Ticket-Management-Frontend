@@ -23,31 +23,6 @@
                 </div>
             </v-col>
             <v-col cols="12">
-                <!-- :color="statusColors"
-                :track-color="statusColors" -->
-                <!-- :track-fill-color="statusColors"    -->
-                <!-- #03CFCF
-#FF7601
-12CB36
-#D5D5D6
-#f1f3f4 -->
-                <!-- <div class="d-none">{{ colorComputed }}</div> -->
-                <!-- {{ticketStatus[0] ? ticketStatus[0].toLowerCase() : ''}} -->
-                <!-- <v-slider
-                    :color="statusColors"
-                    :track-color="statusColors"
-                    track-fill-color="#03CFCF"
-                    v-model="ticketStatusVal"
-                    @input="clicked()"
-                    :ticks="ticketStatus"
-                    tick-size="20"
-                    :max="4"
-                    step="1"
-                    show-ticks="always"
-                    rounded="true"
-                >
-                </v-slider> -->
-
                 <div class="task_process">
                     <div class="process_info" v-for="(data, i) in ticketStatus" :key="i">
                         <span class="text-warning" :style="{ background: `${data.background_color}` }">&nbsp;</span>
@@ -456,7 +431,6 @@ function confirmClick() {
             getComments();
         })
         .catch((error) => {
-            console.log('errr', error);
             deleteDialog.value?.close();
             isSnackbar.value = true;
             showSnackbar.value = true;
@@ -481,7 +455,6 @@ function saveComment(id) {
             getComments();
         })
         .catch((error) => {
-            console.log('errr', error);
             isLoading.value = false;
             isEditable.value = false;
             isEdit.value = false;
@@ -513,10 +486,8 @@ function getComments() {
         .then((res) => {
             isLoading.value = false;
             comments.value = res.data.data;
-            console.log('dataa11 ccc', comments.value);
         })
         .catch((error) => {
-            console.log('errr', error);
             isLoading.value = false;
             isSnackbar.value = true;
             showSnackbar.value = true;
@@ -539,7 +510,6 @@ function addComment() {
                 isLoading.value = false;
                 commentMsg.value = '';
                 getComments();
-                console.log('dataa11 ppp', res.data);
             })
             .catch((error) => {
                 isLoading.value = false;
@@ -553,37 +523,21 @@ function addComment() {
     }
 }
 function getTicketData() {
-    console.log('storee', store.ticketID);
     ticketid.value = store.ticketID;
     baseURlApi
         .get(`ticket/view/${ticketid.value}`)
         .then((res) => {
-            // isLoading.value = false;
-
             ticketItems.value = res.data.data.ticket_detail;
-            console.log('errr 111', ticketItems.value.assigned_engineer.first_name);
             ticketStatus.value = res.data.data.ticket_status;
             erName.value = ticketItems.value.assigned_engineer.first_name + ' ' + ticketItems.value.assigned_engineer.last_name;
-            // const object = res.data.data.ticket_status.map((element, index) => {
-            //     return (index = element.status_name);
-            // });
             profileimg.value = ticketItems.value.assigned_engineer.profile_photo;
-            // ticketStatus.value = { ...object };
-
-            // const colors = res.data.data.ticket_status.map((element, index) => {
-            //     return (index = element.background_color);
-            // });
-            // sliderColor.value = { ...colors };
             problem_types.value = ticketItems.value.problem_types.map((data) => {
                 return data.problem_name;
             });
 
             getCardData();
-            console.log('dataa11 ppp', ticketItems.value);
         })
         .catch((error) => {
-            console.log('errr', error);
-            // isLoading.value = false;
             isSnackbar.value = true;
             showSnackbar.value = true;
             message.value = error.response.data.message;
@@ -592,10 +546,7 @@ function getTicketData() {
         });
 }
 function closeDialog() {
-    console.log('closeddd');
-
     store.SET_CUSTOMIZER_DRAWER((store.Customizer_drawer = false));
-    // filterSelect.value.reset()
 }
 // /************************************************* mounted ************************************************/
 onMounted(() => {

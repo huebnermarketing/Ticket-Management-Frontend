@@ -41,7 +41,6 @@ baseURlApi.interceptors.response.use(
     if (errorStatusCode === 401) {
       handle401(error)
     } else {
-      console.log(error)
       return Promise.reject(error)
     }
   },

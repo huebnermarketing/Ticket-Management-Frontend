@@ -1,4 +1,3 @@
-
 <template>
     <v-container v-scroll="onScroll" fluid class="pa-0">
         <v-row no-gutters>
@@ -25,7 +24,10 @@
                                 <PlusIcon stroke-width="1.5" size="20" class="text-white" />Add Ticket
                             </v-btn>
                             <v-btn btn color="primary" flat @click="openFilterDrawer()">
-                                <v-icon> mdi-filter </v-icon>
+                                <v-icon v-if="!hasFilters"> mdi-filter </v-icon>
+                                <v-badge v-else color="error" dot>
+                                    <v-icon> mdi-filter </v-icon>
+                                </v-badge>
                             </v-btn>
                         </div>
                     </v-col>
@@ -336,9 +338,15 @@ const isSnackbar = ref(false);
 
 const tableHeight = ref(0);
 const totalItems = ref(0);
-const filters = ref(null);
+const filters = ref([]);
 const computedResult = ref(null);
 const is_filter = ref(false);
+
+const hasFilters = computed(() => {
+    const { query } = route;
+    const { ticket_status, customers, problem_types, appointment_type, payment_status, ticket_priorities } = query || {};
+    return !!ticket_priorities || !!payment_status || !!appointment_type || !!problem_types || !!customers || ticket_status?.length > 0;
+});
 
 const name = ref();
 //get users
@@ -371,28 +379,43 @@ function onScroll(e) {
         getTickets();
     }
 }
+// const ticketFilters = computed(()=> store.ticketFilterOptions)
+function getTicketFilters() {
+    baseURlApi
+        .post('ticket/get-detail', {
+            is_filter: 1
+        })
+        .then((res) => {
+            store.SET_TICKET_FILTER_OPTIONS(res.data.data);
+        })
+        .catch((error) => {
+            //
+        });
+}
+function makeRequestBody() {
+    const { query } = route;
+    const customer_id = [...(query.customers || [])];
+    const problem_type_id = [...(query.problem_types || [])];
+    const ticket_status_id = [...(query.ticket_status || [])];
+    const appointment_type_id = [...(query.appointment_type || [])];
+    const payment_type_id = [...(query.payment_status || [])];
+    const priority_id = [...(query.ticket_priorities || [])];
+    return {
+        customer_id,
+        problem_type_id,
+        ticket_status_id,
+        appointment_type_id,
+        payment_type_id,
+        priority_id
+        // is_filter: true
+    };
+}
 function getTickets() {
     if ((current_page.value > 1 && items.value.length >= totalItems.value) || isLoading.value) return;
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };
-    let requestbody = null;
-    if (filters.value) {
-        let ticketStatusIDs = filters.value[0]?.ticket_status_id?.map((data) => {
-            return data.id;
-        });
-        requestbody = {
-            customer_id: filters.value[0]?.customer_id?.customer_id ? [filters.value[0]?.customer_id?.customer_id] : [],
-            problem_type_id: filters.value[0]?.problem_type_id?.id ? [filters.value[0]?.problem_type_id?.id] : [],
-            ticket_status_id: filters.value[0]?.ticket_status_id.length > 0 ? ticketStatusIDs : [],
-            appointment_type_id: filters.value[0]?.appointment_type_id?.id ? [filters.value[0]?.appointment_type_id?.id] : [],
-            payment_type_id: filters.value[0]?.payment_type_id?.id ? [filters.value[0]?.payment_type_id?.id] : [],
-            priority_id: filters.value[0]?.priority_id?.id ? [filters.value[0]?.priority_id?.id] : []
-            // is_filter: true
-        };
-    }
-    const filtersparams = filters.value ? requestbody : null;
     baseURlApi
-        .post(`ticket/list`, filtersparams, { params: params })
+        .post(`ticket/list`, makeRequestBody(), { params })
         .then((res) => {
             isLoading.value = false;
             serverItemsLength.value = res.data.data.allTicket.total;
@@ -400,40 +423,6 @@ function getTickets() {
 
             ticketDashboard.value = res.data.data.ticketDashboard;
             updateTopCardValues();
-            // if (0) {
-            //     let itemsData = [];
-            //     if (isFromAdd.value) {
-            //         let newArray = [].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data);
-
-            //         // Declare an empty object
-            //         let uniqueObject = {};
-
-            //         // Loop for the array elements
-            //         for (let i in newArray) {
-            //             // Extract the title
-            //             let objid = newArray[i]['id'];
-
-            //             // Use the title as the index
-            //             uniqueObject[objid] = newArray[i];
-            //         }
-
-            //         // Loop to push unique object into array
-            //         for (let i in uniqueObject) {
-            //             itemsData.push(uniqueObject[i]);
-            //         }
-            //     } else {
-            //         itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.allTicket.data));
-            //     }
-            //     items.value = itemsData.slice();
-            //     items.value = JSON.parse(JSON.stringify(items.value));
-            //     const proxy = new Proxy(items.value, {
-            //         get(target, prop, receiver) {
-            //             return target[prop];
-            //         }
-            //     });
-            //     items.value = [...proxy];
-            //     items.value = [...JSON.parse(JSON.stringify(items.value))];
-            // }
             items.value.push(...res.data.data.allTicket.data);
             current_page.value++;
         })
@@ -447,8 +436,6 @@ function getTickets() {
         });
 }
 function filterData(addedData) {
-    // const existing = items.value.find((e) => e.id === editedData.id);
-    // if (existing) Object.assign(existing, editedData);
     const existing = items.value.find((e) => e.id === addedData.id);
     if (existing) Object.assign(existing, addedData);
 }
@@ -524,6 +511,7 @@ function deleteTicket(id) {
 }
 onMounted(() => {
     getTickets();
+    getTicketFilters();
 });
 
 //  filters.value = computed(() => {
@@ -540,8 +528,21 @@ watch(
         }
     }
 );
+// watch(
+//     () => bus.value.get('filterdata'),
+//     (val) => {
+//         console.log('val', val);
+//         //  if(val.is_filter){
+//         //     is_filter.value = true
+//         filters.value = [...val];
+//         current_page.value = 1;
+//         items.value = [];
+//         getTickets();
+//         //  }
+//     }
+// );
 watch(
-    () => bus.value.get('filterdata'),
+    () => route.query,
     (val) => {
         //  if(val.is_filter){
         //     is_filter.value = true
@@ -549,8 +550,8 @@ watch(
         current_page.value = 1;
         items.value = [];
         getTickets();
-        //  }
-    }
+    },
+    { deep: true }
 );
 </script>
 

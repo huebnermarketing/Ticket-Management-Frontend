@@ -38,55 +38,55 @@
                         <div class="mb-4">
                             <label class="text-h4 font-weight-regular">Ticket Details</label>
                         </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">Customer Name</label>
-                            <div class="detail_info">
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">Customer Name</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems?.customer?.first_name + ' ' + ticketItems?.customer?.last_name }}</h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">Problem Type</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">Problem Type</label></v-col>
+                            <v-col class="detail_info">
                                 <h5 v-for="(data, i) in problem_types" :key="i">
                                     {{ data && i < problem_types.length - 1 ? data + ',' : data }}
                                 </h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">problem title</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">problem title</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems.problem_title }}</h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">description</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">description</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems.description }}</h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">due date</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">due date</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems.due_date }}</h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">assign engineer</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">assign engineer</label></v-col>
+                            <v-col class="detail_info">
                                 <img v-if="!profileimg" src="@/assets/images/profile/user.png" alt="image" />
                                 <img v-if="profileimg" :src="profileimg" alt="image" />
-                            </div>
-                            <h5>{{ erName }}</h5>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">appointment type</label>
-                            <div class="detail_info">
+                                <h5>{{ erName }}</h5>
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">appointment type</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems?.appointment_type?.appointment_name }}</h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">Address</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">Address</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>
                                     {{
                                         ticketItems?.customer_location?.address_line1 +
@@ -98,43 +98,43 @@
                                         ticketItems?.customer_location?.zipcode
                                     }}
                                 </h5>
-                            </div>
-                        </div>
+                            </v-col>
+                        </v-row>
                         <!----------------------------------------------------- payment details --------------------------------------------------->
                         <v-divider class="mt-4"></v-divider>
                         <div class="mb-4 mt-4">
                             <label class="text-h4 font-weight-regular">Payment Details</label>
                         </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">Ticket amount</label>
-                            <div class="detail_info">
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">Ticket amount</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems.amount }}</h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">payment status</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">payment status</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems?.payment_status?.payment_type }}</h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">paid amount</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">paid amount</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems?.collected_amount }}</h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">payment mode</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">payment mode</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems?.payment_mode }}</h5>
-                            </div>
-                        </div>
-                        <div class="ticket_detail_info">
-                            <label class="text-capitalize">remaining amount</label>
-                            <div class="detail_info">
+                            </v-col>
+                        </v-row>
+                        <v-row class="ticket_detail_info">
+                            <v-col sm="3"><label class="text-capitalize">remaining amount</label></v-col>
+                            <v-col class="detail_info">
                                 <h5>{{ ticketItems?.remaining_amount }}</h5>
-                            </div>
-                        </div>
+                            </v-col>
+                        </v-row>
                         <!----------------------------------------------------------- comments ---------------------------------------------->
                         <v-divider class="mt-4"></v-divider>
                         <div>

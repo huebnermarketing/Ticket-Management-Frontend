@@ -106,7 +106,6 @@
                                             v-model="companyName"
                                             variant="outlined"
                                             color="primary"
-                                            :rules="requiredrule"
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- address line 1 --------------------------------->
@@ -664,7 +663,8 @@ const startDateConfig = ref({
     wrap: 'true',
     disableMobile: 'true',
     dateFormat: 'Y-m-d',
-    altFormat: 'Y-m-d'
+    altFormat: 'd-m-Y',
+    altInput: true,
 });
 /******************************************************** edit ticket **********************************************/
 // const ticketId = ref(0);

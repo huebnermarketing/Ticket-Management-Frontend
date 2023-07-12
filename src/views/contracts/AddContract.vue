@@ -629,7 +629,8 @@ const startDateConfig = ref({
     wrap: 'true',
     disableMobile: 'true',
     dateFormat: 'Y-m-d',
-    altFormat: 'Y-m-d'
+    altFormat: 'd-m-Y',
+    altInput: true,
 });
 /********************************************************* emits ********************************************************/
 const emit = defineEmits(['ticketAdded']);

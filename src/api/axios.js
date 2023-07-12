@@ -38,8 +38,8 @@ baseURlApi.interceptors.response.use(
   },
   function (error) {
     const errorStatusCode = error.response.status
-    if (errorStatusCode === 403 || errorStatusCode === 404) {
-      //   TODO: Redirect logic with 403 and 404
+    if (errorStatusCode === 401) {
+      handle401(error)
     } else {
       return Promise.reject(error)
     }
@@ -47,3 +47,12 @@ baseURlApi.interceptors.response.use(
 )
 
 export { baseURlApi, localURL }
+
+/**********************************************/
+
+function handle401(err) {
+    localStorage.removeItem('auth-token')
+    localStorage.removeItem('user')
+    if (err?.config?.url?.includes('/auth/logout')) location.href = location.origin + '/login'
+    else location.href = location.origin + '/login?redirect=' + location.pathname + location.search
+}

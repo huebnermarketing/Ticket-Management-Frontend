@@ -41,7 +41,7 @@
                                                     @click:clear="
                                                         () => {
                                                             customerSearchModel = '';
-                                                            selectedCustomerModel = null;
+                                                            selectedCustomerModel = {};
                                                             isExistingCustomer = false;
                                                             selectAddress = '';
                                                             addressLineOne = '';
@@ -198,7 +198,7 @@
                                     <!---------------------------------- Address --------------------------------->
                                     <v-col cols="12" md="6">
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">choose Address</v-label>
-                                        <v-combobox
+                                        <v-select
                                             :label="!isExistingCustomer ? 'Add new address' : ''"
                                             v-model="selectAddress"
                                             :items="addressOptions"
@@ -207,7 +207,7 @@
                                             item-value="id"
                                             return-object
                                             single-line
-                                            :disabled="!isExistingCustomer"
+                                            :disabled="!isExistingCustomer || !selectedCustomerModel.id"
                                             variant="outlined"
                                             bg-color="none"
                                             base-color="none"
@@ -216,6 +216,7 @@
                                             open-on-clear
                                             persistent-clear
                                             persistent-counter
+                                            hide-no-data
                                         >
                                             <!-- <template v-slot:item="{ item }">
                                                 {{  item?.value?.address_line1 + ','+item?.value?.area + ','+item?.value?.city+ '-'+item?.value?.zipcode }}
@@ -231,7 +232,7 @@
                                                     >
                                                 </div>
                                             </template>
-                                        </v-combobox>
+                                        </v-select>
                                     </v-col>
                                     <!---------------------------------- company name --------------------------------->
                                     <v-col cols="12" md="6">
@@ -240,7 +241,6 @@
                                             v-model="companyName"
                                             variant="outlined"
                                             color="primary"
-                                            :rules="requiredrule"
                                         ></v-text-field>
                                     </v-col>
                                     <!---------------------------------- address line 1 --------------------------------->
@@ -320,7 +320,7 @@
                                     <v-col cols="12" md="6">
                                         <!-- @blur="onEnterProblem(e)" -->
                                         <v-label class="mb-2 font-weight-medium text-capitalize required">Problem type</v-label>
-                                        <v-combobox
+                                        <v-autocomplete
                                             class="prolem-typ"
                                             v-model="problemType"
                                             v-model:search="searchProblem"
@@ -362,7 +362,7 @@
                                                     </v-list-item-title>
                                                 </v-list-item>
                                             </template>
-                                        </v-combobox>
+                                        </v-autocomplete>
                                     </v-col>
                                     <!---------------------------------- problem title --------------------------------->
                                     <v-col cols="12" md="6">
@@ -726,7 +726,8 @@ const startDateConfig = ref({
     wrap: 'true',
     disableMobile: 'true',
     dateFormat: 'Y-m-d',
-    altFormat: 'Y-m-d'
+    altFormat: 'd-m-Y',
+    altInput: true,
 });
 const showPicker = ref(false);
 const selectedDate = ref(null);
@@ -975,18 +976,19 @@ async function createTicket() {
         // var index = data.indexOf(' ');
         selectedCustomerModel.value.first_name = newCutomerValue.value?.first_name; // Gets the first part
         selectedCustomerModel.value.last_name = newCutomerValue.value?.last_name.replace(' ', '');
+        selectedCustomerModel.value.id = newCutomerValue.value.id;
         // }
         // else{
         //     selectedCustomerModel.value.first_name = newCutomerValue.value
         // }
     }
-    if (dueDate.value == '') {
+    if (!dueDate.value) {
         isEmptyStartDate.value = true;
     }
-    if (selectedCustomerModel.value == null) {
+    if (!selectedCustomerModel.value?.id) {
         isEmptyCustomerName.value = true;
     }
-    if (valid && dueDate.value !== '' && selectedCustomerModel.value !== null) {
+    if (valid && dueDate.value !== '' && selectedCustomerModel.value?.id) {
         issubmit.value = true;
 
         const requestBody = {
@@ -1180,7 +1182,7 @@ function getTickets() {
             paymentStatusOptions.value = data.payment_status;
             paymentModeOptions.value = data.payment_mode;
             TicketpriorityOptions.value = data.ticket_priorities;
-            getCustomersList();
+            // getCustomersList();
             // selectCustomerList.value = data.customers;
         })
         .catch((error) => {
@@ -1235,9 +1237,9 @@ const fromDateDisp = computed(() => {
     // format/do something with date
 });
 const filteredCustomers = computed(() => {
-    if (customerSearchModel.value?.length < 3) {
-        return [];
-    }
+    // if (customerSearchModel.value?.length < 3) {
+    //     return [];
+    // }
     const _model = (customerSearchModel.value || '').toLowerCase().trim();
     return selectCustomerList.value.filter((e) => {
         return _model
@@ -1251,7 +1253,7 @@ const filteredCustomers = computed(() => {
     });
 });
 const customerSearchModel = ref('');
-const selectedCustomerModel = ref(null);
+const selectedCustomerModel = ref({});
 const searchTimer = ref({});
 
 function addTempCustomer(custName) {
@@ -1277,6 +1279,7 @@ function addTempCustomer(custName) {
     }
     newCutomerValue.value = newCustomer;
     selectCustomerList.value.unshift(newCustomer);
+    selectedCustomerModel.value = newCustomer
     isExistingCustomer.value = false;
     isnewCustomer.value = true;
     selectAddress.value = '';

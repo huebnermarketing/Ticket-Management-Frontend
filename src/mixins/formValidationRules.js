@@ -36,9 +36,10 @@ export const formValidationsRules = () => {
             return 'Mobile number is required.';
         },
         (value) => {
-            if (value?.length <= 15 && value?.length >= 3) return true;
+            // if (value?.length <= 15 && value?.length >= 3) return true;
 
-            return 'Mobile number must be between 3-15 digit.';
+            // return 'Mobile number must be between 3-15 digit.';
+            return value?.length >= 10 || 'Mobile number must be at least 10 digits.';
         }
         // (value) => {
         //     if (/^\d+$/.test(value)) return true;
@@ -48,8 +49,9 @@ export const formValidationsRules = () => {
     const alternativemobilerule = [
         (value) => {
             if (value?.length > 0) {
-                if (value?.length <= 15 && value?.length >= 3) return true;
-                return 'Mobile number must be between 3-15 digit.';
+                // if (value?.length <= 15 && value?.length >= 3) return true;
+                // return 'Mobile number must be between 3-15 digit.';
+                return value?.length >= 10 || 'Mobile number must at least 10 digits.';
             }
         },
         (value) => {

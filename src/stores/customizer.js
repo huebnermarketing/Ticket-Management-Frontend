@@ -16,7 +16,8 @@ export const useCustomizerStore = defineStore({
     ComponentName : null,
     drawerWidth:"",
     ticketID: 0,
-    filterData : null
+    filterData : null,
+    ticketFilterOptions: {},
   }),
 
   getters: {
@@ -52,6 +53,9 @@ export const useCustomizerStore = defineStore({
     },
     SET_FILTER_DATA(payload) {
       this.ticketID = payload
+    },
+    SET_TICKET_FILTER_OPTIONS(payload) {
+      this.ticketFilterOptions = payload
     }
   }
 })

@@ -74,6 +74,21 @@ const MainRoutes = {
                         },
                     ]
                 },
+                {
+                    path: ':id',
+                    component: () => import('@/views/Empty.vue'),
+                    children: [
+                        {
+                            name: 'EditContract',
+                            path: 'edit/contract',
+                            component: () => import('@/views/contracts/EditContract.vue'),
+                        },
+                        {
+                            path: '',
+                            redirect: { name: 'EditContract' }
+                        },
+                    ]
+                },
             ]
         },
         //---------------------------------- Reports ---------------------------------------------//

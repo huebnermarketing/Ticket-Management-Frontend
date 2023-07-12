@@ -41,7 +41,6 @@ baseURlApi.interceptors.response.use(
     if (errorStatusCode === 403 || errorStatusCode === 404) {
       //   TODO: Redirect logic with 403 and 404
     } else {
-      console.log(error)
       return Promise.reject(error)
     }
   },

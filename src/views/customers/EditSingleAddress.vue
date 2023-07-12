@@ -139,9 +139,6 @@ async function addAddress() {
             is_primary: singleAddressDetails.value.is_primary,
             id: singleAddressDetails.value.id
         };
-        // store.setAddress(...data)
-        //    console.log("ddd 111",store.getnewAddress)
-
         emit('updateClicked', data);
         issubmit.value = false;
         editSingleAddressForm.value?.reset();

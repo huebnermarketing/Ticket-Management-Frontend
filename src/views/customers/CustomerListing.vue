@@ -224,11 +224,8 @@ function getCustomers() {
                 for (let i in uniqueObject) {
                     itemsData.push(uniqueObject[i]);
                 }
-                console.log("one")
             } else {
-                console.log("res.daa",res.data.data)
                 itemsData = Array.from([].concat(JSON.parse(JSON.stringify(items.value)), res.data.data.data));
-                                console.log("two")
 
             }
 
@@ -241,7 +238,6 @@ function getCustomers() {
             });
             items.value = [...proxy];
             items.value = [...JSON.parse(JSON.stringify(items.value))][0] !== null ? [...JSON.parse(JSON.stringify(items.value))] : [];
-            console.log("ite",items.value)
         })
         .catch((error) => {
             isLoading.value = false;

@@ -392,16 +392,6 @@
                                     <!---------------------------------- Due Date --------------------------------->
                                     <v-col cols="12" sm="6" class="position-relative">
                                         <v-label for="due_date" class="mb-2 font-weight-medium text-capitalize required">Due Date</v-label>
-                                        <!-- <v-text-field
-                                            class="due-date"
-                                            color="primary"
-                                            variant="outlined"
-                                            type="date"
-                                            id="due_date"
-                                            @keydown="restrictKeyUp($event)"
-                                            v-model="dueDate"
-                                            :rules="requiredrule"
-                                        ></v-text-field> -->
                                         <flat-pickr
                                             id="projectStartDate"
                                             noCalendar="true"
@@ -412,7 +402,6 @@
                                             :config="startDateConfig"
                                             :rules="requiredrule"
                                         />
-
                                         <div class="flat-calender" data-toggle>
                                             <CalendarIcon width="21" stroke-width="1.5" />
                                         </div>
@@ -924,7 +913,6 @@ function onBlurCalled() {
     }
 }
 function onEnterProblem() {
-    console.log('search prblm', searchProblem.value, problemType.value);
     if (searchProblem.value.length > 0) {
         if (problemTypeOptions.value.filter((data) => data.problem_name.toUpperCase() === searchProblem.value.toUpperCase()).length == 0) {
             const requestBody = {
@@ -969,7 +957,6 @@ async function createTicket() {
         return data.id;
     });
     if (isnewCustomer.value == true) {
-        console.log('existng enter');
         // if(newCutomerValue.value.includes(" ")){
         // const data = newCutomerValue.value ;
         // var index = data.indexOf(' ');

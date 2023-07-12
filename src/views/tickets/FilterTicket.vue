@@ -102,7 +102,6 @@ function applyFilter() {
         priority_id:sections.value.find(e=>e.id==='priority').selected,
         is_filter:true
     }
-    console.log(filterData)
     emit('filterdata',filterData)
     store.SET_FILTER_DATA(filterData)
     store.SET_CUSTOMIZER_DRAWER(store.Customizer_drawer = false);

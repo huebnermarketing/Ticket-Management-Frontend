@@ -153,7 +153,6 @@ function updateSectionItems() {
 
 const route = useRoute()
 function applyFilter() {
-    debugger
     if (!canApplyFilter.value) return
     // const filterData = {
     //     customer_id: sections.value.find(e=>e.id==='customers').selected,

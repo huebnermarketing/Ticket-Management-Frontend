@@ -6,7 +6,7 @@
                     <v-col cols="12">
                         <!-- <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb> -->
 
-                        <TopCards :topCardsData="topCardsData" />
+                        <TopCards :topCardsData="topCardsData" @click="onHeaderFilterClick" />
                     </v-col>
                     <!-- <v-col cols="12" lg="4" md="6">
                         <v-text-field
@@ -392,7 +392,7 @@ function getTicketFilters() {
             //
         });
 }
-function makeRequestBody() {
+function makeRequestBodyFromQuery() {
     const { query } = route;
     const customer_id = [...(query.customers || [])];
     const problem_type_id = [...(query.problem_types || [])];
@@ -400,22 +400,25 @@ function makeRequestBody() {
     const appointment_type_id = [...(query.appointment_type || [])];
     const payment_type_id = [...(query.payment_status || [])];
     const priority_id = [...(query.ticket_priorities || [])];
-    return {
+    const reqBody = {
         customer_id,
         problem_type_id,
         ticket_status_id,
         appointment_type_id,
         payment_type_id,
         priority_id
-        // is_filter: true
     };
+    if (!!query?.filter) {
+        reqBody.filter = query.filter
+    }
+    return reqBody
 }
 function getTickets() {
     if ((current_page.value > 1 && items.value.length >= totalItems.value) || isLoading.value) return;
     isLoading.value = true;
     const params = { total_record: 50, page: parseInt(current_page.value) };
     baseURlApi
-        .post(`ticket/list`, makeRequestBody(), { params })
+        .post(`ticket/list`, makeRequestBodyFromQuery(), { params })
         .then((res) => {
             isLoading.value = false;
             serverItemsLength.value = res.data.data.allTicket.total;
@@ -511,6 +514,13 @@ function deleteTicket(id) {
     deleteId.value = id;
     deleteDialog.value?.open();
 }
+
+function onHeaderFilterClick(filter) {
+    // console.log(store.ticketFilterOptions)
+    const query = { filter: filter.key }
+    router.push({ query })
+}
+
 onMounted(() => {
     getTickets();
     getTicketFilters();
